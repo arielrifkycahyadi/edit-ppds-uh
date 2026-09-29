@@ -1,0 +1,5052 @@
+<!-- =========================================================
+     SIPATUJU PPDS FK UNHAS
+     PAGE      : RIWAYAT PEMERIKSAAN REVIEWER
+     WORDPRESS : 03 Riwayat Pemeriksaan Reviewer
+     PARENT    : Reviewer SIPATUJU
+     SLUG      : riwayat-pemeriksaan
+     URL       : /riwayat-pemeriksaan/
+     ROLE      : Reviewer
+     FORMAT    : Elementor HTML Widget
+     NAMESPACE : spj26revhist
+     ROOT      : #spj26revhist-root
+     STYLE     : Mirror Hasil Pemeriksaan Residen - Reviewer Sidebar - Data Sync v5.1 + Optional Diagnostics
+
+     Fungsi:
+     - Menampilkan riwayat pemeriksaan selesai milik Reviewer login
+     - Visual mengikuti page Hasil Pemeriksaan Residen
+     - Filter Semua / Layak / Tidak Layak
+     - Pencarian riwayat
+     - Pagination 10 / 20 / 30 / Semua
+     - Detail keputusan dan catatan 3 jurnal
+     - Auto refresh 60 detik
+     - Responsive desktop / tablet / mobile
+========================================================== -->
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:wght@600;700;800&family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap');
+
+#spj26revhist-root{
+    --spj26rev-maroon:#9d1b16;
+    --spj26rev-maroon-dark:#7f1511;
+    --spj26rev-green:#2fb36d;
+    --spj26rev-green-soft:#e9f9f0;
+    --spj26rev-red:#d64545;
+    --spj26rev-red-soft:#fff0f0;
+    --spj26rev-blue:#5a89ea;
+    --spj26rev-blue-soft:#ebf2ff;
+    --spj26rev-white:#ffffff;
+    --spj26rev-background:#f5f7fb;
+    --spj26rev-surface:#ffffff;
+    --spj26rev-surface-soft:#f8fafc;
+    --spj26rev-border:#e8edf4;
+    --spj26rev-text:#162032;
+    --spj26rev-text-secondary:#5b677a;
+    --spj26rev-text-muted:#8a94a6;
+    --spj26rev-shadow:0 18px 38px rgba(23,32,55,.06);
+
+    position:fixed;
+    inset:0;
+    z-index:9999;
+
+    width:100vw;
+    height:100vh;
+    height:100dvh;
+    min-height:0;
+
+    margin:0 !important;
+    padding:0 !important;
+
+    overflow:hidden;
+    background:var(--spj26rev-background);
+    color:var(--spj26rev-text);
+
+    font-family:"Inter",Arial,sans-serif;
+    box-sizing:border-box;
+}
+
+#spj26revhist-root *,
+#spj26revhist-root *::before,
+#spj26revhist-root *::after{
+    box-sizing:border-box;
+}
+
+#spj26revhist-root h1,
+#spj26revhist-root h2,
+#spj26revhist-root h3,
+#spj26revhist-root p{
+    margin:0;
+}
+
+#spj26revhist-root a{
+    color:inherit;
+    text-decoration:none;
+}
+
+#spj26revhist-root button,
+#spj26revhist-root input,
+#spj26revhist-root select{
+    font:inherit;
+}
+
+#spj26revhist-root [hidden]{
+    display:none !important;
+}
+
+
+/* =========================================================
+   PAGE LOCK / ELEMENTOR
+========================================================= */
+
+html.spj26revhist-page-lock,
+body.spj26revhist-page-lock{
+    width:100% !important;
+    height:100% !important;
+    min-height:100% !important;
+    margin:0 !important;
+    padding:0 !important;
+    overflow:hidden !important;
+}
+
+body.spj26revhist-page-lock #page,
+body.spj26revhist-page-lock .site,
+body.spj26revhist-page-lock .site-content,
+body.spj26revhist-page-lock .elementor,
+body.spj26revhist-page-lock .elementor-section-wrap,
+body.spj26revhist-page-lock .elementor-section,
+body.spj26revhist-page-lock .elementor-container,
+body.spj26revhist-page-lock .elementor-column,
+body.spj26revhist-page-lock .elementor-widget-wrap,
+body.spj26revhist-page-lock .elementor-element,
+body.spj26revhist-page-lock .elementor-widget,
+body.spj26revhist-page-lock .elementor-widget-container{
+    width:100% !important;
+    max-width:none !important;
+    margin:0 !important;
+    padding:0 !important;
+}
+
+
+/* =========================================================
+   LAYOUT + HEADER
+========================================================= */
+
+#spj26revhist-root .spj26rev-layout{
+    width:100%;
+    height:100%;
+
+    display:grid;
+    grid-template-columns:300px minmax(0,1fr);
+    grid-template-rows:76px minmax(0,1fr);
+}
+
+#spj26revhist-root .spj26rev-header{
+    grid-column:1 / -1;
+    grid-row:1;
+
+    min-width:0;
+    padding:0 30px;
+
+    background:#fff;
+    border-bottom:1px solid var(--spj26rev-border);
+
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:24px;
+
+    z-index:10;
+}
+
+#spj26revhist-root .spj26rev-header-left,
+#spj26revhist-root .spj26rev-header-right,
+#spj26revhist-root .spj26rev-user,
+#spj26revhist-root .spj26rev-brand-row,
+#spj26revhist-root .spj26rev-nav-left{
+    display:flex;
+    align-items:center;
+}
+
+#spj26revhist-root .spj26rev-header-left{
+    min-width:0;
+    gap:14px;
+}
+
+#spj26revhist-root .spj26rev-header-right{
+    flex:0 0 auto;
+    gap:10px;
+}
+
+#spj26revhist-root .spj26rev-mobile-menu{
+    display:none;
+}
+
+#spj26revhist-root .spj26rev-logo{
+    width:48px;
+    height:48px;
+    flex:0 0 48px;
+
+    border-radius:6px;
+    background:var(--spj26rev-maroon);
+    color:#fff;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+}
+
+#spj26revhist-root .spj26rev-logo .material-symbols-outlined{
+    font-size:25px;
+}
+
+#spj26revhist-root .spj26rev-brand{
+    min-width:0;
+}
+
+#spj26revhist-root .spj26rev-brand-row{
+    min-width:0;
+    gap:10px;
+}
+
+#spj26revhist-root .spj26rev-brand-name{
+    color:#871717;
+
+    font-family:"Plus Jakarta Sans",sans-serif;
+    font-size:15px;
+    font-weight:800;
+    letter-spacing:-.02em;
+    white-space:nowrap;
+}
+
+#spj26revhist-root .spj26rev-brand-divider{
+    color:#d6dce6;
+}
+
+#spj26revhist-root .spj26rev-brand-description{
+    color:#71605c;
+
+    font-size:12px;
+    font-weight:500;
+
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+}
+
+#spj26revhist-root .spj26rev-faculty{
+    margin-top:3px;
+
+    color:#76615b;
+
+    font-family:"JetBrains Mono",monospace;
+    font-size:10px;
+    font-weight:600;
+    letter-spacing:.08em;
+    text-transform:uppercase;
+}
+
+#spj26revhist-root .spj26rev-user{
+    gap:10px;
+}
+
+#spj26revhist-root .spj26rev-user-text{
+    text-align:right;
+}
+
+#spj26revhist-root .spj26rev-user-name{
+    display:block;
+
+    color:var(--spj26rev-text);
+
+    font-family:"Plus Jakarta Sans",sans-serif;
+    font-size:13px;
+    font-weight:700;
+}
+
+#spj26revhist-root .spj26rev-user-role{
+    display:block;
+    margin-top:1px;
+
+    color:var(--spj26rev-maroon);
+
+    font-size:10px;
+    font-weight:600;
+}
+
+#spj26revhist-root .spj26rev-avatar{
+    width:38px;
+    height:38px;
+
+    border-radius:50%;
+    background:var(--spj26rev-maroon);
+    color:#fff;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+}
+
+
+/* =========================================================
+   SIDEBAR
+========================================================= */
+
+#spj26revhist-root .spj26rev-sidebar{
+    grid-column:1;
+    grid-row:2;
+
+    min-height:0;
+    padding:18px 16px 14px;
+
+    background:#fff;
+    border-right:1px solid var(--spj26rev-border);
+
+    display:flex;
+    flex-direction:column;
+    justify-content:space-between;
+
+    overflow:hidden;
+}
+
+#spj26revhist-root .spj26rev-sidebar-main{
+    min-height:0;
+}
+
+#spj26revhist-root .spj26rev-nav-title{
+    margin:4px 8px 7px;
+
+    color:#6c5a57;
+
+    font-size:10px;
+    font-weight:700;
+    text-transform:uppercase;
+    letter-spacing:.04em;
+}
+
+#spj26revhist-root .spj26rev-nav{
+    display:flex;
+    flex-direction:column;
+    gap:5px;
+}
+
+#spj26revhist-root .spj26rev-nav-link{
+    width:100%;
+    min-height:42px;
+    padding:9px 13px;
+
+    border-radius:8px;
+
+    color:#5b4744;
+
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+
+    font-size:13px;
+    font-weight:500;
+
+    transition:
+        background-color .18s ease,
+        color .18s ease;
+}
+
+#spj26revhist-root .spj26rev-nav-link:hover{
+    background:var(--spj26rev-surface-soft);
+    color:var(--spj26rev-text);
+}
+
+#spj26revhist-root .spj26rev-nav-link.active{
+    background:#8f1919;
+    color:#fff;
+    font-weight:700;
+}
+
+#spj26revhist-root .spj26rev-nav-left{
+    min-width:0;
+    gap:10px;
+}
+
+#spj26revhist-root .spj26rev-nav-link .material-symbols-outlined{
+    font-size:19px;
+}
+
+#spj26revhist-root .spj26rev-nav-count{
+    min-width:20px;
+    height:20px;
+    padding:0 6px;
+
+    border-radius:999px;
+    background:#edf2f7;
+    color:var(--spj26rev-maroon);
+
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+
+    font-size:9px;
+    line-height:1;
+    font-weight:800;
+}
+
+#spj26revhist-root .spj26rev-nav-link.active .spj26rev-nav-count{
+    background:rgba(255,255,255,.18);
+    color:#fff;
+}
+
+#spj26revhist-root .spj26rev-nav-section-gap{
+    height:20px;
+}
+
+#spj26revhist-root .spj26rev-sidebar-info{
+    padding:14px 15px;
+
+    border-radius:8px;
+    background:#f8fafc;
+}
+
+#spj26revhist-root .spj26rev-sidebar-info-title{
+    color:var(--spj26rev-maroon);
+
+    display:flex;
+    align-items:center;
+    gap:7px;
+
+    font-size:10px;
+    font-weight:700;
+}
+
+#spj26revhist-root .spj26rev-sidebar-info-title .material-symbols-outlined{
+    font-size:16px;
+}
+
+#spj26revhist-root .spj26rev-version{
+    margin-top:5px;
+
+    color:#594b48;
+
+    font-family:"JetBrains Mono",monospace;
+    font-size:10px;
+}
+
+#spj26revhist-root .spj26rev-department{
+    margin-top:4px;
+
+    color:#665855;
+    font-size:10px;
+    line-height:1.45;
+}
+
+
+/* =========================================================
+   RIGHT PANE
+========================================================= */
+
+#spj26revhist-root .spj26rev-rightpane{
+    grid-column:2;
+    grid-row:2;
+
+    min-width:0;
+    min-height:0;
+
+    display:flex;
+    flex-direction:column;
+
+    overflow:hidden;
+}
+
+#spj26revhist-root .spj26rev-main{
+    min-width:0;
+    min-height:0;
+    flex:1 1 auto;
+
+    padding:24px 28px;
+
+    display:flex;
+
+    overflow-y:auto;
+    overflow-x:hidden;
+}
+
+#spj26revhist-root .spj26rev-panel{
+    width:100%;
+    max-width:1320px;
+    margin:0 auto;
+
+    align-self:flex-start;
+
+    border:1px solid var(--spj26rev-border);
+    border-radius:18px;
+    background:#fff;
+    box-shadow:var(--spj26rev-shadow);
+
+    overflow:hidden;
+}
+
+#spj26revhist-root .spj26rev-panel-top{
+    padding:26px 24px 22px;
+
+    display:flex;
+    align-items:flex-start;
+    justify-content:space-between;
+    gap:18px;
+}
+
+#spj26revhist-root .spj26rev-panel-title{
+    color:var(--spj26rev-text);
+
+    font-family:"Plus Jakarta Sans",sans-serif;
+    font-size:30px;
+    font-weight:800;
+    line-height:1.15;
+}
+
+#spj26revhist-root .spj26rev-panel-subtitle{
+    max-width:760px;
+    margin-top:8px;
+
+    color:var(--spj26rev-text-muted);
+
+    font-size:13px;
+    line-height:1.65;
+}
+
+#spj26revhist-root .spj26rev-updated-pill{
+    padding:10px 14px;
+
+    border-radius:999px;
+    background:#f4f8f6;
+    color:#60706b;
+
+    display:inline-flex;
+    align-items:center;
+    gap:7px;
+
+    font-size:11px;
+    font-weight:600;
+    white-space:nowrap;
+}
+
+#spj26revhist-root .spj26rev-updated-pill .material-symbols-outlined{
+    color:#6bb694;
+    font-size:16px;
+}
+
+
+/* =========================================================
+   TOOLBAR
+========================================================= */
+
+#spj26revhist-root .spj26rev-panel-toolbar{
+    padding:18px 24px;
+
+    border-bottom:1px solid var(--spj26rev-border);
+
+    display:flex;
+    flex-wrap:nowrap;
+    align-items:center;
+    justify-content:space-between;
+    gap:14px;
+}
+
+#spj26revhist-root .spj26rev-filters{
+    min-width:0;
+    flex:1 1 auto;
+
+    display:flex;
+    flex-wrap:nowrap;
+    align-items:center;
+    gap:10px;
+}
+
+#spj26revhist-root .spj26rev-filter-chip{
+    min-height:40px;
+    padding:0 14px;
+
+    border:1px solid var(--spj26rev-border);
+    border-radius:10px;
+    background:#f7f9fc;
+    color:#6d7787;
+
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+
+    font-size:12px;
+    font-weight:700;
+
+    cursor:pointer;
+
+    transition:all .18s ease;
+}
+
+#spj26revhist-root .spj26rev-filter-chip:hover{
+    border-color:#d9e2ee;
+    background:#f3f6fb;
+}
+
+#spj26revhist-root .spj26rev-filter-chip.is-active{
+    border-color:var(--spj26rev-maroon);
+    background:var(--spj26rev-maroon);
+    color:#fff;
+}
+
+#spj26revhist-root .spj26rev-filter-chip-count{
+    font-size:11px;
+    font-weight:800;
+    opacity:.88;
+}
+
+#spj26revhist-root .spj26rev-toolbar-actions{
+    flex:0 0 auto;
+
+    display:flex;
+    flex-wrap:nowrap;
+    align-items:center;
+    justify-content:flex-end;
+    gap:10px;
+}
+
+#spj26revhist-root .spj26rev-search{
+    position:relative;
+    flex:0 0 auto;
+}
+
+#spj26revhist-root .spj26rev-search .material-symbols-outlined{
+    position:absolute;
+    left:12px;
+    top:50%;
+    transform:translateY(-50%);
+
+    color:#afbacd;
+    font-size:18px;
+
+    pointer-events:none;
+}
+
+#spj26revhist-root .spj26rev-search input{
+    width:310px;
+    min-height:40px;
+
+    padding:0 14px 0 38px;
+
+    border:1px solid var(--spj26rev-border);
+    border-radius:10px;
+    background:#fbfcfe;
+    color:var(--spj26rev-text);
+
+    outline:none;
+}
+
+#spj26revhist-root .spj26rev-search input:focus{
+    border-color:#cfdae9;
+    background:#fff;
+}
+
+
+/* =========================================================
+   TABLE GRID
+========================================================= */
+
+#spj26revhist-root .spj26rev-table{
+    width:100%;
+}
+
+#spj26revhist-root .spj26rev-table-head,
+#spj26revhist-root .spj26rev-table-row{
+    display:grid;
+    grid-template-columns:
+        155px
+        minmax(0,2.4fr)
+        minmax(0,1.2fr)
+        145px
+        145px;
+
+    gap:18px;
+    align-items:start;
+}
+
+#spj26revhist-root .spj26rev-table-head{
+    padding:14px 24px;
+
+    border-bottom:1px solid var(--spj26rev-border);
+    background:#f8fafc;
+    color:#8491a2;
+
+    font-size:10px;
+    font-weight:800;
+    letter-spacing:.04em;
+    text-transform:uppercase;
+}
+
+#spj26revhist-root .spj26rev-table-body{
+    min-height:180px;
+}
+
+#spj26revhist-root .spj26rev-table-row{
+    padding:18px 24px;
+
+    border-bottom:1px solid var(--spj26rev-border);
+    background:#fff;
+}
+
+#spj26revhist-root .spj26rev-table-row:last-child{
+    border-bottom:0;
+}
+
+#spj26revhist-root .spj26rev-code{
+    color:#111827;
+
+    font-size:14px;
+    font-weight:800;
+    line-height:1.25;
+}
+
+#spj26revhist-root .spj26rev-code-dates{
+    margin-top:10px;
+}
+
+#spj26revhist-root .spj26rev-cell-note{
+    margin-top:3px;
+
+    color:#718096;
+
+    font-size:10px;
+    line-height:1.45;
+}
+
+#spj26revhist-root .spj26rev-title{
+    color:#1b2433;
+
+    font-size:14px;
+    font-weight:700;
+    line-height:1.4;
+}
+
+#spj26revhist-root .spj26rev-submeta{
+    margin-top:6px;
+
+    color:#718096;
+
+    font-size:11px;
+    line-height:1.55;
+}
+
+#spj26revhist-root .spj26rev-submeta strong{
+    color:#394456;
+    font-weight:700;
+}
+
+#spj26revhist-root .spj26rev-person-name{
+    color:#233044;
+
+    font-size:13px;
+    font-weight:700;
+    line-height:1.45;
+}
+
+#spj26revhist-root .spj26rev-status-pill{
+    min-width:125px;
+    min-height:38px;
+    padding:0 16px;
+
+    border:1px solid transparent;
+    border-radius:999px;
+
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+
+    text-align:center;
+    text-transform:uppercase;
+
+    font-size:11px;
+    font-weight:800;
+    line-height:1.2;
+}
+
+#spj26revhist-root .spj26rev-status-pill.eligible{
+    border-color:#c7edd8;
+    background:var(--spj26rev-green-soft);
+    color:var(--spj26rev-green);
+}
+
+#spj26revhist-root .spj26rev-status-pill.not-eligible{
+    border-color:#f0b8b8;
+    background:var(--spj26rev-red-soft);
+    color:var(--spj26rev-red);
+}
+
+#spj26revhist-root .spj26rev-status-pill.completed{
+    border-color:#d0defe;
+    background:var(--spj26rev-blue-soft);
+    color:var(--spj26rev-blue);
+}
+
+#spj26revhist-root .spj26rev-row-actions{
+    display:flex;
+    flex-wrap:wrap;
+    align-items:center;
+    gap:8px;
+}
+
+#spj26revhist-root .spj26rev-btn{
+    min-height:36px;
+    padding:0 14px;
+
+    border:1px solid var(--spj26rev-border);
+    border-radius:10px;
+    background:#fff;
+    color:#4a5568;
+
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+
+    font-size:11px;
+    font-weight:700;
+
+    cursor:pointer;
+
+    transition:all .18s ease;
+}
+
+#spj26revhist-root .spj26rev-btn:hover{
+    background:#f8fafc;
+}
+
+
+/* =========================================================
+   BOTTOM PAGINATION
+========================================================= */
+
+#spj26revhist-root .spj26rev-panel-bottom{
+    padding:14px 24px 18px;
+
+    border-top:1px solid var(--spj26rev-border);
+
+    color:#8a97a8;
+
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:16px;
+
+    font-size:12px;
+}
+
+#spj26revhist-root .spj26rev-page-size-control{
+    color:#7b8798;
+
+    display:flex;
+    align-items:center;
+    gap:8px;
+
+    font-size:12px;
+    font-weight:500;
+}
+
+#spj26revhist-root .spj26rev-page-size-select{
+    min-width:78px;
+    height:34px;
+    padding:0 28px 0 10px;
+
+    border:1px solid var(--spj26rev-border);
+    border-radius:8px;
+    background:#fff;
+    color:var(--spj26rev-text);
+
+    font-size:12px;
+    font-weight:700;
+
+    outline:none;
+    cursor:pointer;
+}
+
+#spj26revhist-root .spj26rev-page-size-select:focus{
+    border-color:var(--spj26rev-maroon);
+    box-shadow:0 0 0 3px rgba(143,25,25,.08);
+}
+
+#spj26revhist-root .spj26rev-pagination{
+    display:flex;
+    align-items:center;
+    gap:8px;
+}
+
+#spj26revhist-root .spj26rev-page-btn,
+#spj26revhist-root .spj26rev-page-number{
+    min-width:30px;
+    min-height:30px;
+    padding:0 10px;
+
+    border:1px solid var(--spj26rev-border);
+    border-radius:9px;
+    background:#fff;
+    color:#8c98a9;
+
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+
+    font-size:11px;
+    font-weight:700;
+}
+
+#spj26revhist-root .spj26rev-page-btn{
+    cursor:pointer;
+}
+
+#spj26revhist-root .spj26rev-page-btn:hover:not(:disabled){
+    background:#f8fafc;
+}
+
+#spj26revhist-root .spj26rev-page-btn:disabled{
+    opacity:.5;
+    cursor:not-allowed;
+}
+
+#spj26revhist-root .spj26rev-page-number.is-active{
+    border-color:var(--spj26rev-maroon);
+    background:var(--spj26rev-maroon);
+    color:#fff;
+}
+
+
+/* =========================================================
+   EMPTY
+========================================================= */
+
+#spj26revhist-root .spj26rev-empty{
+    padding:60px 24px;
+    text-align:center;
+}
+
+#spj26revhist-root .spj26rev-empty .material-symbols-outlined{
+    color:#b2becf;
+    font-size:38px;
+}
+
+#spj26revhist-root .spj26rev-empty-title{
+    margin-top:12px;
+
+    color:#243042;
+
+    font-family:"Plus Jakarta Sans",sans-serif;
+    font-size:20px;
+    font-weight:800;
+}
+
+#spj26revhist-root .spj26rev-empty-text{
+    margin-top:8px;
+
+    color:#8591a2;
+
+    font-size:13px;
+}
+
+
+/* =========================================================
+   FOOTER
+========================================================= */
+
+#spj26revhist-root .spj26rev-footer{
+    flex:0 0 auto;
+
+    padding:18px 28px 22px;
+
+    color:#6b7788;
+
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:20px;
+
+    font-size:11px;
+}
+
+#spj26revhist-root .spj26rev-footer-left{
+    min-width:0;
+
+    display:flex;
+    align-items:center;
+    gap:9px;
+}
+
+#spj26revhist-root .spj26rev-footer-brand{
+    color:var(--spj26rev-maroon);
+    font-weight:700;
+}
+
+#spj26revhist-root .spj26rev-footer-right{
+    color:#7e8898;
+
+    font-family:"JetBrains Mono",monospace;
+    font-size:9px;
+    white-space:nowrap;
+}
+
+
+/* =========================================================
+   DETAIL MODAL
+========================================================= */
+
+#spj26revhist-root .spj26rev-modal{
+    position:fixed;
+    inset:0;
+    z-index:150;
+
+    display:none;
+    align-items:center;
+    justify-content:center;
+
+    padding:20px;
+}
+
+#spj26revhist-root .spj26rev-modal.is-open{
+    display:flex;
+}
+
+#spj26revhist-root .spj26rev-modal-backdrop{
+    position:absolute;
+    inset:0;
+
+    background:rgba(15,23,42,.48);
+}
+
+#spj26revhist-root .spj26rev-modal-dialog{
+    position:relative;
+    z-index:2;
+
+    width:min(900px,100%);
+    max-height:92vh;
+
+    border-radius:18px;
+    background:#fff;
+    box-shadow:0 24px 60px rgba(15,23,42,.2);
+
+    overflow-y:auto;
+}
+
+#spj26revhist-root .spj26rev-modal-head{
+    position:sticky;
+    top:0;
+    z-index:5;
+
+    padding:18px 20px;
+
+    border-bottom:1px solid var(--spj26rev-border);
+    background:#fff;
+
+    display:flex;
+    align-items:flex-start;
+    justify-content:space-between;
+    gap:16px;
+}
+
+#spj26revhist-root .spj26rev-modal-title{
+    color:#182235;
+
+    font-family:"Plus Jakarta Sans",sans-serif;
+    font-size:18px;
+    font-weight:800;
+}
+
+#spj26revhist-root .spj26rev-modal-subtitle{
+    margin-top:4px;
+
+    color:#8995a7;
+
+    font-size:11px;
+    line-height:1.5;
+}
+
+#spj26revhist-root .spj26rev-modal-close{
+    width:36px;
+    height:36px;
+    flex:0 0 36px;
+
+    border:1px solid var(--spj26rev-border);
+    border-radius:10px;
+    background:#fff;
+    color:#6f7a8b;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    cursor:pointer;
+}
+
+#spj26revhist-root .spj26rev-modal-body{
+    padding:20px;
+}
+
+#spj26revhist-root .spj26rev-detail-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:12px;
+}
+
+#spj26revhist-root .spj26rev-detail-item{
+    padding:13px 14px;
+
+    border:1px solid var(--spj26rev-border);
+    border-radius:12px;
+    background:#f9fbfd;
+}
+
+#spj26revhist-root .spj26rev-detail-item.full{
+    grid-column:1 / -1;
+}
+
+#spj26revhist-root .spj26rev-detail-label{
+    color:#94a0b1;
+
+    font-size:9px;
+    font-weight:800;
+    letter-spacing:.04em;
+    text-transform:uppercase;
+}
+
+#spj26revhist-root .spj26rev-detail-value{
+    margin-top:5px;
+
+    color:#2a3547;
+
+    font-size:11px;
+    font-weight:600;
+    line-height:1.6;
+
+    white-space:pre-line;
+    overflow-wrap:anywhere;
+}
+
+#spj26revhist-root .spj26rev-journal-list{
+    margin-top:16px;
+
+    display:flex;
+    flex-direction:column;
+    gap:12px;
+}
+
+#spj26revhist-root .spj26rev-journal-card{
+    padding:15px;
+
+    border:1px solid var(--spj26rev-border);
+    border-radius:12px;
+    background:#fff;
+}
+
+#spj26revhist-root .spj26rev-journal-head{
+    display:flex;
+    align-items:flex-start;
+    justify-content:space-between;
+    gap:12px;
+}
+
+#spj26revhist-root .spj26rev-journal-ident{
+    min-width:0;
+
+    display:flex;
+    align-items:flex-start;
+    gap:9px;
+}
+
+#spj26revhist-root .spj26rev-journal-number{
+    width:25px;
+    height:25px;
+    flex:0 0 25px;
+
+    border-radius:50%;
+    background:#182235;
+    color:#fff;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    font-size:9px;
+    font-weight:800;
+}
+
+#spj26revhist-root .spj26rev-journal-name{
+    color:#1e293b;
+
+    font-size:12px;
+    font-weight:800;
+    line-height:1.4;
+}
+
+#spj26revhist-root .spj26rev-journal-meta{
+    margin-top:3px;
+
+    color:#718096;
+
+    font-family:"JetBrains Mono",monospace;
+    font-size:9px;
+    line-height:1.45;
+}
+
+#spj26revhist-root .spj26rev-comment{
+    margin-top:11px;
+    padding:11px 12px;
+
+    border-radius:10px;
+    background:#f8fafc;
+}
+
+#spj26revhist-root .spj26rev-comment-label{
+    color:#7f8a9a;
+
+    font-size:9px;
+    font-weight:800;
+    text-transform:uppercase;
+    letter-spacing:.04em;
+}
+
+#spj26revhist-root .spj26rev-comment-text{
+    margin-top:5px;
+
+    color:#3a4658;
+
+    font-size:11px;
+    line-height:1.6;
+
+    white-space:pre-line;
+    overflow-wrap:anywhere;
+}
+
+#spj26revhist-root .spj26rev-toast{
+    position:fixed;
+    right:20px;
+    bottom:20px;
+    z-index:180;
+
+    max-width:390px;
+    padding:12px 14px;
+
+    border:1px solid #a7f3d0;
+    border-radius:9px;
+    background:#ecfdf5;
+    color:#047857;
+
+    box-shadow:0 12px 30px rgba(15,23,42,.14);
+
+    font-size:10.5px;
+    line-height:1.45;
+}
+
+#spj26revhist-root .spj26rev-overlay{
+    display:none;
+}
+
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media(max-width:1180px){
+
+    #spj26revhist-root .spj26rev-layout{
+        grid-template-columns:240px minmax(0,1fr);
+    }
+
+    #spj26revhist-root .spj26rev-brand-divider,
+    #spj26revhist-root .spj26rev-brand-description{
+        display:none;
+    }
+
+    #spj26revhist-root .spj26rev-table-head,
+    #spj26revhist-root .spj26rev-table-row{
+        grid-template-columns:
+            145px
+            minmax(0,2fr)
+            minmax(0,1fr)
+            135px
+            130px;
+        gap:14px;
+    }
+
+}
+
+
+@media(max-width:800px){
+
+    html.spj26revhist-page-lock,
+    body.spj26revhist-page-lock{
+        height:100% !important;
+        overflow:hidden !important;
+    }
+
+    #spj26revhist-root{
+        height:100vh;
+        height:100dvh;
+    }
+
+    #spj26revhist-root .spj26rev-layout{
+        display:block;
+        height:100%;
+    }
+
+    #spj26revhist-root .spj26rev-header{
+        height:64px;
+        min-height:64px;
+        padding:8px 14px;
+    }
+
+    #spj26revhist-root .spj26rev-mobile-menu{
+        width:38px;
+        height:38px;
+        flex:0 0 38px;
+
+        border:1px solid var(--spj26rev-border);
+        border-radius:8px;
+        background:#fff;
+        color:var(--spj26rev-maroon);
+
+        display:flex;
+        align-items:center;
+        justify-content:center;
+
+        cursor:pointer;
+    }
+
+    #spj26revhist-root .spj26rev-logo{
+        width:38px;
+        height:38px;
+        flex-basis:38px;
+    }
+
+    #spj26revhist-root .spj26rev-brand-name{
+        font-size:11px;
+    }
+
+    #spj26revhist-root .spj26rev-faculty,
+    #spj26revhist-root .spj26rev-user-text{
+        display:none;
+    }
+
+    #spj26revhist-root .spj26rev-sidebar{
+        position:fixed;
+        top:0;
+        left:0;
+        z-index:100;
+
+        width:270px;
+        height:100vh;
+        height:100dvh;
+
+        overflow-y:auto;
+        overflow-x:hidden;
+
+        transform:translateX(-102%);
+        transition:transform .22s ease;
+
+        box-shadow:8px 0 24px rgba(15,23,42,.14);
+    }
+
+    #spj26revhist-root .spj26rev-sidebar.open{
+        transform:translateX(0);
+    }
+
+    #spj26revhist-root .spj26rev-overlay{
+        position:fixed;
+        inset:0;
+        z-index:90;
+
+        background:rgba(15,23,42,.4);
+    }
+
+    #spj26revhist-root .spj26rev-overlay.open{
+        display:block;
+    }
+
+    #spj26revhist-root .spj26rev-rightpane{
+        height:calc(100% - 64px);
+        margin-top:64px;
+    }
+
+    #spj26revhist-root .spj26rev-main{
+        padding:18px 14px 24px;
+    }
+
+    #spj26revhist-root .spj26rev-panel{
+        border-radius:14px;
+    }
+
+    #spj26revhist-root .spj26rev-panel-top{
+        padding:22px 18px 18px;
+
+        flex-direction:column;
+        align-items:flex-start;
+    }
+
+    #spj26revhist-root .spj26rev-panel-title{
+        font-size:24px;
+    }
+
+    #spj26revhist-root .spj26rev-panel-subtitle{
+        font-size:12px;
+    }
+
+    #spj26revhist-root .spj26rev-panel-toolbar{
+        padding:14px 18px;
+
+        align-items:stretch;
+        flex-direction:column;
+    }
+
+    #spj26revhist-root .spj26rev-filters{
+        overflow-x:auto;
+        padding-bottom:2px;
+    }
+
+    #spj26revhist-root .spj26rev-filter-chip{
+        flex:0 0 auto;
+    }
+
+    #spj26revhist-root .spj26rev-toolbar-actions,
+    #spj26revhist-root .spj26rev-search,
+    #spj26revhist-root .spj26rev-search input{
+        width:100%;
+    }
+
+    #spj26revhist-root .spj26rev-table-head{
+        display:none;
+    }
+
+    #spj26revhist-root .spj26rev-table-body{
+        padding:10px;
+    }
+
+    #spj26revhist-root .spj26rev-table-row{
+        display:block;
+
+        margin-bottom:10px;
+        padding:0;
+
+        border:1px solid var(--spj26rev-border);
+        border-radius:12px;
+
+        overflow:hidden;
+    }
+
+    #spj26revhist-root .spj26rev-table-row:last-child{
+        margin-bottom:0;
+        border-bottom:1px solid var(--spj26rev-border);
+    }
+
+    #spj26revhist-root .spj26rev-mobile-cell{
+        position:relative;
+
+        min-height:48px;
+        padding:12px 12px 12px 118px;
+
+        border-bottom:1px solid var(--spj26rev-border);
+    }
+
+    #spj26revhist-root .spj26rev-mobile-cell:last-child{
+        border-bottom:0;
+    }
+
+    #spj26revhist-root .spj26rev-mobile-cell::before{
+        content:attr(data-label);
+
+        position:absolute;
+        left:12px;
+        top:13px;
+
+        width:92px;
+
+        color:#9aa5b5;
+
+        font-size:8px;
+        font-weight:800;
+        text-transform:uppercase;
+        letter-spacing:.04em;
+    }
+
+    #spj26revhist-root .spj26rev-panel-bottom{
+        padding:14px 18px 16px;
+
+        align-items:flex-start;
+        flex-direction:column;
+    }
+
+    #spj26revhist-root .spj26rev-pagination{
+        width:100%;
+        justify-content:space-between;
+    }
+
+    #spj26revhist-root .spj26rev-footer{
+        padding:14px 18px 18px;
+
+        align-items:flex-start;
+        flex-direction:column;
+        gap:4px;
+    }
+
+    #spj26revhist-root .spj26rev-detail-grid{
+        grid-template-columns:1fr;
+    }
+
+    #spj26revhist-root .spj26rev-detail-item.full{
+        grid-column:auto;
+    }
+
+}
+
+
+@media(max-width:480px){
+
+    #spj26revhist-root .spj26rev-main{
+        padding:12px 10px 18px;
+    }
+
+    #spj26revhist-root .spj26rev-panel-top{
+        padding:18px 15px 15px;
+    }
+
+    #spj26revhist-root .spj26rev-panel-title{
+        font-size:22px;
+    }
+
+    #spj26revhist-root .spj26rev-panel-toolbar{
+        padding:12px 15px;
+    }
+
+    #spj26revhist-root .spj26rev-filter-chip{
+        min-height:36px;
+        padding:0 11px;
+
+        font-size:11px;
+    }
+
+    #spj26revhist-root .spj26rev-mobile-cell{
+        padding-left:105px;
+    }
+
+    #spj26revhist-root .spj26rev-mobile-cell::before{
+        width:80px;
+    }
+
+    #spj26revhist-root .spj26rev-status-pill{
+        min-width:110px;
+    }
+
+    #spj26revhist-root .spj26rev-modal{
+        padding:10px;
+    }
+
+    #spj26revhist-root .spj26rev-modal-dialog{
+        max-height:96vh;
+        border-radius:13px;
+    }
+
+    #spj26revhist-root .spj26rev-journal-head{
+        flex-direction:column;
+    }
+
+}
+
+
+/* =========================================================
+   REVIEWER WORKFLOW SYNC v2
+   Sidebar canonical mengikuti page Pemeriksaan Saya
+========================================================= */
+
+#spj26revhist-root .spj26rev-sidebar{
+    position:relative;
+    height:100%;
+    min-height:0;
+    padding:18px 16px 14px;
+    background:#fff;
+    border-right:1px solid #e2e8f0;
+    display:flex;
+    flex-direction:column;
+    justify-content:space-between;
+    overflow:hidden;
+    z-index:30;
+}
+
+#spj26revhist-root .spj26rev-sidebar-main{min-height:0;}
+
+#spj26revhist-root .spj26rev-nav-title{
+    margin:4px 8px 7px;
+    color:#6c5a57;
+    font-size:10px;
+    font-weight:700;
+    text-transform:uppercase;
+    letter-spacing:.04em;
+}
+
+#spj26revhist-root .spj26rev-nav{
+    display:flex;
+    flex-direction:column;
+    gap:5px;
+}
+
+#spj26revhist-root .spj26rev-nav-link{
+    width:100%;
+    min-height:42px;
+    padding:9px 13px;
+    border-radius:6px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+    color:#5b4744;
+    font-size:13px;
+    font-weight:500;
+    transition:background-color .18s ease,color .18s ease;
+}
+
+#spj26revhist-root .spj26rev-nav-link:hover{
+    background:#f8fafc;
+    color:#0f172a;
+}
+
+#spj26revhist-root .spj26rev-nav-link.active{
+    background:#941c1c;
+    color:#fff;
+    font-weight:700;
+}
+
+#spj26revhist-root .spj26rev-nav-left{
+    min-width:0;
+    display:flex;
+    align-items:center;
+    gap:10px;
+}
+
+#spj26revhist-root .spj26rev-nav-link .material-symbols-outlined{font-size:19px;}
+
+#spj26revhist-root .spj26rev-nav-notification{
+    position:relative;
+    width:30px;
+    min-width:30px;
+    height:28px;
+    flex:0 0 30px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+}
+
+#spj26revhist-root .spj26rev-nav-badge{
+    min-width:22px;
+    height:22px;
+    padding:0 6px;
+    border-radius:999px;
+    background:#fee2e2;
+    color:#800000;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:9px;
+    line-height:1;
+    font-weight:800;
+}
+
+#spj26revhist-root .spj26rev-nav-link.active .spj26rev-nav-badge{
+    background:rgba(255,255,255,.16);
+    color:#fff;
+}
+
+#spj26revhist-root .spj26rev-nav-dot{
+    position:absolute;
+    top:0;
+    right:0;
+    width:8px;
+    height:8px;
+    border:2px solid #fff;
+    border-radius:50%;
+    background:#ef4444;
+}
+
+#spj26revhist-root .spj26rev-nav-link.active .spj26rev-nav-dot{
+    border-color:#941c1c;
+    background:#fde68a;
+}
+
+#spj26revhist-root .spj26rev-nav-dot[hidden]{display:none !important;}
+
+#spj26revhist-root .spj26rev-nav-section-gap{height:20px;}
+
+#spj26revhist-root .spj26rev-sidebar-info{
+    padding:14px 15px;
+    border-radius:7px;
+    background:#f8fafc;
+}
+
+#spj26revhist-root .spj26rev-sidebar-info-title{
+    display:flex;
+    align-items:center;
+    gap:7px;
+    color:#800000;
+    font-size:10px;
+    font-weight:700;
+}
+
+#spj26revhist-root .spj26rev-sidebar-info-title .material-symbols-outlined{font-size:16px;}
+
+#spj26revhist-root .spj26rev-version{
+    margin-top:5px;
+    color:#594b48;
+    font-family:"JetBrains Mono",monospace;
+    font-size:10px;
+}
+
+#spj26revhist-root .spj26rev-department{
+    margin-top:4px;
+    color:#665855;
+    font-size:10px;
+    line-height:1.45;
+}
+
+
+
+/* =========================================================
+   HISTORY LAYOUT ALIGNMENT - SAMA DENGAN PAGE REVIEWER LAIN
+========================================================= */
+
+#spj26revhist-root .spj26rev-rightpane{
+    height:100%;
+    min-width:0;
+    min-height:0;
+    overflow:hidden;
+
+    display:grid;
+    grid-template-rows:
+        minmax(0,1fr)
+        50px;
+}
+
+#spj26revhist-root .spj26rev-main{
+    width:100%;
+    height:100%;
+    min-width:0;
+    min-height:0;
+
+    padding:24px 28px;
+
+    display:flex;
+
+    overflow-y:auto;
+    overflow-x:hidden;
+
+    overscroll-behavior:contain;
+    scrollbar-gutter:stable;
+}
+
+#spj26revhist-root .spj26rev-footer{
+    height:50px;
+    min-height:50px;
+    padding:0 28px;
+
+    border-top:1px solid var(--spj26rev-border);
+    background:#fff;
+
+    color:#6b5b58;
+
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:20px;
+
+    overflow:hidden;
+
+    font-size:10px;
+}
+
+#spj26revhist-root .spj26rev-footer-left{
+    min-width:0;
+    display:flex;
+    align-items:center;
+    gap:8px;
+    color:#6b5b58;
+    font-size:10px;
+}
+
+#spj26revhist-root .spj26rev-footer-brand{
+    color:var(--spj26rev-maroon);
+    font-weight:800;
+}
+
+#spj26revhist-root .spj26rev-footer-right{
+    color:#625451;
+    font-family:"JetBrains Mono",monospace;
+    font-size:9px;
+    white-space:nowrap;
+}
+
+@media(max-width:800px){
+
+    #spj26revhist-root .spj26rev-rightpane{
+        height:calc(100% - 64px);
+        margin-top:64px;
+
+        grid-template-rows:
+            minmax(0,1fr)
+            auto;
+    }
+
+    #spj26revhist-root .spj26rev-footer{
+        height:auto;
+        min-height:50px;
+        padding:8px 14px;
+
+        align-items:flex-start;
+        justify-content:center;
+        flex-direction:column;
+        gap:3px;
+    }
+}
+
+
+
+/* =========================================================
+   RIWAYAT v4 - MIRROR HASIL PEMERIKSAAN RESIDEN
+   Sidebar tetap canonical Reviewer.
+========================================================= */
+
+#spj26revhist-root .spj26rev-main{
+    padding:28px;
+    background:var(--spj26rev-background);
+}
+
+#spj26revhist-root .spj26rev-panel{
+    border:1px solid var(--spj26rev-border);
+    border-radius:14px;
+    background:#fff;
+    box-shadow:0 18px 38px rgba(23,32,55,.06);
+    overflow:hidden;
+}
+
+#spj26revhist-root .spj26rev-panel-top{
+    padding:22px 24px 18px;
+    border-bottom:1px solid var(--spj26rev-border);
+    display:flex;
+    align-items:flex-start;
+    justify-content:space-between;
+    gap:18px;
+}
+
+#spj26revhist-root .spj26rev-panel-title{
+    font-family:"Plus Jakarta Sans",sans-serif;
+    font-size:24px;
+    font-weight:800;
+    line-height:1.15;
+    color:var(--spj26rev-text);
+}
+
+#spj26revhist-root .spj26rev-panel-subtitle{
+    margin-top:8px;
+    max-width:760px;
+    color:var(--spj26rev-text-muted);
+    font-size:13px;
+    line-height:1.65;
+}
+
+#spj26revhist-root .spj26rev-panel-toolbar{
+    padding:18px 24px;
+    display:flex;
+    flex-wrap:nowrap;
+    align-items:center;
+    justify-content:space-between;
+    gap:14px;
+    border-bottom:1px solid var(--spj26rev-border);
+}
+
+#spj26revhist-root .spj26rev-search input{
+    width:285px;
+    min-height:40px;
+}
+
+#spj26revhist-root .spj26rev-table-head,
+#spj26revhist-root .spj26rev-table-row{
+    grid-template-columns:
+        150px
+        minmax(0,2.4fr)
+        minmax(0,1.3fr)
+        145px
+        150px;
+    gap:18px;
+    align-items:start;
+}
+
+#spj26revhist-root .spj26rev-table-head{
+    padding:14px 24px;
+}
+
+#spj26revhist-root .spj26rev-table-row{
+    padding:18px 24px;
+}
+
+#spj26revhist-root .spj26rev-code{
+    font-size:15px;
+    font-weight:800;
+    color:#111827;
+    line-height:1.2;
+}
+
+#spj26revhist-root .spj26rev-code-chips{
+    margin-top:8px;
+    display:flex;
+    flex-wrap:wrap;
+    gap:6px;
+}
+
+#spj26revhist-root .spj26rev-mini-chip{
+    min-height:22px;
+    padding:0 8px;
+    border-radius:6px;
+    background:#f4f7fb;
+    color:#64748b;
+    display:inline-flex;
+    align-items:center;
+    font-size:10px;
+    font-weight:700;
+}
+
+#spj26revhist-root .spj26rev-title{
+    font-size:14px;
+    font-weight:700;
+    line-height:1.4;
+    color:#1b2433;
+}
+
+#spj26revhist-root .spj26rev-submeta,
+#spj26revhist-root .spj26rev-cell-note{
+    color:#718096;
+    font-size:11px;
+    line-height:1.6;
+}
+
+#spj26revhist-root .spj26rev-code-dates .spj26rev-cell-note{
+    margin-top:3px;
+    font-size:10px;
+    line-height:1.45;
+}
+
+#spj26revhist-root .spj26rev-status-pill{
+    min-width:125px;
+    min-height:38px;
+    padding:0 16px;
+    border-radius:999px;
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    text-transform:uppercase;
+    text-align:center;
+    font-size:11px;
+    font-weight:800;
+    line-height:1.2;
+}
+
+#spj26revhist-root .spj26rev-btn{
+    min-height:36px;
+    padding:0 14px;
+    border-radius:10px;
+    font-size:11px;
+    font-weight:700;
+}
+
+#spj26revhist-root .spj26rev-panel-bottom{
+    padding:14px 24px 18px;
+}
+
+@media(max-width:1180px){
+    #spj26revhist-root .spj26rev-table-head,
+    #spj26revhist-root .spj26rev-table-row{
+        grid-template-columns:
+            140px
+            minmax(0,2.1fr)
+            minmax(0,1.15fr)
+            130px
+            145px;
+    }
+}
+
+@media(max-width:960px){
+    #spj26revhist-root .spj26rev-panel-top,
+    #spj26revhist-root .spj26rev-panel-toolbar,
+    #spj26revhist-root .spj26rev-panel-bottom{
+        padding-left:18px;
+        padding-right:18px;
+    }
+
+    #spj26revhist-root .spj26rev-table-head,
+    #spj26revhist-root .spj26rev-table-row{
+        gap:12px;
+        padding-left:18px;
+        padding-right:18px;
+    }
+}
+
+@media(max-width:800px){
+    #spj26revhist-root .spj26rev-main{
+        padding:16px;
+    }
+
+    #spj26revhist-root .spj26rev-panel-top{
+        flex-direction:column;
+        align-items:stretch;
+    }
+
+    #spj26revhist-root .spj26rev-panel-title{
+        font-size:24px;
+    }
+
+    #spj26revhist-root .spj26rev-updated-pill{
+        width:fit-content;
+    }
+
+    #spj26revhist-root .spj26rev-panel-toolbar{
+        align-items:stretch;
+    }
+
+    #spj26revhist-root .spj26rev-search,
+    #spj26revhist-root .spj26rev-search input{
+        width:100%;
+    }
+}
+
+
+
+/* =========================================================
+   TRUE FULLPAGE - RIWAYAT PEMERIKSAAN REVIEWER v4
+========================================================= */
+#spj26revhist-root{
+    position:fixed !important;
+    inset:0 !important;
+    z-index:9999 !important;
+    width:100vw !important;
+    max-width:none !important;
+    height:100vh !important;
+    height:100dvh !important;
+    margin:0 !important;
+    padding:0 !important;
+    overflow:hidden !important;
+}
+
+
+
+/* =========================================================
+   OPTIONAL DEBUG PANEL
+   Aktif hanya dengan ?spj26_debug=1
+========================================================= */
+
+#spj26revhist-root .spj26rev-debug-panel{
+    position:fixed;
+    right:18px;
+    bottom:68px;
+    z-index:500;
+
+    width:min(440px,calc(100vw - 36px));
+    max-height:46vh;
+    padding:14px 15px;
+
+    border:1px solid #dbe3ec;
+    border-radius:12px;
+    background:rgba(255,255,255,.98);
+    color:#334155;
+
+    box-shadow:0 18px 48px rgba(15,23,42,.18);
+
+    font-family:"JetBrains Mono",monospace;
+    font-size:10px;
+    line-height:1.55;
+
+    overflow:auto;
+}
+
+#spj26revhist-root .spj26rev-debug-title{
+    margin-bottom:8px;
+    color:#8f1919;
+    font-family:"Inter",sans-serif;
+    font-size:11px;
+    font-weight:800;
+    text-transform:uppercase;
+    letter-spacing:.04em;
+}
+
+#spj26revhist-root .spj26rev-debug-row{
+    padding:3px 0;
+    border-bottom:1px dashed #eef2f7;
+    overflow-wrap:anywhere;
+}
+
+#spj26revhist-root .spj26rev-debug-row:last-child{
+    border-bottom:0;
+}
+
+#spj26revhist-root .spj26rev-debug-key{
+    color:#64748b;
+}
+
+#spj26revhist-root .spj26rev-debug-ok{
+    color:#047857;
+    font-weight:700;
+}
+
+#spj26revhist-root .spj26rev-debug-error{
+    color:#b91c1c;
+    font-weight:700;
+}
+
+</style>
+
+
+<div id="spj26revhist-root">
+
+    <div
+        class="spj26rev-overlay"
+        id="spj26rev-overlay"
+    ></div>
+
+
+    <div class="spj26rev-layout">
+
+        <header class="spj26rev-header">
+
+            <div class="spj26rev-header-left">
+
+                <button
+                    class="spj26rev-mobile-menu"
+                    id="spj26rev-menu-button"
+                    type="button"
+                    aria-label="Buka Menu"
+                >
+                    <span class="material-symbols-outlined">menu</span>
+                </button>
+
+                <div class="spj26rev-logo">
+                    <span class="material-symbols-outlined">fact_check</span>
+                </div>
+
+                <div class="spj26rev-brand">
+
+                    <div class="spj26rev-brand-row">
+
+                        <div class="spj26rev-brand-name">
+                            SIPATUJU PPDS
+                        </div>
+
+                        <div class="spj26rev-brand-divider">
+                            |
+                        </div>
+
+                        <div class="spj26rev-brand-description">
+                            Sistem Pemeriksaan Kelayakan Jurnal PPDS FK UNHAS
+                        </div>
+
+                    </div>
+
+                    <div class="spj26rev-faculty">
+                        Fakultas Kedokteran • Akreditasi Unggul
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="spj26rev-header-right">
+
+                <div class="spj26rev-user">
+
+                    <div class="spj26rev-user-text">
+
+                        <span
+                            class="spj26rev-user-name"
+                            id="spj26rev-user-name"
+                        >Reviewer</span>
+
+                        <span class="spj26rev-user-role">
+                            Reviewer
+                        </span>
+
+                    </div>
+
+                    <div class="spj26rev-avatar">
+                        <span class="material-symbols-outlined">person_search</span>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </header>
+
+
+        <aside
+            class="spj26rev-sidebar"
+            id="spj26rev-sidebar"
+        >
+
+            <div class="spj26rev-sidebar-main">
+
+                <div class="spj26rev-nav-title">
+                    Menu Reviewer
+                </div>
+
+                <nav class="spj26rev-nav">
+
+                    <a
+                        class="spj26rev-nav-link"
+                        href="/reviewer-sipatuju/"
+                    >
+                        <span class="spj26rev-nav-left">
+                            <span class="material-symbols-outlined">grid_view</span>
+                            <span>Dashboard</span>
+                        </span>
+                    </a>
+
+                    <a
+                        class="spj26rev-nav-link"
+                        href="/reviewer-sipatuju/pengajuan-tersedia/"
+                    >
+                        <span class="spj26rev-nav-left">
+                            <span class="material-symbols-outlined">inbox</span>
+                            <span>Pengajuan Tersedia</span>
+                        </span>
+
+                        <span
+                            class="spj26rev-nav-count"
+                            id="spj26rev-nav-available"
+                        >0</span>
+                    </a>
+
+                    <a
+                        class="spj26rev-nav-link"
+                        href="/reviewer-sipatuju/pemeriksaan-saya/"
+                    >
+                        <span class="spj26rev-nav-left">
+                            <span class="material-symbols-outlined">rate_review</span>
+                            <span>Pemeriksaan Saya</span>
+                        </span>
+
+                        <span
+                            class="spj26rev-nav-count"
+                            id="spj26rev-nav-active"
+                        >0</span>
+                    </a>
+
+                    <a
+                        class="spj26rev-nav-link active"
+                        href="/riwayat-pemeriksaan/"
+                        aria-current="page"
+                    >
+                        <span class="spj26rev-nav-left">
+                            <span class="material-symbols-outlined">history</span>
+                            <span>Riwayat Pemeriksaan</span>
+                        </span>
+                    </a>
+
+                </nav>
+
+
+                <div class="spj26rev-nav-section-gap"></div>
+
+
+                <div class="spj26rev-nav-title">
+                    Akun
+                </div>
+
+                <nav class="spj26rev-nav">
+
+                    <a
+                        class="spj26rev-nav-link"
+                        href="/reviewer-sipatuju/profil/"
+                    >
+                        <span class="spj26rev-nav-left">
+                            <span class="material-symbols-outlined">manage_accounts</span>
+                            <span>Profil &amp; Password</span>
+                        </span>
+                    </a>
+
+                    <a
+                        class="spj26rev-nav-link"
+                        id="spj26rev-logout"
+                        href="#"
+                        data-spj26-logout
+                    >
+                        <span class="spj26rev-nav-left">
+                            <span class="material-symbols-outlined">logout</span>
+                            <span>Logout</span>
+                        </span>
+                    </a>
+
+                </nav>
+
+            </div>
+
+
+            <div class="spj26rev-sidebar-info">
+
+                <div class="spj26rev-sidebar-info-title">
+                    <span class="material-symbols-outlined">verified</span>
+                    <span>PPDS FK UNHAS</span>
+                </div>
+
+                <div class="spj26rev-version">
+                    Versi Sistem 2026.1
+                </div>
+
+                <div class="spj26rev-department">
+                    Program Pendidikan Dokter Spesialis
+                </div>
+
+            </div>
+
+        </aside>
+
+
+        <div class="spj26rev-rightpane">
+
+            <main class="spj26rev-main">
+
+                <section class="spj26rev-panel">
+
+                    <div class="spj26rev-panel-top">
+
+                        <div>
+
+                            <h1 class="spj26rev-panel-title">
+                                Riwayat Pemeriksaan
+                            </h1>
+
+                            <p class="spj26rev-panel-subtitle">
+                                Lihat kembali hasil pemeriksaan artikel yang telah Anda selesaikan beserta keputusan dan catatan pada setiap jurnal kandidat.
+                            </p>
+
+                        </div>
+
+
+                        <div
+                            class="spj26rev-updated-pill"
+                            id="spj26rev-updated-pill"
+                        >
+                            <span class="material-symbols-outlined">history</span>
+
+                            <span id="spj26rev-updated-text">
+                                Terakhir diperbarui: -
+                            </span>
+                        </div>
+
+                    </div>
+
+
+                    <div class="spj26rev-panel-toolbar">
+
+                        <div
+                            class="spj26rev-filters"
+                            id="spj26rev-filter-bar"
+                        ></div>
+
+
+                        <div class="spj26rev-toolbar-actions">
+
+                            <label
+                                class="spj26rev-search"
+                                aria-label="Cari riwayat pemeriksaan"
+                            >
+
+                                <span class="material-symbols-outlined">
+                                    search
+                                </span>
+
+                                <input
+                                    type="search"
+                                    id="spj26rev-search-input"
+                                    placeholder="Cari judul artikel, kode, atau Residen..."
+                                    autocomplete="off"
+                                >
+
+                            </label>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="spj26rev-table">
+
+                        <div class="spj26rev-table-head">
+                            <div>Kode Artikel</div>
+                            <div>Judul Artikel</div>
+                            <div>Dosen Pembimbing</div>
+                            <div>Status</div>
+                            <div>Aksi</div>
+                        </div>
+
+
+                        <div
+                            class="spj26rev-table-body"
+                            id="spj26rev-table-body"
+                        ></div>
+
+                    </div>
+
+
+                    <div class="spj26rev-panel-bottom">
+
+                        <div class="spj26rev-page-size-control">
+
+                            <span>Tampilkan</span>
+
+                            <select
+                                id="spj26rev-page-size"
+                                class="spj26rev-page-size-select"
+                                aria-label="Jumlah riwayat yang ditampilkan"
+                            >
+                                <option value="10" selected>10</option>
+                                <option value="20">20</option>
+                                <option value="30">30</option>
+                                <option value="all">Semua</option>
+                            </select>
+
+                            <span>data artikel</span>
+
+                        </div>
+
+
+                        <div class="spj26rev-pagination">
+
+                            <button
+                                class="spj26rev-page-btn"
+                                id="spj26rev-page-prev"
+                                type="button"
+                            >
+                                Sebelumnya
+                            </button>
+
+                            <span
+                                class="spj26rev-page-number is-active"
+                                id="spj26rev-page-indicator"
+                            >1</span>
+
+                            <button
+                                class="spj26rev-page-btn"
+                                id="spj26rev-page-next"
+                                type="button"
+                            >
+                                Selanjutnya
+                            </button>
+
+                        </div>
+
+                    </div>
+
+                </section>
+
+            </main>
+
+
+            <footer class="spj26rev-footer">
+
+                <div class="spj26rev-footer-left">
+
+                    <span class="spj26rev-footer-brand">
+                        SIPATUJU PPDS
+                    </span>
+
+                    <span>•</span>
+
+                    <span>
+                        Fakultas Kedokteran Universitas Hasanuddin
+                    </span>
+
+                </div>
+
+                <div class="spj26rev-footer-right">
+                    PPDS FK UNHAS - Versi Sistem 2026.1
+                </div>
+
+            </footer>
+
+        </div>
+
+    </div>
+
+
+    <!-- DETAIL MODAL -->
+    <div
+        class="spj26rev-modal"
+        id="spj26rev-detail-modal"
+        aria-hidden="true"
+    >
+
+        <div
+            class="spj26rev-modal-backdrop"
+            id="spj26rev-detail-backdrop"
+        ></div>
+
+
+        <div
+            class="spj26rev-modal-dialog"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="spj26rev-detail-title"
+        >
+
+            <div class="spj26rev-modal-head">
+
+                <div>
+
+                    <div
+                        class="spj26rev-modal-title"
+                        id="spj26rev-detail-title"
+                    >
+                        Detail Artikel
+                    </div>
+
+                    <div
+                        class="spj26rev-modal-subtitle"
+                        id="spj26rev-detail-subtitle"
+                    >-</div>
+
+                </div>
+
+                <button
+                    class="spj26rev-modal-close"
+                    id="spj26rev-detail-close"
+                    type="button"
+                    aria-label="Tutup detail"
+                >
+                    <span class="material-symbols-outlined">close</span>
+                </button>
+
+            </div>
+
+
+            <div class="spj26rev-modal-body">
+
+                <div class="spj26rev-detail-grid">
+
+                    <div class="spj26rev-detail-item">
+                        <div class="spj26rev-detail-label">Residen</div>
+                        <div
+                            class="spj26rev-detail-value"
+                            id="spj26rev-detail-resident"
+                        >-</div>
+                    </div>
+
+                    <div class="spj26rev-detail-item">
+                        <div class="spj26rev-detail-label">Program PPDS</div>
+                        <div
+                            class="spj26rev-detail-value"
+                            id="spj26rev-detail-program"
+                        >-</div>
+                    </div>
+
+                    <div class="spj26rev-detail-item full">
+                        <div class="spj26rev-detail-label">Judul Artikel</div>
+                        <div
+                            class="spj26rev-detail-value"
+                            id="spj26rev-detail-article-title"
+                        >-</div>
+                    </div>
+
+                    <div class="spj26rev-detail-item full">
+                        <div class="spj26rev-detail-label">Abstrak</div>
+                        <div
+                            class="spj26rev-detail-value"
+                            id="spj26rev-detail-abstract"
+                        >-</div>
+                    </div>
+
+                    <div class="spj26rev-detail-item full">
+                        <div class="spj26rev-detail-label">Pembimbing Utama</div>
+                        <div
+                            class="spj26rev-detail-value"
+                            id="spj26rev-detail-supervisor"
+                        >-</div>
+                    </div>
+
+                    <div class="spj26rev-detail-item">
+                        <div class="spj26rev-detail-label">Tanggal Submit</div>
+                        <div
+                            class="spj26rev-detail-value"
+                            id="spj26rev-detail-submitted"
+                        >-</div>
+                    </div>
+
+                    <div class="spj26rev-detail-item">
+                        <div class="spj26rev-detail-label">Selesai Diperiksa</div>
+                        <div
+                            class="spj26rev-detail-value"
+                            id="spj26rev-detail-completed"
+                        >-</div>
+                    </div>
+
+                </div>
+
+
+                <div
+                    class="spj26rev-journal-list"
+                    id="spj26rev-detail-journals"
+                ></div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+
+    <div
+        class="spj26rev-debug-panel"
+        id="spj26rev-debug-panel"
+        hidden
+    >
+        <div class="spj26rev-debug-title">
+            Reviewer Data Diagnostics
+        </div>
+        <div id="spj26rev-debug-content"></div>
+    </div>
+
+    <div
+        class="spj26rev-toast"
+        id="spj26rev-toast"
+        hidden
+    ></div>
+
+</div>
+
+
+<script>
+(function(){
+
+    document
+        .documentElement
+        .classList
+        .add(
+            'spj26revhist-page-lock'
+        );
+
+    document
+        .body
+        .classList
+        .add(
+            'spj26revhist-page-lock'
+        );
+
+
+    const root =
+        document.getElementById(
+            'spj26revhist-root'
+        );
+
+    if(!root){
+        return;
+    }
+
+
+    const isElementorEditor =
+        document.body.classList.contains(
+            'elementor-editor-active'
+        )
+        ||
+        /(?:^|[?&])elementor-preview=/.test(
+            window.location.search
+        );
+
+    if(
+        !isElementorEditor
+        &&
+        root.parentElement !== document.body
+    ){
+        document.body.appendChild(root);
+    }
+
+
+    let completedSubmissions = [];
+    let filteredSubmissions = [];
+
+    let currentFilter = 'all';
+    let currentPage = 1;
+    let itemsPerPage = 10;
+    let searchTerm = '';
+
+
+    /* =====================================================
+       ELEMENTS
+    ===================================================== */
+
+    const menuButton =
+        root.querySelector(
+            '#spj26rev-menu-button'
+        );
+
+    const sidebar =
+        root.querySelector(
+            '#spj26rev-sidebar'
+        );
+
+    const overlay =
+        root.querySelector(
+            '#spj26rev-overlay'
+        );
+
+    const tableBody =
+        root.querySelector(
+            '#spj26rev-table-body'
+        );
+
+    const filterBar =
+        root.querySelector(
+            '#spj26rev-filter-bar'
+        );
+
+    const searchInput =
+        root.querySelector(
+            '#spj26rev-search-input'
+        );
+
+    const pageSizeSelect =
+        root.querySelector(
+            '#spj26rev-page-size'
+        );
+
+    const prevButton =
+        root.querySelector(
+            '#spj26rev-page-prev'
+        );
+
+    const nextButton =
+        root.querySelector(
+            '#spj26rev-page-next'
+        );
+
+    const pageIndicator =
+        root.querySelector(
+            '#spj26rev-page-indicator'
+        );
+
+    const detailModal =
+        root.querySelector(
+            '#spj26rev-detail-modal'
+        );
+
+    const detailBackdrop =
+        root.querySelector(
+            '#spj26rev-detail-backdrop'
+        );
+
+    const detailClose =
+        root.querySelector(
+            '#spj26rev-detail-close'
+        );
+
+    const toast =
+        root.querySelector(
+            '#spj26rev-toast'
+        );
+
+
+    /* =====================================================
+       HELPERS
+    ===================================================== */
+
+    function setText(id,value){
+
+        const element =
+            root.querySelector(
+                '#' + id
+            );
+
+        if(element){
+            element.textContent =
+                String(
+                    value ?? ''
+                );
+        }
+
+    }
+
+
+    function createEl(
+        tag,
+        className,
+        text
+    ){
+
+        const element =
+            document.createElement(tag);
+
+        if(className){
+            element.className = className;
+        }
+
+        if(
+            text !== undefined
+            &&
+            text !== null
+        ){
+            element.textContent =
+                String(text);
+        }
+
+        return element;
+
+    }
+
+
+    function normalize(value){
+
+        return String(
+            value ?? ''
+        )
+        .toLowerCase()
+        .trim();
+
+    }
+
+
+
+    const debugEnabled =
+        new URLSearchParams(
+            window.location.search
+        ).get(
+            'spj26_debug'
+        ) === '1';
+
+
+    const debugPanel =
+        root.querySelector(
+            '#spj26rev-debug-panel'
+        );
+
+    const debugContent =
+        root.querySelector(
+            '#spj26rev-debug-content'
+        );
+
+
+    const debugState = {
+        pagePath:
+            window.location.pathname,
+        config:
+            false,
+        configPath:
+            '',
+        dashboard:
+            'belum diuji',
+        history:
+            'belum diuji',
+        available:
+            '-',
+        active:
+            '-',
+        completed:
+            '-',
+        lastError:
+            '-'
+    };
+
+
+    function renderDebug(){
+
+        if(
+            !debugEnabled
+            ||
+            !debugPanel
+            ||
+            !debugContent
+        ){
+            return;
+        }
+
+        debugPanel.hidden = false;
+
+        const rows = [
+            ['Current URL',debugState.pagePath],
+            ['Reviewer config',debugState.config ? 'TERSEDIA' : 'TIDAK TERSEDIA'],
+            ['Config portalPath',debugState.configPath || '-'],
+            ['Dashboard endpoint',debugState.dashboard],
+            ['History endpoint',debugState.history],
+            ['Available',debugState.available],
+            ['Active',debugState.active],
+            ['Completed',debugState.completed],
+            ['Last error',debugState.lastError]
+        ];
+
+        debugContent.innerHTML = '';
+
+        rows.forEach(function(row){
+
+            const line =
+                createEl(
+                    'div',
+                    'spj26rev-debug-row'
+                );
+
+            const key =
+                createEl(
+                    'span',
+                    'spj26rev-debug-key',
+                    row[0] + ': '
+                );
+
+            const value =
+                createEl(
+                    'span',
+                    (
+                        String(row[1]).indexOf('ERROR') === 0
+                        ||
+                        row[1] === 'TIDAK TERSEDIA'
+                    )
+                    ?
+                    'spj26rev-debug-error'
+                    :
+                    (
+                        row[1] === 'TERSEDIA'
+                        ||
+                        String(row[1]).indexOf('OK') === 0
+                    )
+                    ?
+                    'spj26rev-debug-ok'
+                    :
+                    '',
+                    row[1]
+                );
+
+            line.appendChild(key);
+            line.appendChild(value);
+
+            debugContent.appendChild(line);
+
+        });
+
+    }
+
+
+    function syncDebugConfig(){
+
+        const cfg =
+            window.spj26ReviewerPortalConfig
+            ||
+            null;
+
+        debugState.config =
+            !!(
+                cfg
+                &&
+                cfg.ajaxUrl
+                &&
+                cfg.nonce
+            );
+
+        debugState.configPath =
+            cfg
+            &&
+            cfg.portalPath
+            ?
+            String(
+                cfg.portalPath
+            )
+            :
+            '';
+
+        renderDebug();
+
+    }
+
+
+    function showToast(message){
+
+        if(!toast){
+            return;
+        }
+
+        toast.textContent =
+            String(
+                message || ''
+            );
+
+        toast.hidden = false;
+
+        window.setTimeout(
+            function(){
+                toast.hidden = true;
+            },
+            3200
+        );
+
+    }
+
+
+    function openSidebar(){
+
+        if(sidebar){
+            sidebar.classList.add('open');
+        }
+
+        if(overlay){
+            overlay.classList.add('open');
+        }
+
+    }
+
+
+    function closeSidebar(){
+
+        if(sidebar){
+            sidebar.classList.remove('open');
+        }
+
+        if(overlay){
+            overlay.classList.remove('open');
+        }
+
+    }
+
+
+    if(menuButton){
+        menuButton.addEventListener(
+            'click',
+            openSidebar
+        );
+    }
+
+
+    if(overlay){
+        overlay.addEventListener(
+            'click',
+            closeSidebar
+        );
+    }
+
+
+    root
+        .querySelectorAll(
+            '.spj26rev-sidebar a'
+        )
+        .forEach(function(link){
+
+            link.addEventListener(
+                'click',
+                function(){
+
+                    if(
+                        window.innerWidth <= 800
+                    ){
+                        closeSidebar();
+                    }
+
+                }
+            );
+
+        });
+
+
+    /* =====================================================
+       BACKEND
+    ===================================================== */
+
+    async function backendRequest(
+        action,
+        payload
+    ){
+
+        const config =
+            window.spj26ReviewerPortalConfig;
+
+        if(
+            !config
+            ||
+            !config.ajaxUrl
+            ||
+            !config.nonce
+        ){
+
+            throw new Error(
+                'Konfigurasi backend Reviewer belum tersedia.'
+            );
+
+        }
+
+
+        const body =
+            new URLSearchParams();
+
+        body.append(
+            'action',
+            action
+        );
+
+        body.append(
+            'nonce',
+            config.nonce
+        );
+
+
+        Object.keys(
+            payload || {}
+        )
+        .forEach(function(key){
+
+            body.append(
+                key,
+                payload[key]
+            );
+
+        });
+
+
+        const response =
+            await fetch(
+                config.ajaxUrl,
+                {
+                    method:'POST',
+                    credentials:'same-origin',
+                    headers:{
+                        'Content-Type':
+                            'application/x-www-form-urlencoded; charset=UTF-8'
+                    },
+                    body:
+                        body.toString()
+                }
+            );
+
+
+        let result = null;
+
+        try{
+
+            result =
+                await response.json();
+
+        }catch(error){
+
+            throw new Error(
+                'Respons server tidak valid.'
+            );
+
+        }
+
+
+        if(
+            !result
+            ||
+            result.success !== true
+        ){
+
+            throw new Error(
+                result
+                &&
+                result.data
+                &&
+                result.data.message
+                ?
+                result.data.message
+                :
+                'Permintaan ke server gagal.'
+            );
+
+        }
+
+
+        return result.data;
+
+    }
+
+
+    /* =====================================================
+       IDENTITY
+    ===================================================== */
+
+    function renderIdentity(){
+
+        const config =
+            window.spj26ReviewerPortalConfig;
+
+        if(!config){
+            return;
+        }
+
+
+        setText(
+            'spj26rev-user-name',
+            config.name || 'Reviewer'
+        );
+
+
+        const logout =
+            root.querySelector(
+                '#spj26rev-logout'
+            );
+
+        if(
+            logout
+            &&
+            config.logoutUrl
+        ){
+            logout.href =
+                config.logoutUrl;
+        }
+
+    }
+
+
+    /* =====================================================
+       STATUS / SEARCH
+    ===================================================== */
+
+    function finalResult(item){
+
+        const journals =
+            Array.isArray(
+                item &&
+                item.journals
+            )
+            ?
+            item.journals
+            :
+            [];
+
+
+        if(
+            journals.some(function(journal){
+                return (
+                    journal.decision ===
+                    'tidak_layak'
+                );
+            })
+        ){
+
+            return {
+                key:'not_eligible',
+                label:'Tidak Layak',
+                className:'not-eligible'
+            };
+
+        }
+
+
+        if(
+            journals.length === 3
+            &&
+            journals.every(function(journal){
+                return (
+                    journal.decision ===
+                    'layak'
+                );
+            })
+        ){
+
+            return {
+                key:'eligible',
+                label:'Layak',
+                className:'eligible'
+            };
+
+        }
+
+
+        return {
+            key:'completed',
+            label:'Selesai',
+            className:'completed'
+        };
+
+    }
+
+
+    function searchableText(item){
+
+        const journals =
+            Array.isArray(
+                item.journals
+            )
+            ?
+            item.journals
+            :
+            [];
+
+
+        const journalText =
+            journals
+            .map(function(journal){
+
+                return [
+                    journal.name,
+                    journal.issn,
+                    journal.quartile,
+                    journal.decision,
+                    journal.comment
+                ]
+                .filter(Boolean)
+                .join(' ');
+
+            })
+            .join(' ');
+
+
+        return normalize(
+            [
+                item.code,
+                item.resident_name,
+                item.resident_nim,
+                item.resident_program,
+                item.article_title,
+                item.article_type,
+                item.supervisor_name,
+                journalText
+            ]
+            .filter(Boolean)
+            .join(' ')
+        );
+
+    }
+
+
+    function getQuartileSummary(item){
+
+        const journals =
+            Array.isArray(
+                item &&
+                item.journals
+            )
+            ?
+            item.journals
+            :
+            [];
+
+        const unique = [];
+
+        journals.forEach(function(journal){
+
+            const value =
+                journal &&
+                journal.quartile
+                ?
+                String(
+                    journal.quartile
+                ).trim()
+                :
+                '';
+
+            if(
+                value
+                &&
+                !unique.includes(value)
+            ){
+                unique.push(value);
+            }
+
+        });
+
+        return unique.join(' • ');
+
+    }
+
+
+    /* =====================================================
+       FILTER CHIPS
+    ===================================================== */
+
+    function getCounts(){
+
+        const counts = {
+            all:
+                completedSubmissions.length,
+            eligible:0,
+            not_eligible:0
+        };
+
+
+        completedSubmissions
+        .forEach(function(item){
+
+            const status =
+                finalResult(item);
+
+            if(
+                status.key === 'eligible'
+            ){
+                counts.eligible += 1;
+            }
+
+            if(
+                status.key === 'not_eligible'
+            ){
+                counts.not_eligible += 1;
+            }
+
+        });
+
+
+        return counts;
+
+    }
+
+
+    function renderFilters(){
+
+        if(!filterBar){
+            return;
+        }
+
+
+        filterBar.innerHTML = '';
+
+
+        const counts =
+            getCounts();
+
+
+        [
+            {
+                key:'all',
+                label:'Semua',
+                count:counts.all
+            },
+            {
+                key:'eligible',
+                label:'Layak',
+                count:counts.eligible
+            },
+            {
+                key:'not_eligible',
+                label:'Tidak Layak',
+                count:counts.not_eligible
+            }
+        ]
+        .forEach(function(filter){
+
+            const button =
+                createEl(
+                    'button',
+                    'spj26rev-filter-chip' +
+                    (
+                        currentFilter === filter.key
+                        ?
+                        ' is-active'
+                        :
+                        ''
+                    )
+                );
+
+            button.type = 'button';
+
+            button.appendChild(
+                createEl(
+                    'span',
+                    '',
+                    filter.label
+                )
+            );
+
+            button.appendChild(
+                createEl(
+                    'span',
+                    'spj26rev-filter-chip-count',
+                    filter.count
+                )
+            );
+
+
+            button.addEventListener(
+                'click',
+                function(){
+
+                    currentFilter =
+                        filter.key;
+
+                    currentPage = 1;
+
+                    renderFilters();
+                    applyFilters();
+
+                }
+            );
+
+
+            filterBar.appendChild(
+                button
+            );
+
+        });
+
+    }
+
+
+    /* =====================================================
+       FILTER + PAGINATION
+    ===================================================== */
+
+    function getPageSize(){
+
+        if(itemsPerPage === 'all'){
+
+            return Math.max(
+                filteredSubmissions.length,
+                1
+            );
+
+        }
+
+        return Math.max(
+            1,
+            Number(itemsPerPage) || 10
+        );
+
+    }
+
+
+    function applyFilters(){
+
+        const query =
+            normalize(
+                searchTerm
+            );
+
+
+        filteredSubmissions =
+            completedSubmissions
+            .filter(function(item){
+
+                const status =
+                    finalResult(item);
+
+
+                if(
+                    currentFilter !== 'all'
+                    &&
+                    status.key !== currentFilter
+                ){
+                    return false;
+                }
+
+
+                if(
+                    query
+                    &&
+                    !searchableText(item)
+                        .includes(query)
+                ){
+                    return false;
+                }
+
+
+                return true;
+
+            });
+
+
+        const pageSize =
+            getPageSize();
+
+        const totalPages =
+            Math.max(
+                1,
+                Math.ceil(
+                    filteredSubmissions.length /
+                    pageSize
+                )
+            );
+
+
+        if(currentPage > totalPages){
+            currentPage = totalPages;
+        }
+
+        if(currentPage < 1){
+            currentPage = 1;
+        }
+
+
+        renderTable();
+        renderPagination();
+
+    }
+
+
+    /* =====================================================
+       TABLE
+    ===================================================== */
+
+    function makeCell(
+        label,
+        child
+    ){
+
+        const cell =
+            createEl(
+                'div',
+                'spj26rev-mobile-cell'
+            );
+
+        cell.setAttribute(
+            'data-label',
+            label
+        );
+
+
+        if(child instanceof Node){
+            cell.appendChild(child);
+        }else{
+            cell.textContent =
+                String(
+                    child ?? '-'
+                );
+        }
+
+
+        return cell;
+
+    }
+
+
+    function renderEmpty(){
+
+        if(!tableBody){
+            return;
+        }
+
+
+        tableBody.innerHTML = '';
+
+
+        const empty =
+            createEl(
+                'div',
+                'spj26rev-empty'
+            );
+
+        empty.appendChild(
+            createEl(
+                'span',
+                'material-symbols-outlined',
+                'history'
+            )
+        );
+
+        empty.appendChild(
+            createEl(
+                'div',
+                'spj26rev-empty-title',
+                completedSubmissions.length
+                ?
+                'Tidak ada riwayat yang sesuai'
+                :
+                'Belum ada riwayat pemeriksaan'
+            )
+        );
+
+        empty.appendChild(
+            createEl(
+                'div',
+                'spj26rev-empty-text',
+                completedSubmissions.length
+                ?
+                'Ubah filter atau kata pencarian untuk melihat riwayat lainnya.'
+                :
+                'Belum ada pemeriksaan selesai yang terhubung dengan akun Reviewer ini.'
+            )
+        );
+
+
+        tableBody.appendChild(
+            empty
+        );
+
+    }
+
+
+    function renderTable(){
+
+        if(!tableBody){
+            return;
+        }
+
+
+        if(
+            filteredSubmissions.length === 0
+        ){
+
+            renderEmpty();
+            return;
+
+        }
+
+
+        tableBody.innerHTML = '';
+
+
+        const pageSize =
+            getPageSize();
+
+        const startIndex =
+            (currentPage - 1) *
+            pageSize;
+
+        const endIndex =
+            Math.min(
+                startIndex + pageSize,
+                filteredSubmissions.length
+            );
+
+
+        filteredSubmissions
+        .slice(
+            startIndex,
+            endIndex
+        )
+        .forEach(function(item){
+
+            const row =
+                createEl(
+                    'div',
+                    'spj26rev-table-row'
+                );
+
+            const result =
+                finalResult(item);
+
+
+            /* KODE */
+            const codeWrap =
+                document.createElement('div');
+
+            codeWrap.appendChild(
+                createEl(
+                    'div',
+                    'spj26rev-code',
+                    item.code || '-'
+                )
+            );
+
+
+            const chips =
+                createEl(
+                    'div',
+                    'spj26rev-code-chips'
+                );
+
+
+            if(item.article_type){
+
+                chips.appendChild(
+                    createEl(
+                        'span',
+                        'spj26rev-mini-chip',
+                        item.article_type
+                    )
+                );
+
+            }
+
+
+            const quartiles =
+                getQuartileSummary(item);
+
+
+            if(quartiles){
+
+                chips.appendChild(
+                    createEl(
+                        'span',
+                        'spj26rev-mini-chip',
+                        quartiles
+                    )
+                );
+
+            }
+
+
+            if(chips.childNodes.length > 0){
+
+                codeWrap.appendChild(
+                    chips
+                );
+
+            }
+
+
+            const dates =
+                createEl(
+                    'div',
+                    'spj26rev-code-dates'
+                );
+
+            dates.appendChild(
+                createEl(
+                    'div',
+                    'spj26rev-cell-note',
+                    'Submit: ' +
+                    (
+                        item.submitted_at ||
+                        '-'
+                    )
+                )
+            );
+
+            dates.appendChild(
+                createEl(
+                    'div',
+                    'spj26rev-cell-note',
+                    'Selesai: ' +
+                    (
+                        item.completed_at ||
+                        item.updated_at ||
+                        '-'
+                    )
+                )
+            );
+
+            codeWrap.appendChild(dates);
+
+            row.appendChild(
+                makeCell(
+                    'Kode Artikel',
+                    codeWrap
+                )
+            );
+
+
+            /* RESIDEN + ARTIKEL */
+            const articleWrap =
+                document.createElement('div');
+
+            articleWrap.appendChild(
+                createEl(
+                    'div',
+                    'spj26rev-title',
+                    item.article_title || '-'
+                )
+            );
+
+            const residentMeta =
+                createEl(
+                    'div',
+                    'spj26rev-submeta'
+                );
+
+            residentMeta.appendChild(
+                createEl(
+                    'strong',
+                    '',
+                    item.resident_name || '-'
+                )
+            );
+
+            residentMeta.appendChild(
+                document.createTextNode(
+                    ' • ' +
+                    (
+                        item.resident_nim ||
+                        '-'
+                    )
+                )
+            );
+
+            articleWrap.appendChild(
+                residentMeta
+            );
+
+            if(item.resident_program){
+
+                articleWrap.appendChild(
+                    createEl(
+                        'div',
+                        'spj26rev-submeta',
+                        item.resident_program
+                    )
+                );
+
+            }
+
+
+            row.appendChild(
+                makeCell(
+                    'Judul Artikel',
+                    articleWrap
+                )
+            );
+
+
+            /* PEMBIMBING */
+            row.appendChild(
+                makeCell(
+                    'Dosen Pembimbing',
+                    createEl(
+                        'div',
+                        'spj26rev-person-name',
+                        item.supervisor_name || '-'
+                    )
+                )
+            );
+
+
+            /* HASIL */
+            row.appendChild(
+                makeCell(
+                    'Status',
+                    createEl(
+                        'span',
+                        'spj26rev-status-pill ' +
+                        result.className,
+                        result.label
+                    )
+                )
+            );
+
+
+            /* AKSI */
+            const actions =
+                createEl(
+                    'div',
+                    'spj26rev-row-actions'
+                );
+
+            const detail =
+                createEl(
+                    'button',
+                    'spj26rev-btn'
+                );
+
+            detail.type = 'button';
+
+            detail.appendChild(
+                createEl(
+                    'span',
+                    'material-symbols-outlined',
+                    'visibility'
+                )
+            );
+
+            detail.appendChild(
+                createEl(
+                    'span',
+                    '',
+                    'Lihat Detail'
+                )
+            );
+
+            detail.addEventListener(
+                'click',
+                function(){
+                    openDetail(item);
+                }
+            );
+
+            actions.appendChild(
+                detail
+            );
+
+            row.appendChild(
+                makeCell(
+                    'Aksi',
+                    actions
+                )
+            );
+
+
+            tableBody.appendChild(
+                row
+            );
+
+        });
+
+    }
+
+
+    function renderPagination(){
+
+        const pageSize =
+            getPageSize();
+
+        const totalPages =
+            Math.max(
+                1,
+                Math.ceil(
+                    filteredSubmissions.length /
+                    pageSize
+                )
+            );
+
+
+        if(pageIndicator){
+            pageIndicator.textContent =
+                String(currentPage);
+        }
+
+        if(prevButton){
+            prevButton.disabled =
+                currentPage <= 1;
+        }
+
+        if(nextButton){
+            nextButton.disabled =
+                currentPage >= totalPages;
+        }
+
+    }
+
+
+    if(prevButton){
+
+        prevButton.addEventListener(
+            'click',
+            function(){
+
+                if(currentPage <= 1){
+                    return;
+                }
+
+                currentPage -= 1;
+
+                renderTable();
+                renderPagination();
+
+            }
+        );
+
+    }
+
+
+    if(nextButton){
+
+        nextButton.addEventListener(
+            'click',
+            function(){
+
+                const totalPages =
+                    Math.max(
+                        1,
+                        Math.ceil(
+                            filteredSubmissions.length /
+                            getPageSize()
+                        )
+                    );
+
+                if(
+                    currentPage >= totalPages
+                ){
+                    return;
+                }
+
+                currentPage += 1;
+
+                renderTable();
+                renderPagination();
+
+            }
+        );
+
+    }
+
+
+    if(pageSizeSelect){
+
+        pageSizeSelect.addEventListener(
+            'change',
+            function(){
+
+                const value =
+                    String(
+                        this.value
+                    );
+
+                itemsPerPage =
+                    value === 'all'
+                    ?
+                    'all'
+                    :
+                    Number(value);
+
+                currentPage = 1;
+
+                applyFilters();
+
+            }
+        );
+
+    }
+
+
+    if(searchInput){
+
+        searchInput.addEventListener(
+            'input',
+            function(){
+
+                searchTerm =
+                    this.value || '';
+
+                currentPage = 1;
+
+                applyFilters();
+
+            }
+        );
+
+    }
+
+
+    /* =====================================================
+       DETAIL
+    ===================================================== */
+
+    function journalDecision(journal){
+
+        if(
+            journal.decision ===
+            'layak'
+        ){
+
+            return {
+                label:'Layak',
+                className:'eligible'
+            };
+
+        }
+
+        if(
+            journal.decision ===
+            'tidak_layak'
+        ){
+
+            return {
+                label:'Tidak Layak',
+                className:'not-eligible'
+            };
+
+        }
+
+        return {
+            label:'Selesai',
+            className:'completed'
+        };
+
+    }
+
+
+    function renderDetailJournals(item){
+
+        const container =
+            root.querySelector(
+                '#spj26rev-detail-journals'
+            );
+
+        if(!container){
+            return;
+        }
+
+
+        container.innerHTML = '';
+
+
+        const journals =
+            Array.isArray(
+                item.journals
+            )
+            ?
+            item.journals
+            :
+            [];
+
+
+        journals
+        .forEach(function(journal){
+
+            const card =
+                createEl(
+                    'div',
+                    'spj26rev-journal-card'
+                );
+
+            const head =
+                createEl(
+                    'div',
+                    'spj26rev-journal-head'
+                );
+
+            const ident =
+                createEl(
+                    'div',
+                    'spj26rev-journal-ident'
+                );
+
+            ident.appendChild(
+                createEl(
+                    'span',
+                    'spj26rev-journal-number',
+                    journal.order || '-'
+                )
+            );
+
+
+            const info =
+                document.createElement('div');
+
+            info.appendChild(
+                createEl(
+                    'div',
+                    'spj26rev-journal-name',
+                    journal.name || '-'
+                )
+            );
+
+            info.appendChild(
+                createEl(
+                    'div',
+                    'spj26rev-journal-meta',
+                    'ISSN: ' +
+                    (journal.issn || '-') +
+                    ' • Kuartil: ' +
+                    (journal.quartile || '-')
+                )
+            );
+
+
+            ident.appendChild(info);
+            head.appendChild(ident);
+
+
+            const decision =
+                journalDecision(journal);
+
+            head.appendChild(
+                createEl(
+                    'span',
+                    'spj26rev-status-pill ' +
+                    decision.className,
+                    decision.label
+                )
+            );
+
+
+            card.appendChild(head);
+
+
+            const comment =
+                createEl(
+                    'div',
+                    'spj26rev-comment'
+                );
+
+            comment.appendChild(
+                createEl(
+                    'div',
+                    'spj26rev-comment-label',
+                    'Catatan Pemeriksaan'
+                )
+            );
+
+            comment.appendChild(
+                createEl(
+                    'div',
+                    'spj26rev-comment-text',
+                    journal.comment || '-'
+                )
+            );
+
+
+            card.appendChild(comment);
+
+            container.appendChild(card);
+
+        });
+
+    }
+
+
+    function openDetail(item){
+
+        if(!detailModal){
+            return;
+        }
+
+
+        const result =
+            finalResult(item);
+
+
+        setText(
+            'spj26rev-detail-subtitle',
+            (item.code || '-') +
+            ' • ' +
+            result.label
+        );
+
+        setText(
+            'spj26rev-detail-resident',
+            [
+                item.resident_name,
+                item.resident_nim
+            ]
+            .filter(Boolean)
+            .join(' • ') || '-'
+        );
+
+        setText(
+            'spj26rev-detail-program',
+            item.resident_program || '-'
+        );
+
+        setText(
+            'spj26rev-detail-article-title',
+            item.article_title || '-'
+        );
+
+        setText(
+            'spj26rev-detail-abstract',
+            item.article_abstract || '-'
+        );
+
+        setText(
+            'spj26rev-detail-supervisor',
+            item.supervisor_name || '-'
+        );
+
+        setText(
+            'spj26rev-detail-submitted',
+            item.submitted_at || '-'
+        );
+
+        setText(
+            'spj26rev-detail-completed',
+            item.completed_at ||
+            item.updated_at ||
+            '-'
+        );
+
+
+        renderDetailJournals(item);
+
+
+        detailModal.classList.add(
+            'is-open'
+        );
+
+        detailModal.setAttribute(
+            'aria-hidden',
+            'false'
+        );
+
+    }
+
+
+    function closeDetail(){
+
+        if(!detailModal){
+            return;
+        }
+
+
+        detailModal.classList.remove(
+            'is-open'
+        );
+
+        detailModal.setAttribute(
+            'aria-hidden',
+            'true'
+        );
+
+    }
+
+
+    if(detailClose){
+        detailClose.addEventListener(
+            'click',
+            closeDetail
+        );
+    }
+
+
+    if(detailBackdrop){
+        detailBackdrop.addEventListener(
+            'click',
+            closeDetail
+        );
+    }
+
+
+    document.addEventListener(
+        'keydown',
+        function(event){
+
+            if(
+                event.key === 'Escape'
+                &&
+                detailModal
+                &&
+                detailModal.classList.contains(
+                    'is-open'
+                )
+            ){
+                closeDetail();
+            }
+
+        }
+    );
+
+
+    /* =====================================================
+       DATA LOAD
+    ===================================================== */
+
+    function updateTime(){
+
+        const now =
+            new Date();
+
+        const text =
+            now.toLocaleTimeString(
+                'id-ID',
+                {
+                    hour:'2-digit',
+                    minute:'2-digit'
+                }
+            );
+
+        setText(
+            'spj26rev-updated-text',
+            'Terakhir diperbarui: ' +
+            text
+        );
+
+    }
+
+
+    async function loadHistory(
+        showSuccess
+    ){
+
+        try{
+
+            syncDebugConfig();
+
+            let data = null;
+
+            try{
+
+                data =
+                    await backendRequest(
+                        'spj26_reviewer_dashboard_data',
+                        {}
+                    );
+
+                debugState.dashboard =
+                    'OK';
+
+            }catch(dashboardError){
+
+                debugState.dashboard =
+                    'ERROR: ' +
+                    (
+                        dashboardError.message
+                        ||
+                        'unknown'
+                    );
+
+                debugState.lastError =
+                    debugState.dashboard;
+
+                renderDebug();
+
+                throw dashboardError;
+
+            }
+
+
+            let completed =
+                Array.isArray(
+                    data &&
+                    data.completed
+                )
+                ?
+                data.completed
+                :
+                [];
+
+
+            debugState.available =
+                Array.isArray(
+                    data &&
+                    data.available
+                )
+                ?
+                data.available.length
+                :
+                0;
+
+            debugState.active =
+                Array.isArray(
+                    data &&
+                    data.active
+                )
+                ?
+                data.active.length
+                :
+                0;
+
+            debugState.completed =
+                completed.length;
+
+
+            /*
+             * Endpoint khusus hanya fallback jika completed Dashboard kosong.
+             */
+            if(
+                completed.length === 0
+            ){
+
+                try{
+
+                    const historyData =
+                        await backendRequest(
+                            'spj26_reviewer_history_data',
+                            {}
+                        );
+
+                    debugState.history =
+                        'OK';
+
+                    if(
+                        historyData
+                        &&
+                        Array.isArray(
+                            historyData.completed
+                        )
+                    ){
+
+                        if(
+                            historyData.completed.length > 0
+                        ){
+                            completed =
+                                historyData.completed;
+                        }
+
+                        debugState.completed =
+                            completed.length;
+                    }
+
+                }catch(historyEndpointError){
+
+                    debugState.history =
+                        'ERROR: ' +
+                        (
+                            historyEndpointError.message
+                            ||
+                            'unknown'
+                        );
+
+                    debugState.lastError =
+                        debugState.history;
+
+                    console.warn(
+                        'SIPATUJU Reviewer History: fallback endpoint khusus tidak tersedia.',
+                        historyEndpointError
+                    );
+
+                }
+
+            }else{
+
+                debugState.history =
+                    'tidak diperlukan';
+
+            }
+
+
+            completedSubmissions =
+                completed;
+
+
+            setText(
+                'spj26rev-nav-available',
+                debugState.available
+            );
+
+            setText(
+                'spj26rev-nav-active',
+                debugState.active
+            );
+
+
+            renderFilters();
+
+            currentPage = 1;
+
+            applyFilters();
+            updateTime();
+
+            debugState.lastError =
+                '-';
+
+            renderDebug();
+
+
+            if(showSuccess){
+
+                showToast(
+                    'Riwayat pemeriksaan berhasil diperbarui.'
+                );
+
+            }
+
+
+        }catch(error){
+
+            console.error(
+                'SIPATUJU Reviewer History:',
+                error
+            );
+
+            debugState.lastError =
+                'ERROR: ' +
+                (
+                    error.message
+                    ||
+                    'Riwayat pemeriksaan gagal dimuat.'
+                );
+
+            renderDebug();
+
+            showToast(
+                error.message ||
+                'Riwayat pemeriksaan gagal dimuat.'
+            );
+
+        }
+
+    }
+
+
+    let historyInitialized = false;
+
+
+    function hasReviewerConfig(){
+
+        return !!(
+            window.spj26ReviewerPortalConfig
+            &&
+            window.spj26ReviewerPortalConfig.ajaxUrl
+            &&
+            window.spj26ReviewerPortalConfig.nonce
+        );
+
+    }
+
+
+    function initialize(){
+
+        if(historyInitialized){
+            return;
+        }
+
+        syncDebugConfig();
+
+        if(!hasReviewerConfig()){
+
+            debugState.lastError =
+                'ERROR: Reviewer config belum tersedia untuk URL ini.';
+
+            renderDebug();
+
+            showToast(
+                'Menunggu konfigurasi backend Reviewer...'
+            );
+
+            let attempts = 0;
+
+            const waitTimer =
+                window.setInterval(
+                    function(){
+
+                        attempts += 1;
+
+                        if(hasReviewerConfig()){
+
+                            window.clearInterval(
+                                waitTimer
+                            );
+
+                            syncDebugConfig();
+                            initialize();
+                            return;
+                        }
+
+                        if(attempts >= 20){
+
+                            window.clearInterval(
+                                waitTimer
+                            );
+
+                            debugState.lastError =
+                                'ERROR: Reviewer config tidak dicetak backend pada URL ini.';
+
+                            renderDebug();
+
+                            showToast(
+                                'Konfigurasi backend Reviewer belum tersedia.'
+                            );
+                        }
+
+                    },
+                    250
+                );
+
+            return;
+        }
+
+
+        historyInitialized = true;
+
+        renderIdentity();
+
+        loadHistory(false);
+
+
+        window.setInterval(
+            function(){
+                loadHistory(false);
+            },
+            30000
+        );
+
+    }
+
+
+    if(
+        document.readyState ===
+        'complete'
+    ){
+
+        initialize();
+
+    }else{
+
+        window.addEventListener(
+            'load',
+            initialize,
+            { once:true }
+        );
+
+        document.addEventListener(
+            'DOMContentLoaded',
+            initialize,
+            { once:true }
+        );
+
+    }
+
+})();
+</script>
+
+<script>
+(function(){
+    const root = document.getElementById("spj26revhist-root");
+    if(!root) return;
+
+    const CURRENT_SECTION = "completed";
+    const STORAGE_VERSION = 'v2';
+
+    const PATHS = {
+        available:'/reviewer-sipatuju/pengajuan-tersedia/',
+        active:'/reviewer-sipatuju/pemeriksaan-saya/',
+        completed:'/riwayat-pemeriksaan/'
+    };
+
+    function normalizePath(value){
+        try{
+            return new URL(value, window.location.origin).pathname.replace(/\/+$/, '') + '/';
+        }catch(error){
+            return '';
+        }
+    }
+
+    function findNavLink(path){
+        const wanted = normalizePath(path);
+        const links = root.querySelectorAll('.spj26rev-nav-link[href]');
+
+        for(const link of links){
+            if(normalizePath(link.getAttribute('href')) === wanted){
+                return link;
+            }
+        }
+
+        return null;
+    }
+
+    function ensureIndicator(section){
+        const link = findNavLink(PATHS[section]);
+        if(!link) return null;
+
+        Array.from(link.children).forEach(function(node){
+            if(
+                node.classList
+                &&
+                (
+                    node.classList.contains('spj26rev-nav-badge')
+                    ||
+                    node.classList.contains('spj26rev-nav-count')
+                    ||
+                    node.classList.contains('spj26rev-nav-notification')
+                )
+            ){
+                node.remove();
+            }
+        });
+
+        const wrap = document.createElement('span');
+        wrap.className = 'spj26rev-nav-notification';
+
+        const badge = document.createElement('span');
+        badge.className = 'spj26rev-nav-badge';
+        badge.textContent = '0';
+
+        const dot = document.createElement('span');
+        dot.className = 'spj26rev-nav-dot';
+        dot.hidden = true;
+
+        wrap.appendChild(badge);
+        wrap.appendChild(dot);
+        link.appendChild(wrap);
+
+        return {link:link,wrap:wrap,badge:badge,dot:dot};
+    }
+
+    const indicators = {
+        available:ensureIndicator('available'),
+        active:ensureIndicator('active'),
+        completed:ensureIndicator('completed')
+    };
+
+    function getConfig(){
+        return window.spj26ReviewerPortalConfig || null;
+    }
+
+    function getIdentity(){
+        const cfg = getConfig() || {};
+        return String(cfg.username || cfg.name || 'reviewer')
+            .trim()
+            .replace(/[^a-zA-Z0-9_-]/g,'_');
+    }
+
+    function getStorageKey(){
+        return 'spj26rev_sidebar_seen_' + STORAGE_VERSION + '_' + getIdentity();
+    }
+
+    function buildSnapshot(items){
+        const result = {};
+        const list = Array.isArray(items) ? items : [];
+
+        list.forEach(function(item){
+            if(!item) return;
+
+            const key = String(item.id || item.code || '').trim();
+            if(!key) return;
+
+            const journals = Array.isArray(item.journals)
+                ? item.journals.map(function(journal){
+                    return {
+                        id:journal && journal.id ? String(journal.id) : '',
+                        order:journal && journal.order ? String(journal.order) : '',
+                        name:journal && journal.name ? String(journal.name) : '',
+                        issn:journal && journal.issn ? String(journal.issn) : '',
+                        quartile:journal && journal.quartile ? String(journal.quartile) : '',
+                        link:journal && journal.link ? String(journal.link) : '',
+                        decision:journal && journal.decision ? String(journal.decision) : '',
+                        comment:journal && journal.comment ? String(journal.comment) : ''
+                    };
+                })
+                : [];
+
+            result[key] = JSON.stringify({
+                code:item.code ? String(item.code) : '',
+                status:item.status ? String(item.status) : '',
+                status_label:item.status_label ? String(item.status_label) : '',
+                assigned_at:item.assigned_at ? String(item.assigned_at) : '',
+                updated_at:item.updated_at ? String(item.updated_at) : '',
+                completed_at:item.completed_at ? String(item.completed_at) : '',
+                journals:journals
+            });
+        });
+
+        return result;
+    }
+
+    function diffCount(current, seen){
+        const keys = new Set([
+            ...Object.keys(current || {}),
+            ...Object.keys(seen || {})
+        ]);
+
+        let count = 0;
+
+        keys.forEach(function(key){
+            if((current || {})[key] !== (seen || {})[key]){
+                count += 1;
+            }
+        });
+
+        return count;
+    }
+
+    function readState(){
+        try{
+            const raw = window.localStorage.getItem(getStorageKey());
+            if(!raw) return null;
+
+            const parsed = JSON.parse(raw);
+            return parsed && typeof parsed === 'object'
+                ? parsed
+                : null;
+        }catch(error){
+            console.warn(
+                'SIPATUJU Reviewer: state notifikasi tidak dapat dibaca.',
+                error
+            );
+            return null;
+        }
+    }
+
+    function writeState(state){
+        try{
+            window.localStorage.setItem(
+                getStorageKey(),
+                JSON.stringify(state)
+            );
+        }catch(error){
+            console.warn(
+                'SIPATUJU Reviewer: state notifikasi tidak dapat disimpan.',
+                error
+            );
+        }
+    }
+
+    function setIndicator(section,total,unread){
+        const indicator = indicators[section];
+        if(!indicator) return;
+
+        indicator.badge.textContent = String(total);
+        indicator.dot.hidden = unread <= 0;
+
+        indicator.wrap.title = unread > 0
+            ? unread + ' pembaruan belum dilihat'
+            : total + ' data saat ini';
+    }
+
+    async function requestData(){
+        const cfg = getConfig();
+
+        if(!cfg || !cfg.ajaxUrl || !cfg.nonce){
+            throw new Error('Konfigurasi Reviewer belum tersedia.');
+        }
+
+        const body = new URLSearchParams();
+        body.append('action','spj26_reviewer_dashboard_data');
+        body.append('nonce',cfg.nonce);
+
+        const response = await fetch(
+            cfg.ajaxUrl,
+            {
+                method:'POST',
+                credentials:'same-origin',
+                headers:{
+                    'Content-Type':'application/x-www-form-urlencoded; charset=UTF-8'
+                },
+                body:body.toString()
+            }
+        );
+
+        const result = await response.json();
+
+        if(!result || result.success !== true){
+            throw new Error(
+                result && result.data && result.data.message
+                    ? result.data.message
+                    : 'Data Reviewer gagal dimuat.'
+            );
+        }
+
+        return result.data || {};
+    }
+
+    async function refreshSidebar(){
+        try{
+            const data = await requestData();
+
+            const lists = {
+                available:Array.isArray(data.available) ? data.available : [],
+                active:Array.isArray(data.active) ? data.active : [],
+                completed:Array.isArray(data.completed) ? data.completed : []
+            };
+
+            const current = {
+                available:buildSnapshot(lists.available),
+                active:buildSnapshot(lists.active),
+                completed:buildSnapshot(lists.completed)
+            };
+
+            let state = readState();
+
+            if(!state){
+                state = {
+                    available:current.available,
+                    active:current.active,
+                    completed:current.completed
+                };
+            }
+
+            const unread = {
+                available:diffCount(current.available,state.available || {}),
+                active:diffCount(current.active,state.active || {}),
+                completed:diffCount(current.completed,state.completed || {})
+            };
+
+            if(CURRENT_SECTION === 'available'){
+                state.available = current.available;
+                unread.available = 0;
+            }
+
+            if(CURRENT_SECTION === 'active'){
+                state.active = current.active;
+                unread.active = 0;
+            }
+
+            if(CURRENT_SECTION === 'completed'){
+                state.completed = current.completed;
+                unread.completed = 0;
+            }
+
+            setIndicator('available',lists.available.length,unread.available);
+            setIndicator('active',lists.active.length,unread.active);
+            setIndicator('completed',lists.completed.length,unread.completed);
+
+            writeState(state);
+
+            window.dispatchEvent(
+                new CustomEvent(
+                    'spj26:reviewer-sidebar-sync',
+                    {detail:{data:data,unread:unread}}
+                )
+            );
+
+        }catch(error){
+            console.warn(
+                'SIPATUJU Reviewer: sinkronisasi notifikasi sidebar gagal.',
+                error
+            );
+        }
+    }
+
+    function init(){
+        refreshSidebar();
+        window.setInterval(refreshSidebar,30000);
+    }
+
+    if(document.readyState === 'complete'){
+        init();
+    }else{
+        window.addEventListener('load',init,{once:true});
+    }
+})();
+</script>

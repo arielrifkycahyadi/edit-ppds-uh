@@ -1,0 +1,3014 @@
+<!-- =========================================================
+     SIPATUJU PPDS FK UNHAS
+     PAGE      : HASIL PEMERIKSAAN
+     WORDPRESS : 00 Hasil Pemeriksaan
+     PARENT    : 00 Dashboard Residen
+     SLUG      : hasil
+     URL       : /residen-sipatuju/hasil/
+     ROLE      : Residen
+     FORMAT    : Elementor HTML Widget
+     NAMESPACE : spj26res
+     ROOT      : #spj26res-results-root
+     SYNC      : Residen Flow v5 - fullpage canonical UI
+
+     Revisi:
+     - Sidebar "Buat Pengajuan" selalu aktif
+     - Sidebar "Hasil Pemeriksaan" memiliki indikator notif menyala
+     - Tampilan isi diubah menjadi layout tabel seperti mockup
+     - Filter status, search, pagination, dan action button per artikel
+     - Status Residen: Sedang Diperiksa / Tidak Layak / Selesai
+     - Identitas pemeriksa tidak diekspos ke antarmuka Residen
+     - Auto-refresh data setiap 30 detik
+     - Popup detail: Abstrak full-width, Pembimbing full-width, tanggal sejajar
+     - Tombol Submit Artikel Baru di toolbar dihapus
+     - Search sejajar satu baris dengan filter status pada desktop
+     - Terintegrasi dengan Dashboard dan Buat Pengajuan dalam flow Residen
+     - Tidak menambah endpoint AJAX baru
+     - Kolom KET dihapus; Submit/Update dipindah ke bawah Kode Artikel
+     - Jenis artikel di bawah Judul Artikel dihapus
+     - Label kecil Dosen Pembimbing di bawah nama pembimbing dihapus
+     - Status Selesai menampilkan Unduh Surat hanya jika backend menyatakan LoA tersedia
+     - Unduh Surat tidak membuka preview/cetak; URL diambil dari backend/config
+     - Pagination dapat dipilih: 10 / 20 / 30 / Semua data
+========================================================== -->
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:wght@600;700;800&family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap');
+
+#spj26res-results-root {
+    --spj26res-maroon: #9d1b16;
+    --spj26res-maroon-dark: #7f1511;
+    --spj26res-maroon-soft: #fcebea;
+    --spj26res-green: #2fb36d;
+    --spj26res-green-soft: #e9f9f0;
+    --spj26res-red: #d64545;
+    --spj26res-red-soft: #fff0f0;
+    --spj26res-blue: #5a89ea;
+    --spj26res-blue-soft: #ebf2ff;
+    --spj26res-red-soft: #fff1ef;
+    --spj26res-red-line: #f1c2b9;
+    --spj26res-white: #ffffff;
+    --spj26res-background: #f5f7fb;
+    --spj26res-surface: #ffffff;
+    --spj26res-surface-soft: #f8fafc;
+    --spj26res-border: #e8edf4;
+    --spj26res-text: #162032;
+    --spj26res-text-secondary: #5b677a;
+    --spj26res-text-muted: #8a94a6;
+    --spj26res-shadow: 0 18px 38px rgba(23, 32, 55, 0.06);
+
+    width: 100%;
+    height: 100vh;
+    height: 100dvh;
+    min-height: 0;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    background: var(--spj26res-background);
+    font-family: "Inter", Arial, sans-serif;
+    color: var(--spj26res-text);
+    box-sizing: border-box;
+}
+
+#spj26res-results-root *,
+#spj26res-results-root *::before,
+#spj26res-results-root *::after {
+    box-sizing: border-box;
+}
+
+#spj26res-results-root h1,
+#spj26res-results-root h2,
+#spj26res-results-root h3,
+#spj26res-results-root p {
+    margin: 0;
+}
+
+#spj26res-results-root a {
+    color: inherit;
+    text-decoration: none;
+}
+
+#spj26res-results-root button,
+#spj26res-results-root input {
+    font: inherit;
+}
+
+html.spj26res-page-lock,
+body.spj26res-page-lock {
+    width: 100% !important;
+    height: 100% !important;
+    min-height: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: hidden !important;
+}
+
+body.spj26res-page-lock #page,
+body.spj26res-page-lock .site,
+body.spj26res-page-lock .site-content,
+body.spj26res-page-lock .elementor,
+body.spj26res-page-lock .elementor-section-wrap,
+body.spj26res-page-lock .elementor-element,
+body.spj26res-page-lock .elementor-widget,
+body.spj26res-page-lock .elementor-widget-container {
+    max-height: none !important;
+}
+
+#spj26res-results-root .spj26res-layout {
+    width: 100%;
+    height: 100%;
+    display: grid;
+    grid-template-columns: 300px minmax(0, 1fr);
+    grid-template-rows: 76px minmax(0, 1fr);
+}
+
+#spj26res-results-root .spj26res-header {
+    grid-column: 1 / -1;
+    grid-row: 1;
+    background: var(--spj26res-white);
+    border-bottom: 1px solid var(--spj26res-border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+    padding: 0 30px;
+    min-width: 0;
+    z-index: 10;
+}
+
+#spj26res-results-root .spj26res-header-left,
+#spj26res-results-root .spj26res-header-right,
+#spj26res-results-root .spj26res-user,
+#spj26res-results-root .spj26res-brand-row,
+#spj26res-results-root .spj26res-nav-left {
+    display: flex;
+    align-items: center;
+}
+
+#spj26res-results-root .spj26res-header-left {
+    gap: 14px;
+    min-width: 0;
+}
+
+#spj26res-results-root .spj26res-mobile-menu {
+    display: none;
+}
+
+#spj26res-results-root .spj26res-logo {
+    width: 48px;
+    height: 48px;
+    flex: 0 0 48px;
+    border-radius: 6px;
+    background: var(--spj26res-maroon);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--spj26res-white);
+}
+
+#spj26res-results-root .spj26res-logo .material-symbols-outlined {
+    font-size: 25px;
+}
+
+#spj26res-results-root .spj26res-brand {
+    min-width: 0;
+}
+
+#spj26res-results-root .spj26res-brand-row {
+    gap: 10px;
+    min-width: 0;
+}
+
+#spj26res-results-root .spj26res-brand-name {
+    font-family: "Plus Jakarta Sans", sans-serif;
+    color: #871717;
+    font-size: 15px;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    white-space: nowrap;
+}
+
+#spj26res-results-root .spj26res-brand-divider {
+    color: #d6dce6;
+    font-size: 16px;
+}
+
+#spj26res-results-root .spj26res-brand-description {
+    color: #71605c;
+    font-size: 12px;
+    font-weight: 500;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+#spj26res-results-root .spj26res-faculty {
+    margin-top: 3px;
+    color: #76615b;
+    font-family: "JetBrains Mono", monospace;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+#spj26res-results-root .spj26res-header-right {
+    gap: 10px;
+    flex: 0 0 auto;
+}
+
+#spj26res-results-root .spj26res-user {
+    gap: 10px;
+}
+
+#spj26res-results-root .spj26res-user-text {
+    text-align: right;
+}
+
+#spj26res-results-root .spj26res-user-name {
+    display: block;
+    font-family: "Plus Jakarta Sans", sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--spj26res-text);
+}
+
+#spj26res-results-root .spj26res-user-role {
+    display: block;
+    margin-top: 1px;
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--spj26res-maroon);
+}
+
+#spj26res-results-root .spj26res-avatar {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    background: var(--spj26res-maroon);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--spj26res-white);
+}
+
+#spj26res-results-root .spj26res-avatar .material-symbols-outlined {
+    font-size: 21px;
+}
+
+#spj26res-results-root .spj26res-sidebar {
+    grid-column: 1;
+    grid-row: 2;
+    min-height: 0;
+    background: var(--spj26res-white);
+    border-right: 1px solid var(--spj26res-border);
+    padding: 18px 16px 14px 16px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    overflow: hidden;
+}
+
+#spj26res-results-root .spj26res-sidebar-main {
+    min-height: 0;
+}
+
+#spj26res-results-root .spj26res-nav-title {
+    margin: 4px 8px 7px 8px;
+    color: #6c5a57;
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+#spj26res-results-root .spj26res-nav {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+#spj26res-results-root .spj26res-nav-link {
+    width: 100%;
+    min-height: 42px;
+    padding: 9px 13px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    color: #5b4744;
+    font-size: 13px;
+    font-weight: 500;
+    transition: background-color 0.18s ease, color 0.18s ease;
+}
+
+#spj26res-results-root .spj26res-nav-link:hover {
+    background: var(--spj26res-surface-soft);
+    color: var(--spj26res-text);
+}
+
+#spj26res-results-root .spj26res-nav-link.active {
+    background: #8f1919;
+    color: var(--spj26res-white);
+    font-weight: 700;
+}
+
+#spj26res-results-root .spj26res-nav-left {
+    gap: 10px;
+    min-width: 0;
+}
+
+#spj26res-results-root .spj26res-nav-link .material-symbols-outlined {
+    font-size: 19px;
+}
+
+#spj26res-results-root .spj26res-nav-alert {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 10px;
+    height: 10px;
+    border-radius: 999px;
+    background: #6ff0aa;
+    box-shadow: 0 0 0 0 rgba(111, 240, 170, 0.7);
+    animation: spj26resPulse 1.6s infinite;
+    flex: 0 0 auto;
+}
+
+#spj26res-results-root .spj26res-nav-alert[hidden] {
+    display: none;
+}
+
+@keyframes spj26resPulse {
+    0% {
+        box-shadow: 0 0 0 0 rgba(111, 240, 170, 0.72);
+    }
+    70% {
+        box-shadow: 0 0 0 10px rgba(111, 240, 170, 0);
+    }
+    100% {
+        box-shadow: 0 0 0 0 rgba(111, 240, 170, 0);
+    }
+}
+
+#spj26res-results-root .spj26res-nav-count {
+    min-width: 20px;
+    height: 20px;
+    padding: 0 6px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.18);
+    color: inherit;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 9px;
+    font-weight: 800;
+    line-height: 1;
+}
+
+#spj26res-results-root .spj26res-nav-link:not(.active) .spj26res-nav-count {
+    background: #edf2f7;
+    color: var(--spj26res-maroon);
+}
+
+#spj26res-results-root .spj26res-nav-section-gap {
+    height: 20px;
+}
+
+#spj26res-results-root .spj26res-sidebar-info {
+    padding: 14px 15px;
+    border-radius: 8px;
+    background: #f8fafc;
+}
+
+#spj26res-results-root .spj26res-sidebar-info-title {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    color: var(--spj26res-maroon);
+    font-size: 10px;
+    font-weight: 700;
+}
+
+#spj26res-results-root .spj26res-sidebar-info-title .material-symbols-outlined {
+    font-size: 16px;
+}
+
+#spj26res-results-root .spj26res-version {
+    margin-top: 5px;
+    font-family: "JetBrains Mono", monospace;
+    color: #594b48;
+    font-size: 10px;
+    letter-spacing: 0.02em;
+}
+
+#spj26res-results-root .spj26res-department {
+    margin-top: 4px;
+    color: #665855;
+    font-size: 10px;
+    line-height: 1.45;
+}
+
+#spj26res-results-root .spj26res-rightpane {
+    grid-column: 2;
+    grid-row: 2;
+    min-width: 0;
+    min-height: 0;
+    overflow: auto;
+    display: flex;
+    flex-direction: column;
+}
+
+#spj26res-results-root .spj26res-rightpane::-webkit-scrollbar {
+    width: 10px;
+}
+
+#spj26res-results-root .spj26res-rightpane::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+#spj26res-results-root .spj26res-rightpane::-webkit-scrollbar-thumb {
+    background: #d6dee8;
+    border-radius: 999px;
+}
+
+#spj26res-results-root .spj26res-main {
+    min-width: 0;
+    padding: 28px;
+}
+
+#spj26res-results-root .spj26res-panel {
+    background: var(--spj26res-surface);
+    border: 1px solid var(--spj26res-border);
+    border-radius: 18px;
+    box-shadow: var(--spj26res-shadow);
+    overflow: hidden;
+}
+
+#spj26res-results-root .spj26res-panel-top {
+    padding: 22px 24px 18px 24px;
+    border-bottom: 1px solid var(--spj26res-border);
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 18px;
+}
+
+#spj26res-results-root .spj26res-panel-title {
+    font-family: "Plus Jakarta Sans", sans-serif;
+    font-size: 30px;
+    font-weight: 800;
+    line-height: 1.15;
+    color: var(--spj26res-text);
+}
+
+#spj26res-results-root .spj26res-panel-subtitle {
+    margin-top: 8px;
+    color: var(--spj26res-text-muted);
+    font-size: 13px;
+    line-height: 1.65;
+    max-width: 760px;
+}
+
+#spj26res-results-root .spj26res-updated-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 10px 14px;
+    border-radius: 999px;
+    background: #f4f8f6;
+    color: #60706b;
+    font-size: 11px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+#spj26res-results-root .spj26res-updated-pill .material-symbols-outlined {
+    font-size: 16px;
+    color: #6bb694;
+}
+
+#spj26res-results-root .spj26res-panel-toolbar {
+    padding: 18px 24px;
+    display: flex;
+    flex-wrap: nowrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    border-bottom: 1px solid var(--spj26res-border);
+}
+
+#spj26res-results-root .spj26res-filters {
+    display: flex;
+    flex: 1 1 auto;
+    flex-wrap: nowrap;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+}
+
+#spj26res-results-root .spj26res-filter-chip {
+    border: 1px solid var(--spj26res-border);
+    background: #f7f9fc;
+    color: #6d7787;
+    border-radius: 10px;
+    min-height: 40px;
+    padding: 0 14px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: 700;
+    transition: all 0.18s ease;
+}
+
+#spj26res-results-root .spj26res-filter-chip:hover {
+    border-color: #d9e2ee;
+    background: #f3f6fb;
+}
+
+#spj26res-results-root .spj26res-filter-chip.is-active {
+    background: var(--spj26res-maroon);
+    color: #ffffff;
+    border-color: var(--spj26res-maroon);
+}
+
+#spj26res-results-root .spj26res-filter-chip-count {
+    font-weight: 800;
+    font-size: 11px;
+    opacity: 0.88;
+}
+
+#spj26res-results-root .spj26res-toolbar-actions {
+    display: flex;
+    flex: 0 0 auto;
+    flex-wrap: nowrap;
+    align-items: center;
+    gap: 10px;
+    justify-content: flex-end;
+}
+
+#spj26res-results-root .spj26res-search {
+    position: relative;
+    flex: 0 0 auto;
+}
+
+#spj26res-results-root .spj26res-search .material-symbols-outlined {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #afbacd;
+    font-size: 18px;
+}
+
+#spj26res-results-root .spj26res-search input {
+    width: 285px;
+    min-height: 40px;
+    padding: 0 14px 0 38px;
+    border-radius: 10px;
+    border: 1px solid var(--spj26res-border);
+    background: #fbfcfe;
+    color: var(--spj26res-text);
+    outline: none;
+}
+
+#spj26res-results-root .spj26res-search input:focus {
+    border-color: #cfdae9;
+    background: #ffffff;
+}
+
+#spj26res-results-root .spj26res-table {
+    width: 100%;
+}
+
+#spj26res-results-root .spj26res-table-head,
+#spj26res-results-root .spj26res-table-row {
+    display: grid;
+    grid-template-columns: 150px minmax(0, 2.4fr) minmax(0, 1.3fr) 145px 150px;
+    gap: 18px;
+    align-items: start;
+}
+
+#spj26res-results-root .spj26res-table-head {
+    padding: 14px 24px;
+    background: #f8fafc;
+    border-bottom: 1px solid var(--spj26res-border);
+    color: #8491a2;
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+}
+
+#spj26res-results-root .spj26res-table-body {
+    min-height: 180px;
+}
+
+#spj26res-results-root .spj26res-table-row {
+    padding: 18px 24px;
+    border-bottom: 1px solid var(--spj26res-border);
+    background: #ffffff;
+}
+
+#spj26res-results-root .spj26res-table-row:last-child {
+    border-bottom: none;
+}
+
+#spj26res-results-root .spj26res-code {
+    font-size: 15px;
+    font-weight: 800;
+    color: #111827;
+    line-height: 1.2;
+}
+
+#spj26res-results-root .spj26res-code-chips {
+    margin-top: 8px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+#spj26res-results-root .spj26res-code-dates {
+    margin-top: 10px;
+}
+
+#spj26res-results-root .spj26res-code-dates .spj26res-table-cell-note {
+    margin-top: 3px;
+    font-size: 10px;
+    line-height: 1.45;
+}
+
+#spj26res-results-root .spj26res-mini-chip {
+    display: inline-flex;
+    align-items: center;
+    min-height: 22px;
+    padding: 0 8px;
+    border-radius: 6px;
+    background: #f4f7fb;
+    color: #64748b;
+    font-size: 10px;
+    font-weight: 700;
+}
+
+#spj26res-results-root .spj26res-title {
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 1.4;
+    color: #1b2433;
+}
+
+#spj26res-results-root .spj26res-submeta,
+#spj26res-results-root .spj26res-person-meta,
+#spj26res-results-root .spj26res-table-cell-note {
+    margin-top: 6px;
+    color: #718096;
+    font-size: 11px;
+    line-height: 1.6;
+}
+
+#spj26res-results-root .spj26res-submeta strong,
+#spj26res-results-root .spj26res-person-meta strong {
+    color: #394456;
+    font-weight: 700;
+}
+
+#spj26res-results-root .spj26res-person-name {
+    font-size: 13px;
+    font-weight: 700;
+    color: #233044;
+    line-height: 1.45;
+}
+
+#spj26res-results-root .spj26res-status-pill {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 125px;
+    min-height: 38px;
+    padding: 0 16px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 800;
+    text-transform: uppercase;
+    text-align: center;
+    line-height: 1.2;
+    border: 1px solid transparent;
+}
+
+#spj26res-results-root .spj26res-status-pill.completed {
+    background: var(--spj26res-green-soft);
+    color: var(--spj26res-green);
+    border-color: #c7edd8;
+}
+
+#spj26res-results-root .spj26res-status-pill.not-eligible {
+    background: var(--spj26res-red-soft);
+    color: var(--spj26res-red);
+    border-color: #f0b8b8;
+}
+
+#spj26res-results-root .spj26res-status-pill.processing {
+    background: var(--spj26res-blue-soft);
+    color: var(--spj26res-blue);
+    border-color: #d0defe;
+}
+
+#spj26res-results-root .spj26res-row-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+}
+
+#spj26res-results-root .spj26res-btn {
+    min-height: 36px;
+    padding: 0 14px;
+    border-radius: 10px;
+    border: 1px solid var(--spj26res-border);
+    background: #ffffff;
+    color: #4a5568;
+    font-size: 11px;
+    font-weight: 700;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.18s ease;
+}
+
+#spj26res-results-root .spj26res-btn:hover {
+    background: #f8fafc;
+}
+
+#spj26res-results-root .spj26res-btn-primary {
+    background: var(--spj26res-maroon);
+    color: #ffffff;
+    border-color: var(--spj26res-maroon);
+}
+
+#spj26res-results-root .spj26res-btn-primary:hover {
+    background: var(--spj26res-maroon-dark);
+    border-color: var(--spj26res-maroon-dark);
+}
+
+
+#spj26res-results-root .spj26res-panel-bottom {
+    padding: 14px 24px 18px 24px;
+    border-top: 1px solid var(--spj26res-border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    color: #8a97a8;
+    font-size: 12px;
+}
+
+#spj26res-results-root .spj26res-page-size-control {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #7b8798;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+#spj26res-results-root .spj26res-page-size-select {
+    min-width: 78px;
+    height: 34px;
+    padding: 0 28px 0 10px;
+    border: 1px solid var(--spj26res-border);
+    border-radius: 8px;
+    background: #ffffff;
+    color: var(--spj26res-text);
+    font-size: 12px;
+    font-weight: 700;
+    outline: none;
+    cursor: pointer;
+}
+
+#spj26res-results-root .spj26res-page-size-select:hover {
+    border-color: #d2dbe7;
+}
+
+#spj26res-results-root .spj26res-page-size-select:focus {
+    border-color: var(--spj26res-maroon);
+    box-shadow: 0 0 0 3px rgba(143, 25, 25, 0.08);
+}
+
+#spj26res-results-root .spj26res-pagination {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+#spj26res-results-root .spj26res-page-btn,
+#spj26res-results-root .spj26res-page-number {
+    min-width: 30px;
+    min-height: 30px;
+    padding: 0 10px;
+    border-radius: 9px;
+    border: 1px solid var(--spj26res-border);
+    background: #ffffff;
+    color: #8c98a9;
+    font-size: 11px;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#spj26res-results-root .spj26res-page-btn {
+    cursor: pointer;
+}
+
+#spj26res-results-root .spj26res-page-btn:hover:not(:disabled) {
+    background: #f8fafc;
+}
+
+#spj26res-results-root .spj26res-page-btn:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+}
+
+#spj26res-results-root .spj26res-page-number.is-active {
+    background: var(--spj26res-maroon);
+    border-color: var(--spj26res-maroon);
+    color: #ffffff;
+}
+
+#spj26res-results-root .spj26res-empty {
+    padding: 60px 24px;
+    text-align: center;
+}
+
+#spj26res-results-root .spj26res-empty .material-symbols-outlined {
+    font-size: 38px;
+    color: #b2becf;
+}
+
+#spj26res-results-root .spj26res-empty-title {
+    margin-top: 12px;
+    font-family: "Plus Jakarta Sans", sans-serif;
+    font-size: 20px;
+    font-weight: 800;
+    color: #243042;
+}
+
+#spj26res-results-root .spj26res-empty-text {
+    margin-top: 8px;
+    color: #8591a2;
+    font-size: 13px;
+}
+
+#spj26res-results-root .spj26res-footer {
+    margin-top: auto;
+    padding: 18px 28px 22px 28px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    color: #6b7788;
+    font-size: 11px;
+}
+
+#spj26res-results-root .spj26res-footer-left {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    min-width: 0;
+}
+
+#spj26res-results-root .spj26res-footer-brand {
+    color: var(--spj26res-maroon);
+    font-weight: 700;
+}
+
+#spj26res-results-root .spj26res-footer-right {
+    color: #7e8898;
+    font-family: "JetBrains Mono", monospace;
+    font-size: 9px;
+    white-space: nowrap;
+}
+
+#spj26res-results-root .spj26res-toast {
+    position: fixed;
+    right: 20px;
+    bottom: 20px;
+    z-index: 130;
+    max-width: 360px;
+    padding: 12px 14px;
+    border-radius: 12px;
+    background: rgba(22, 32, 50, 0.96);
+    color: #ffffff;
+    font-size: 12px;
+    line-height: 1.55;
+    box-shadow: 0 18px 40px rgba(0, 0, 0, 0.25);
+}
+
+#spj26res-results-root .spj26res-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 120;
+    display: none;
+}
+
+#spj26res-results-root .spj26res-modal.open {
+    display: block;
+}
+
+#spj26res-results-root .spj26res-modal-backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.54);
+}
+
+#spj26res-results-root .spj26res-modal-dialog {
+    position: relative;
+    width: min(980px, calc(100% - 32px));
+    max-height: calc(100vh - 48px);
+    max-height: calc(100dvh - 48px);
+    margin: 24px auto;
+    background: #ffffff;
+    border-radius: 18px;
+    overflow: hidden;
+    box-shadow: 0 24px 60px rgba(15, 23, 42, 0.2);
+    display: flex;
+    flex-direction: column;
+}
+
+#spj26res-results-root .spj26res-modal-head {
+    padding: 20px 22px;
+    border-bottom: 1px solid var(--spj26res-border);
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+}
+
+#spj26res-results-root .spj26res-modal-title {
+    font-family: "Plus Jakarta Sans", sans-serif;
+    font-size: 22px;
+    font-weight: 800;
+    color: #182133;
+}
+
+#spj26res-results-root .spj26res-modal-subtitle {
+    margin-top: 8px;
+    color: #7a8698;
+    font-size: 12px;
+    line-height: 1.6;
+}
+
+#spj26res-results-root .spj26res-modal-close {
+    width: 40px;
+    height: 40px;
+    border: 1px solid var(--spj26res-border);
+    border-radius: 10px;
+    background: #ffffff;
+    color: #708094;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+
+#spj26res-results-root .spj26res-modal-body {
+    padding: 20px 22px 24px 22px;
+    overflow: auto;
+}
+
+#spj26res-results-root .spj26res-detail-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px;
+}
+
+#spj26res-results-root .spj26res-detail-box {
+    padding: 14px 16px;
+    border-radius: 14px;
+    background: #f8fafc;
+    border: 1px solid var(--spj26res-border);
+}
+
+#spj26res-results-root .spj26res-detail-box-full {
+    grid-column: 1 / -1;
+}
+
+#spj26res-results-root .spj26res-detail-label {
+    color: #8894a7;
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+}
+
+#spj26res-results-root .spj26res-detail-value {
+    margin-top: 8px;
+    color: #233044;
+    font-size: 13px;
+    line-height: 1.7;
+    white-space: pre-wrap;
+    word-break: break-word;
+}
+
+#spj26res-results-root .spj26res-journal-list {
+    margin-top: 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+#spj26res-results-root .spj26res-journal-card {
+    border: 1px solid var(--spj26res-border);
+    border-radius: 15px;
+    overflow: hidden;
+}
+
+#spj26res-results-root .spj26res-journal-top {
+    padding: 14px 16px;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 14px;
+}
+
+#spj26res-results-root .spj26res-journal-name {
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 1.5;
+    color: #172031;
+}
+
+#spj26res-results-root .spj26res-journal-meta {
+    margin-top: 6px;
+    color: #778398;
+    font-size: 11px;
+    line-height: 1.6;
+}
+
+#spj26res-results-root .spj26res-journal-comment {
+    padding: 12px 16px 16px 16px;
+    border-top: 1px solid var(--spj26res-border);
+    background: #fbfcfe;
+}
+
+#spj26res-results-root .spj26res-journal-comment-label {
+    color: #8491a2;
+    font-size: 10px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+#spj26res-results-root .spj26res-journal-comment-text {
+    margin-top: 8px;
+    color: #354255;
+    font-size: 12px;
+    line-height: 1.7;
+    white-space: pre-wrap;
+}
+
+#spj26res-results-root .spj26res-overlay {
+    display: none;
+}
+
+@media (max-width: 1080px) {
+    #spj26res-results-root .spj26res-panel-toolbar {
+        flex-wrap: wrap;
+    }
+
+    #spj26res-results-root .spj26res-filters {
+        flex-wrap: wrap;
+    }
+
+    #spj26res-results-root .spj26res-toolbar-actions {
+        margin-left: auto;
+    }
+}
+
+@media (max-width: 1180px) {
+    #spj26res-results-root .spj26res-search input {
+        width: 240px;
+    }
+
+    #spj26res-results-root .spj26res-table-head,
+    #spj26res-results-root .spj26res-table-row {
+        grid-template-columns: 140px minmax(0, 2.1fr) minmax(0, 1.15fr) 130px 145px;
+    }
+}
+
+@media (max-width: 960px) {
+    #spj26res-results-root .spj26res-layout {
+        grid-template-columns: 250px minmax(0, 1fr);
+    }
+
+    #spj26res-results-root .spj26res-panel-top,
+    #spj26res-results-root .spj26res-panel-toolbar,
+    #spj26res-results-root .spj26res-panel-bottom {
+        padding-left: 18px;
+        padding-right: 18px;
+    }
+
+    #spj26res-results-root .spj26res-table-head,
+    #spj26res-results-root .spj26res-table-row {
+        gap: 12px;
+        padding-left: 18px;
+        padding-right: 18px;
+    }
+}
+
+@media (max-width: 800px) {
+    html.spj26res-page-lock,
+    body.spj26res-page-lock {
+        height: auto !important;
+        min-height: 100% !important;
+        overflow-x: hidden !important;
+        overflow-y: auto !important;
+    }
+
+    #spj26res-results-root {
+        height: auto;
+        min-height: 100vh;
+        overflow: visible;
+    }
+
+    #spj26res-results-root .spj26res-layout {
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+    }
+
+    #spj26res-results-root .spj26res-header {
+        min-height: 64px;
+        padding: 8px 14px;
+    }
+
+    #spj26res-results-root .spj26res-mobile-menu {
+        display: flex;
+        width: 38px;
+        height: 38px;
+        align-items: center;
+        justify-content: center;
+        border: 1px solid var(--spj26res-border);
+        border-radius: 6px;
+        background: var(--spj26res-white);
+        color: var(--spj26res-maroon);
+        cursor: pointer;
+        flex: 0 0 auto;
+    }
+
+    #spj26res-results-root .spj26res-logo {
+        width: 38px;
+        height: 38px;
+        flex-basis: 38px;
+    }
+
+    #spj26res-results-root .spj26res-brand-name {
+        font-size: 11px;
+    }
+
+    #spj26res-results-root .spj26res-faculty,
+    #spj26res-results-root .spj26res-brand-divider,
+    #spj26res-results-root .spj26res-brand-description,
+    #spj26res-results-root .spj26res-user-text {
+        display: none;
+    }
+
+    #spj26res-results-root .spj26res-sidebar {
+        position: fixed;
+        left: 0;
+        top: 0;
+        width: 270px;
+        height: 100vh;
+        height: 100dvh;
+        overflow-y: auto;
+        overflow-x: hidden;
+        z-index: 100;
+        transform: translateX(-102%);
+        transition: transform 0.22s ease;
+        box-shadow: 8px 0 24px rgba(15, 23, 42, 0.14);
+    }
+
+    #spj26res-results-root .spj26res-sidebar.open {
+        transform: translateX(0);
+    }
+
+    #spj26res-results-root .spj26res-overlay {
+        position: fixed;
+        inset: 0;
+        z-index: 90;
+        background: rgba(15, 23, 42, 0.4);
+    }
+
+    #spj26res-results-root .spj26res-overlay.open {
+        display: block;
+    }
+
+    #spj26res-results-root .spj26res-rightpane {
+        overflow: visible;
+    }
+
+    #spj26res-results-root .spj26res-main {
+        padding: 16px;
+    }
+
+    #spj26res-results-root .spj26res-panel-top {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    #spj26res-results-root .spj26res-panel-title {
+        font-size: 24px;
+    }
+
+    #spj26res-results-root .spj26res-updated-pill {
+        width: fit-content;
+    }
+
+    #spj26res-results-root .spj26res-panel-toolbar {
+        align-items: stretch;
+    }
+
+    #spj26res-results-root .spj26res-toolbar-actions,
+    #spj26res-results-root .spj26res-filters {
+        justify-content: flex-start;
+    }
+
+    #spj26res-results-root .spj26res-toolbar-actions {
+        width: 100%;
+        flex-wrap: wrap;
+    }
+
+    #spj26res-results-root .spj26res-search,
+    #spj26res-results-root .spj26res-search input {
+        width: 100%;
+    }
+
+    #spj26res-results-root .spj26res-table-head {
+        display: none;
+    }
+
+    #spj26res-results-root .spj26res-table-row {
+        display: block;
+    }
+
+    #spj26res-results-root .spj26res-table-cell + .spj26res-table-cell {
+        margin-top: 14px;
+    }
+
+    #spj26res-results-root .spj26res-row-actions {
+        margin-top: 12px;
+    }
+
+    #spj26res-results-root .spj26res-panel-bottom {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    #spj26res-results-root .spj26res-page-size-control {
+        width: 100%;
+        flex-wrap: wrap;
+    }
+
+    #spj26res-results-root .spj26res-pagination {
+        width: 100%;
+        justify-content: flex-start;
+        flex-wrap: wrap;
+    }
+
+    #spj26res-results-root .spj26res-footer {
+        padding: 12px 16px 18px 16px;
+        flex-direction: column;
+        align-items: flex-start;
+        justify-content: center;
+        gap: 4px;
+    }
+
+    #spj26res-results-root .spj26res-detail-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+
+/* =========================================================
+   SIDEBAR NOTIFICATION - REFINED
+   Dot indikator ditempelkan ke badge angka agar tidak
+   mengganggu alignment teks menu.
+========================================================= */
+#spj26res-results-root .spj26res-nav-link > .spj26res-nav-left:first-child {
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+#spj26res-results-root .spj26res-nav-notification {
+    position: relative;
+    margin-left: auto;
+    min-width: 24px;
+    min-height: 24px;
+    flex: 0 0 auto;
+    display: inline-flex;
+    align-items: center;
+    justify-content: flex-end;
+    padding-left: 10px;
+}
+
+#spj26res-results-root .spj26res-nav-notification .spj26res-nav-count {
+    min-width: 24px;
+    height: 24px;
+    padding: 0 7px;
+    font-size: 10px;
+    line-height: 1;
+}
+
+#spj26res-results-root .spj26res-nav-notification .spj26res-nav-alert {
+    position: absolute;
+    top: -2px;
+    right: -2px;
+    width: 8px;
+    height: 8px;
+    z-index: 2;
+    background: #4ade80;
+    border: 2px solid #ffffff;
+    box-shadow: 0 0 0 0 rgba(74, 222, 128, 0.55);
+    animation: spj26resPulse 1.8s infinite;
+}
+
+#spj26res-results-root .spj26res-nav-link.active .spj26res-nav-notification .spj26res-nav-alert {
+    border-color: #8f1919;
+}
+
+@media (max-width: 800px) {
+    #spj26res-results-root .spj26res-nav-notification {
+        padding-left: 8px;
+    }
+}
+
+
+
+/* =========================================================
+   SIDEBAR GLOBAL SYNC v3
+   Canonical sidebar untuk Dashboard, Buat Pengajuan, dan
+   Hasil Pemeriksaan. Menyamakan ukuran, spacing, active state,
+   dan posisi notifikasi Hasil Pemeriksaan.
+========================================================= */
+#spj26res-results-root .spj26res-nav-link {
+    min-height: 42px;
+    padding: 9px 13px;
+    border-radius: 8px;
+    color: #5b4744;
+    font-size: 13px;
+    font-weight: 500;
+}
+
+#spj26res-results-root .spj26res-nav-link.active {
+    background: #8f1919;
+    color: #ffffff;
+    font-weight: 700;
+}
+
+#spj26res-results-root .spj26res-nav-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+}
+
+#spj26res-results-root .spj26res-nav-link .material-symbols-outlined {
+    font-size: 19px;
+    flex: 0 0 auto;
+}
+
+/* Hasil Pemeriksaan: label kiri, notification kanan. */
+#spj26res-results-root #spj26res-results-nav {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    column-gap: 16px;
+    width: 100%;
+}
+
+#spj26res-results-root #spj26res-results-nav > .spj26res-nav-left {
+    width: 100%;
+    min-width: 0;
+    flex: none;
+}
+
+#spj26res-results-root #spj26res-results-nav > .spj26res-nav-left > span:last-child {
+    min-width: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+#spj26res-results-root #spj26res-results-nav > .spj26res-nav-notification {
+    position: relative;
+    justify-self: end;
+    width: auto;
+    min-width: 28px;
+    min-height: 28px;
+    margin-left: 0;
+    padding-left: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 auto;
+}
+
+#spj26res-results-root #spj26res-results-nav .spj26res-nav-count {
+    min-width: 26px;
+    height: 26px;
+    padding: 0 8px;
+    border-radius: 999px;
+    background: #edf2f7;
+    color: #8f1919;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    font-weight: 800;
+    line-height: 1;
+}
+
+#spj26res-results-root #spj26res-results-nav.active .spj26res-nav-count {
+    background: rgba(255,255,255,0.18);
+    color: #ffffff;
+}
+
+#spj26res-results-root #spj26res-results-nav .spj26res-nav-alert {
+    position: absolute;
+    top: -1px;
+    right: -3px;
+    width: 8px;
+    height: 8px;
+    z-index: 2;
+    border-radius: 999px;
+    background: #4ade80;
+    border: 2px solid #ffffff;
+    box-shadow: 0 0 0 0 rgba(74, 222, 128, 0.55);
+}
+
+#spj26res-results-root #spj26res-results-nav.active .spj26res-nav-alert {
+    border-color: #8f1919;
+}
+
+#spj26res-results-root #spj26res-results-nav .spj26res-nav-count[hidden],
+#spj26res-results-root #spj26res-results-nav .spj26res-nav-alert[hidden] {
+    display: none !important;
+}
+
+@media (max-width: 800px) {
+    #spj26res-results-root #spj26res-results-nav {
+        column-gap: 12px;
+    }
+}
+
+
+
+/* =========================================================
+   TRUE FULLPAGE UI SYNC v6B — VIEWPORT SHELL
+   Dashboard / Buat Pengajuan / Hasil Pemeriksaan
+   ========================================================= */
+#spj26res-results-root {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    margin: 0 !important;
+    padding: 0 !important;
+    --spj26res-maroon: #800000;
+    --spj26res-maroon-dark: #5c0000;
+    --spj26res-background: #f5f7fb;
+    --spj26res-surface: #ffffff;
+    --spj26res-surface-soft: #f8fafc;
+    --spj26res-border: #e2e8f0;
+    --spj26res-text: #0f172a;
+    --spj26res-text-secondary: #475569;
+    --spj26res-text-muted: #64748b;
+    width: 100vw;
+    max-width: none;
+    height: 100vh;
+    height: 100dvh;
+    min-height: 0;
+    overflow: hidden;
+    background: var(--spj26res-background);
+}
+
+body.spj26res-page-lock #page,
+body.spj26res-page-lock .site,
+body.spj26res-page-lock .site-content,
+body.spj26res-page-lock .elementor,
+body.spj26res-page-lock .elementor-section-wrap,
+body.spj26res-page-lock .elementor-section,
+body.spj26res-page-lock .elementor-container,
+body.spj26res-page-lock .elementor-column,
+body.spj26res-page-lock .elementor-widget-wrap,
+body.spj26res-page-lock .elementor-widget,
+body.spj26res-page-lock .elementor-widget-container {
+    width: 100% !important;
+    max-width: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+#spj26res-results-root .spj26res-layout {
+    width: 100%;
+    height: 100%;
+    grid-template-columns: 300px minmax(0, 1fr);
+    grid-template-rows: 76px minmax(0, 1fr);
+}
+
+#spj26res-results-root .spj26res-header {
+    height: 76px;
+    min-height: 76px;
+    padding: 0 30px;
+    background: #ffffff;
+    border-bottom: 1px solid var(--spj26res-border);
+}
+
+#spj26res-results-root .spj26res-logo {
+    width: 48px;
+    height: 48px;
+    flex: 0 0 48px;
+    border-radius: 8px;
+    background: var(--spj26res-maroon);
+}
+
+#spj26res-results-root .material-symbols-outlined {
+    line-height: 1;
+    font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+}
+
+#spj26res-results-root .spj26res-sidebar {
+    grid-column: 1;
+    grid-row: 2;
+    height: 100%;
+    min-height: 0;
+    padding: 18px 16px 14px;
+    background: #ffffff;
+    border-right: 1px solid var(--spj26res-border);
+    overflow: hidden;
+}
+
+#spj26res-results-root .spj26res-nav-title {
+    margin: 4px 8px 7px;
+    color: #6c5a57;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: .04em;
+}
+
+#spj26res-results-root .spj26res-nav { gap: 5px; }
+
+#spj26res-results-root .spj26res-nav-link {
+    width: 100%;
+    min-height: 42px;
+    padding: 9px 13px;
+    border-radius: 8px;
+    color: #5b4744;
+    font-size: 13px;
+    font-weight: 500;
+}
+
+#spj26res-results-root .spj26res-nav-link:hover {
+    background: #f8fafc;
+    color: var(--spj26res-text);
+}
+
+#spj26res-results-root .spj26res-nav-link.active {
+    background: #8f1919;
+    color: #ffffff;
+    font-weight: 700;
+}
+
+#spj26res-results-root .spj26res-nav-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+}
+
+#spj26res-results-root .spj26res-nav-link .material-symbols-outlined {
+    width: 19px;
+    height: 19px;
+    flex: 0 0 19px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 19px;
+}
+
+#spj26res-results-root .spj26res-sidebar-info {
+    padding: 14px 15px;
+    border-radius: 8px;
+    background: #f8fafc;
+}
+
+#spj26res-results-root #spj26res-results-nav {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    column-gap: 16px;
+}
+
+#spj26res-results-root #spj26res-results-nav > .spj26res-nav-left > span:last-child {
+    min-width: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+#spj26res-results-root #spj26res-results-nav > .spj26res-nav-notification {
+    position: relative;
+    justify-self: end;
+    min-width: 28px;
+    min-height: 28px;
+    margin: 0;
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#spj26res-results-root #spj26res-results-nav .spj26res-nav-count {
+    min-width: 26px;
+    height: 26px;
+    padding: 0 8px;
+    border-radius: 999px;
+    background: rgba(255,255,255,.18);
+    color: #ffffff;
+    font-size: 10px;
+    font-weight: 800;
+}
+
+#spj26res-results-root #spj26res-results-nav .spj26res-nav-alert {
+    position: absolute;
+    top: -1px;
+    right: -3px;
+    width: 8px;
+    height: 8px;
+    border: 2px solid #8f1919;
+    background: #4ade80;
+}
+
+#spj26res-results-root .spj26res-rightpane {
+    grid-column: 2;
+    grid-row: 2;
+    width: 100%;
+    height: 100%;
+    min-width: 0;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+#spj26res-results-root .spj26res-main {
+    width: 100%;
+    min-width: 0;
+    min-height: 0;
+    flex: 1 1 auto;
+    padding: 28px;
+    background: var(--spj26res-background);
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+#spj26res-results-root .spj26res-panel {
+    border-radius: 14px;
+    border-color: var(--spj26res-border);
+}
+
+#spj26res-results-root .spj26res-panel-title {
+    font-size: 24px;
+    color: var(--spj26res-text);
+}
+
+#spj26res-results-root .spj26res-footer {
+    width: 100%;
+    min-height: 58px;
+    height: 58px;
+    flex: 0 0 58px;
+    margin: 0;
+    padding: 0 28px;
+    background: #ffffff;
+    border-top: 1px solid var(--spj26res-border);
+}
+
+@media (max-width: 1050px) {
+    #spj26res-results-root .spj26res-layout {
+        grid-template-columns: 240px minmax(0, 1fr);
+    }
+    #spj26res-results-root .spj26res-main { padding: 24px; }
+}
+
+@media (max-width: 800px) {
+    #spj26res-results-root {
+        position: relative;
+        inset: auto;
+        z-index: auto;
+        margin: 0 !important;
+        width: 100%;
+        height: auto;
+        min-height: 100vh;
+        min-height: 100dvh;
+        overflow: visible;
+    }
+
+    body.spj26res-page-lock #page,
+    body.spj26res-page-lock .site,
+    body.spj26res-page-lock .site-content,
+    body.spj26res-page-lock .elementor,
+    body.spj26res-page-lock .elementor-section-wrap,
+    body.spj26res-page-lock .elementor-section,
+    body.spj26res-page-lock .elementor-container,
+    body.spj26res-page-lock .elementor-column,
+    body.spj26res-page-lock .elementor-widget-wrap,
+    body.spj26res-page-lock .elementor-widget,
+    body.spj26res-page-lock .elementor-widget-container {
+        min-height: 0 !important;
+    }
+
+    #spj26res-results-root .spj26res-header {
+        height: 64px;
+        min-height: 64px;
+        padding: 8px 14px;
+    }
+
+    #spj26res-results-root .spj26res-logo {
+        width: 38px;
+        height: 38px;
+        flex-basis: 38px;
+        border-radius: 7px;
+    }
+
+    #spj26res-results-root .spj26res-layout {
+        min-height: 100dvh;
+        display: flex;
+        flex-direction: column;
+    }
+
+    #spj26res-results-root .spj26res-rightpane {
+        height: auto;
+        min-height: calc(100dvh - 64px);
+        overflow: visible;
+    }
+
+    #spj26res-results-root .spj26res-main {
+        padding: 16px;
+        overflow: visible;
+    }
+
+    #spj26res-results-root .spj26res-footer {
+        height: auto;
+        min-height: 58px;
+        flex-basis: auto;
+        padding: 12px 16px;
+    }
+}
+
+</style>
+
+<div id="spj26res-results-root">
+    <div class="spj26res-overlay" id="spj26res-overlay"></div>
+
+    <div class="spj26res-layout">
+        <header class="spj26res-header">
+            <div class="spj26res-header-left">
+                <button
+                    class="spj26res-mobile-menu"
+                    id="spj26res-menu-button"
+                    type="button"
+                    aria-label="Buka Menu"
+                >
+                    <span class="material-symbols-outlined">menu</span>
+                </button>
+
+                <div class="spj26res-logo">
+                    <span class="material-symbols-outlined">school</span>
+                </div>
+
+                <div class="spj26res-brand">
+                    <div class="spj26res-brand-row">
+                        <div class="spj26res-brand-name">SIPATUJU PPDS</div>
+                        <div class="spj26res-brand-divider">|</div>
+                        <div class="spj26res-brand-description">
+                            Sistem Pemeriksaan Kelayakan Jurnal PPDS FK UNHAS
+                        </div>
+                    </div>
+
+                    <div class="spj26res-faculty">
+                        Fakultas Kedokteran • Akreditasi Unggul
+                    </div>
+                </div>
+            </div>
+
+            <div class="spj26res-header-right">
+                <div class="spj26res-user">
+                    <div class="spj26res-user-text">
+                        <span class="spj26res-user-name" id="spj26res-user-name">Residen</span>
+                        <span class="spj26res-user-role">Residen</span>
+                    </div>
+
+                    <div class="spj26res-avatar">
+                        <span class="material-symbols-outlined">person</span>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <aside class="spj26res-sidebar" id="spj26res-sidebar">
+            <div class="spj26res-sidebar-main">
+                <div class="spj26res-nav-title">Menu Utama</div>
+
+                <nav class="spj26res-nav">
+                    <a class="spj26res-nav-link" href="/residen-sipatuju/">
+                        <span class="spj26res-nav-left">
+                            <span class="material-symbols-outlined">grid_view</span>
+                            <span>Dashboard</span>
+                        </span>
+                    </a>
+
+                    <a
+                        class="spj26res-nav-link"
+                        id="spj26res-new-submission-nav"
+                        href="/residen-sipatuju/pengajuan-baru/"
+                    >
+                        <span class="spj26res-nav-left">
+                            <span
+                                class="material-symbols-outlined"
+                                id="spj26res-new-submission-nav-icon"
+                            >post_add</span>
+                            <span id="spj26res-new-submission-nav-label">Buat Pengajuan</span>
+                        </span>
+                    </a>
+
+                    <a
+                        class="spj26res-nav-link active"
+                        id="spj26res-results-nav"
+                        href="/residen-sipatuju/hasil/"
+                    >
+                        <span class="spj26res-nav-left">
+                            <span class="material-symbols-outlined">fact_check</span>
+                            <span>Hasil Pemeriksaan</span>
+                        </span>
+                        <span class="spj26res-nav-notification">
+<span
+                                class="spj26res-nav-alert"
+                                id="spj26res-results-nav-alert"
+                                hidden
+                                aria-hidden="true"
+                            ></span>
+                            <span
+                                class="spj26res-nav-count"
+                                id="spj26res-results-nav-count"
+                                hidden
+                            >0</span>
+                        </span>
+                    </a>
+                </nav>
+
+                <div class="spj26res-nav-section-gap"></div>
+
+                <div class="spj26res-nav-title">Akses &amp; Akun</div>
+
+                <nav class="spj26res-nav">
+                    <a class="spj26res-nav-link" href="/residen-sipatuju/profil/">
+                        <span class="spj26res-nav-left">
+                            <span class="material-symbols-outlined">manage_accounts</span>
+                            <span>Profil &amp; Password</span>
+                        </span>
+                    </a>
+
+                    <a class="spj26res-nav-link" href="/residen-sipatuju/panduan/">
+                        <span class="spj26res-nav-left">
+                            <span class="material-symbols-outlined">menu_book</span>
+                            <span>Panduan Sistem</span>
+                        </span>
+                    </a>
+
+                    <a class="spj26res-nav-link" id="spj26res-logout" href="#">
+                        <span class="spj26res-nav-left">
+                            <span class="material-symbols-outlined">logout</span>
+                            <span>Logout</span>
+                        </span>
+                    </a>
+                </nav>
+            </div>
+
+            <div class="spj26res-sidebar-info">
+                <div class="spj26res-sidebar-info-title">
+                    <span class="material-symbols-outlined">verified</span>
+                    <span>PPDS FK UNHAS</span>
+                </div>
+
+                <div class="spj26res-version">Versi Sistem 2026.1</div>
+                <div class="spj26res-department">Program Pendidikan Dokter Spesialis</div>
+            </div>
+        </aside>
+
+        <div class="spj26res-rightpane">
+            <main class="spj26res-main">
+                <section class="spj26res-panel">
+                    <div class="spj26res-panel-top">
+                        <div>
+                            <h1 class="spj26res-panel-title">Hasil Pemeriksaan</h1>
+                            <p class="spj26res-panel-subtitle">
+                                Pantau status pengajuan dan lihat hasil pemeriksaan untuk setiap jurnal kandidat setelah pemeriksaan selesai.
+                            </p>
+                        </div>
+
+                        <div class="spj26res-updated-pill" id="spj26res-updated-pill">
+                            <span class="material-symbols-outlined">history</span>
+                            <span id="spj26res-updated-text">Terakhir diperbarui: -</span>
+                        </div>
+                    </div>
+
+                    <div class="spj26res-panel-toolbar">
+                        <div class="spj26res-filters" id="spj26res-filter-bar"></div>
+
+                        <div class="spj26res-toolbar-actions">
+                            <label class="spj26res-search" aria-label="Cari judul artikel atau kode">
+                                <span class="material-symbols-outlined">search</span>
+                                <input
+                                    type="search"
+                                    id="spj26res-search-input"
+                                    placeholder="Cari judul artikel atau kode..."
+                                >
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="spj26res-table">
+                        <div class="spj26res-table-head">
+                            <div>Kode Artikel</div>
+                            <div>Judul Artikel</div>
+                            <div>Dosen Pembimbing</div>
+                            <div>Status</div>
+                            <div>Aksi</div>
+                        </div>
+
+                        <div
+                            class="spj26res-table-body"
+                            id="spj26res-results-table-body"
+                        ></div>
+                    </div>
+
+                    <div class="spj26res-panel-bottom">
+                        <div class="spj26res-page-size-control">
+                            <span>Tampilkan</span>
+
+                            <select
+                                id="spj26res-page-size"
+                                class="spj26res-page-size-select"
+                                aria-label="Jumlah data artikel yang ditampilkan"
+                            >
+                                <option value="10" selected>10</option>
+                                <option value="20">20</option>
+                                <option value="30">30</option>
+                                <option value="all">Semua</option>
+                            </select>
+
+                            <span>data artikel</span>
+                        </div>
+
+                        <div class="spj26res-pagination">
+                            <button
+                                class="spj26res-page-btn"
+                                id="spj26res-page-prev"
+                                type="button"
+                            >Sebelumnya</button>
+
+                            <span
+                                class="spj26res-page-number is-active"
+                                id="spj26res-page-indicator"
+                            >1</span>
+
+                            <button
+                                class="spj26res-page-btn"
+                                id="spj26res-page-next"
+                                type="button"
+                            >Selanjutnya</button>
+                        </div>
+                    </div>
+                </section>
+            </main>
+
+            <footer class="spj26res-footer">
+                <div class="spj26res-footer-left">
+                    <span class="spj26res-footer-brand">SIPATUJU PPDS</span>
+                    <span>•</span>
+                    <span>Fakultas Kedokteran Universitas Hasanuddin</span>
+                </div>
+
+                <div class="spj26res-footer-right">PPDS FK UNHAS - Versi Sistem 2026.1</div>
+            </footer>
+        </div>
+    </div>
+
+    <div class="spj26res-modal" id="spj26res-detail-modal" aria-hidden="true">
+        <div class="spj26res-modal-backdrop" id="spj26res-detail-backdrop"></div>
+
+        <div class="spj26res-modal-dialog" role="dialog" aria-modal="true" aria-labelledby="spj26res-detail-title">
+            <div class="spj26res-modal-head">
+                <div>
+                    <div class="spj26res-modal-title" id="spj26res-detail-title">Detail Artikel</div>
+                    <div class="spj26res-modal-subtitle" id="spj26res-detail-subtitle">-</div>
+                </div>
+
+                <button
+                    class="spj26res-modal-close"
+                    id="spj26res-detail-close"
+                    type="button"
+                    aria-label="Tutup detail"
+                >
+                    <span class="material-symbols-outlined">close</span>
+                </button>
+            </div>
+
+            <div class="spj26res-modal-body" id="spj26res-detail-content"></div>
+        </div>
+    </div>
+
+    <div class="spj26res-toast" id="spj26res-results-toast" hidden></div>
+</div>
+
+<script>
+(function () {
+    document.documentElement.classList.add('spj26res-page-lock');
+    document.body.classList.add('spj26res-page-lock');
+
+    const root = document.getElementById('spj26res-results-root');
+    if (!root) return;
+
+    /* TRUE FULLPAGE v6B: bypass Elementor/theme wrapper spacing. */
+    const isElementorEditor =
+        document.body.classList.contains('elementor-editor-active') ||
+        /(?:^|[?&])elementor-preview=/.test(window.location.search);
+
+    if (!isElementorEditor && root.parentElement !== document.body) {
+        document.body.appendChild(root);
+    }
+
+    let submissions = [];
+    let filteredSubmissions = [];
+    let activeFilter = 'all';
+    let currentPage = 1;
+    let itemsPerPage = 10;
+
+    const menuButton = root.querySelector('#spj26res-menu-button');
+    const sidebar = root.querySelector('#spj26res-sidebar');
+    const overlay = root.querySelector('#spj26res-overlay');
+    const toast = root.querySelector('#spj26res-results-toast');
+    const tableBody = root.querySelector('#spj26res-results-table-body');
+    const filterBar = root.querySelector('#spj26res-filter-bar');
+    const searchInput = root.querySelector('#spj26res-search-input');
+    const updatedText = root.querySelector('#spj26res-updated-text');
+    const pageSizeSelect = root.querySelector('#spj26res-page-size');
+    const prevButton = root.querySelector('#spj26res-page-prev');
+    const nextButton = root.querySelector('#spj26res-page-next');
+    const pageIndicator = root.querySelector('#spj26res-page-indicator');
+
+    const userName = root.querySelector('#spj26res-user-name');
+    const logoutLink = root.querySelector('#spj26res-logout');
+    const newSubmissionNav = root.querySelector('#spj26res-new-submission-nav');
+    const newSubmissionNavIcon = root.querySelector('#spj26res-new-submission-nav-icon');
+    const newSubmissionNavLabel = root.querySelector('#spj26res-new-submission-nav-label');
+    const resultsNavAlert = root.querySelector('#spj26res-results-nav-alert');
+    const resultsNavCount = root.querySelector('#spj26res-results-nav-count');
+
+    const detailModal = root.querySelector('#spj26res-detail-modal');
+    const detailBackdrop = root.querySelector('#spj26res-detail-backdrop');
+    const detailClose = root.querySelector('#spj26res-detail-close');
+    const detailTitle = root.querySelector('#spj26res-detail-title');
+    const detailSubtitle = root.querySelector('#spj26res-detail-subtitle');
+    const detailContent = root.querySelector('#spj26res-detail-content');
+
+    const FILTER_CONFIG = [
+        { key: 'all', label: 'Semua' },
+        { key: 'completed', label: 'Selesai' },
+        { key: 'not_eligible', label: 'Tidak Layak' },
+        { key: 'processing', label: 'Sedang Diperiksa' }
+    ];
+
+    function openSidebar() {
+        if (sidebar) sidebar.classList.add('open');
+        if (overlay) overlay.classList.add('open');
+    }
+
+    function closeSidebar() {
+        if (sidebar) sidebar.classList.remove('open');
+        if (overlay) overlay.classList.remove('open');
+    }
+
+    if (menuButton) {
+        menuButton.addEventListener('click', openSidebar);
+    }
+
+    if (overlay) {
+        overlay.addEventListener('click', closeSidebar);
+    }
+
+    root.querySelectorAll('.spj26res-sidebar a').forEach(function (link) {
+        link.addEventListener('click', function () {
+            if (window.innerWidth <= 800) {
+                closeSidebar();
+            }
+        });
+    });
+
+    function showToast(message) {
+        if (!toast) return;
+        toast.textContent = String(message || '');
+        toast.hidden = false;
+        window.clearTimeout(showToast._timer);
+        showToast._timer = window.setTimeout(function () {
+            toast.hidden = true;
+        }, 3200);
+    }
+
+    function escapeHtml(value) {
+        return String(value ?? '')
+            .replaceAll('&', '&amp;')
+            .replaceAll('<', '&lt;')
+            .replaceAll('>', '&gt;')
+            .replaceAll('"', '&quot;')
+            .replaceAll("'", '&#039;');
+    }
+
+    function createEl(tag, className, text) {
+        const element = document.createElement(tag);
+        if (className) {
+            element.className = className;
+        }
+        if (text !== undefined && text !== null) {
+            element.textContent = text;
+        }
+        return element;
+    }
+
+    async function backendRequest(action, payload) {
+        const config = window.spj26ResidentResultsConfig;
+
+        if (!config || !config.ajaxUrl || !config.nonce) {
+            throw new Error('Konfigurasi backend Hasil Pemeriksaan belum tersedia.');
+        }
+
+        const body = new URLSearchParams();
+        body.append('action', action);
+        body.append('nonce', config.nonce);
+
+        Object.keys(payload || {}).forEach(function (key) {
+            body.append(key, payload[key]);
+        });
+
+        const response = await fetch(config.ajaxUrl, {
+            method: 'POST',
+            credentials: 'same-origin',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'
+            },
+            body: body.toString()
+        });
+
+        const result = await response.json();
+
+        if (!result || result.success !== true) {
+            const message = result && result.data && result.data.message
+                ? result.data.message
+                : 'Permintaan ke server gagal.';
+
+            throw new Error(message);
+        }
+
+        return result.data;
+    }
+
+    function getPortalConfig() {
+        return window.spj26ResidentResultsConfig || {};
+    }
+
+    function applyPortalConfig() {
+        const config = getPortalConfig();
+
+        if (userName) {
+            userName.textContent = config.name || 'Residen';
+        }
+
+        if (logoutLink && config.logoutUrl) {
+            logoutLink.href = config.logoutUrl;
+        }
+
+        if (newSubmissionNav) {
+            newSubmissionNav.classList.remove('is-disabled');
+            newSubmissionNav.setAttribute('href', '/residen-sipatuju/pengajuan-baru/');
+            newSubmissionNav.removeAttribute('aria-disabled');
+            newSubmissionNav.removeAttribute('tabindex');
+        }
+
+        if (newSubmissionNavLabel) {
+            newSubmissionNavLabel.textContent = 'Buat Pengajuan';
+        }
+
+        if (newSubmissionNavIcon) {
+            newSubmissionNavIcon.textContent = 'post_add';
+        }
+    }
+
+
+    function getQuartileSummary(item) {
+        const journals = Array.isArray(item && item.journals) ? item.journals : [];
+        const unique = [];
+        journals.forEach(function (journal) {
+            const q = journal && journal.quartile ? String(journal.quartile).trim() : '';
+            if (q && !unique.includes(q)) {
+                unique.push(q);
+            }
+        });
+        return unique.join(' • ');
+    }
+
+    function getDisplayStatus(item) {
+        const journals = Array.isArray(item && item.journals) ? item.journals : [];
+
+        if (item && item.status === 'done') {
+            const hasNotEligible = journals.some(function (journal) {
+                return journal && journal.decision === 'tidak_layak';
+            });
+
+            if (hasNotEligible) {
+                return {
+                    key: 'not_eligible',
+                    label: 'Tidak Layak',
+                    className: 'not-eligible'
+                };
+            }
+
+            return {
+                key: 'completed',
+                label: 'Selesai',
+                className: 'completed'
+            };
+        }
+
+        return {
+            key: 'processing',
+            label: 'Sedang Diperiksa',
+            className: 'processing'
+        };
+    }
+
+    function getCounts() {
+        const counts = {
+            all: submissions.length,
+            completed: 0,
+            not_eligible: 0,
+            processing: 0
+        };
+
+        submissions.forEach(function (item) {
+            const status = getDisplayStatus(item);
+            counts[status.key] += 1;
+        });
+
+        return counts;
+    }
+
+    function formatUpdatedText() {
+        const date = new Date();
+        const weekdays = [
+            'Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'
+        ];
+        const dayName = weekdays[date.getDay()];
+        const time = date.toLocaleTimeString('id-ID', {
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+
+        return 'Terakhir Diperbarui: ' + dayName + ' ini, ' + time + ' WITA';
+    }
+
+
+    function getResultsNotificationStorageKey() {
+        const config = window.spj26ResidentResultsConfig || {};
+        const identity = String(config.nim || config.name || 'resident')
+            .trim()
+            .replace(/[^a-zA-Z0-9_-]/g, '_');
+
+        return 'spj26res_results_seen_v2_' + identity;
+    }
+
+    function buildResultsNotificationSnapshot(items) {
+        const snapshot = {};
+        const list = Array.isArray(items) ? items : [];
+
+        list.forEach(function (item) {
+            if (!item) return;
+
+            const key = String(item.id || item.code || '').trim();
+            if (!key) return;
+
+            const journals = Array.isArray(item.journals)
+                ? item.journals.map(function (journal) {
+                    return {
+                        order: journal && journal.order ? String(journal.order) : '',
+                        decision: journal && journal.decision ? String(journal.decision) : '',
+                        comment: journal && journal.comment ? String(journal.comment) : '',
+                        updated_at: journal && journal.updated_at ? String(journal.updated_at) : ''
+                    };
+                })
+                : [];
+
+            snapshot[key] = JSON.stringify({
+                status: item.status ? String(item.status) : '',
+                status_label: item.status_label ? String(item.status_label) : '',
+                updated_at: item.updated_at ? String(item.updated_at) : '',
+                completed_at: item.completed_at ? String(item.completed_at) : '',
+                journals: journals
+            });
+        });
+
+        return snapshot;
+    }
+
+    function readSeenResultsNotificationSnapshot() {
+        try {
+            const raw = window.localStorage.getItem(
+                getResultsNotificationStorageKey()
+            );
+
+            if (!raw) return null;
+
+            const parsed = JSON.parse(raw);
+            return parsed && typeof parsed === 'object' ? parsed : null;
+        } catch (error) {
+            console.warn('SIPATUJU Residen - snapshot notifikasi tidak dapat dibaca:', error);
+            return null;
+        }
+    }
+
+    function writeSeenResultsNotificationSnapshot(items) {
+        try {
+            window.localStorage.setItem(
+                getResultsNotificationStorageKey(),
+                JSON.stringify(buildResultsNotificationSnapshot(items))
+            );
+        } catch (error) {
+            console.warn('SIPATUJU Residen - snapshot notifikasi tidak dapat disimpan:', error);
+        }
+    }
+
+    function getUnreadResultsUpdateCount(items) {
+        const currentSnapshot = buildResultsNotificationSnapshot(items);
+        const seenSnapshot = readSeenResultsNotificationSnapshot();
+
+        /*
+         * Pertama kali fitur dipakai: jadikan kondisi saat ini sebagai baseline,
+         * sehingga data lama tidak langsung dianggap sebagai notifikasi baru.
+         */
+        if (!seenSnapshot) {
+            writeSeenResultsNotificationSnapshot(items);
+            return 0;
+        }
+
+        let unreadCount = 0;
+
+        Object.keys(currentSnapshot).forEach(function (key) {
+            /*
+             * Record baru tidak dihitung sebagai perubahan status.
+             * Notifikasi hanya untuk pengajuan yang sebelumnya sudah dikenal,
+             * lalu mengalami perubahan status/detail pemeriksaan.
+             */
+            if (!Object.prototype.hasOwnProperty.call(seenSnapshot, key)) {
+                return;
+            }
+
+            if (seenSnapshot[key] !== currentSnapshot[key]) {
+                unreadCount += 1;
+            }
+        });
+
+        return unreadCount;
+    }
+
+    function renderResultsUpdateNotification(count) {
+        const unreadCount = Math.max(0, Number(count) || 0);
+        const hasUnread = unreadCount > 0;
+
+        if (resultsNavAlert) {
+            resultsNavAlert.hidden = !hasUnread;
+        }
+
+        if (resultsNavCount) {
+            resultsNavCount.hidden = !hasUnread;
+            resultsNavCount.textContent = hasUnread ? String(unreadCount) : '0';
+        }
+    }
+
+    function markResultsAsSeen(items) {
+        writeSeenResultsNotificationSnapshot(items);
+        renderResultsUpdateNotification(0);
+    }
+
+    function renderFilters() {
+        if (!filterBar) return;
+
+        const counts = getCounts();
+        filterBar.innerHTML = '';
+
+        FILTER_CONFIG.forEach(function (filter) {
+            const button = document.createElement('button');
+            button.type = 'button';
+            button.className = 'spj26res-filter-chip' + (activeFilter === filter.key ? ' is-active' : '');
+            button.dataset.filter = filter.key;
+
+            const dot = createEl('span', 'spj26res-filter-chip-dot');
+            dot.textContent = filter.label;
+
+            const count = createEl('span', 'spj26res-filter-chip-count', '(' + String(counts[filter.key] || 0) + ')');
+
+            button.appendChild(dot);
+            button.appendChild(count);
+
+            button.addEventListener('click', function () {
+                activeFilter = filter.key;
+                currentPage = 1;
+                renderFilters();
+                applySearchAndRender();
+            });
+
+            filterBar.appendChild(button);
+        });
+    }
+
+    function matchesSearch(item, query) {
+        if (!query) return true;
+
+        const haystack = [
+            item.code,
+            item.article_title,
+            item.article_type,
+            item.supervisor_name,
+            item.submitted_at,
+            item.updated_at,
+            item.completed_at,
+            item.status_label,
+            (item.journals || []).map(function (journal) {
+                return [journal.name, journal.issn, journal.quartile, journal.comment].join(' ');
+            }).join(' ')
+        ].join(' ').toLowerCase();
+
+        return haystack.indexOf(query.toLowerCase()) !== -1;
+    }
+
+    function getEffectivePageSize() {
+        if (itemsPerPage === 'all') {
+            return Math.max(filteredSubmissions.length, 1);
+        }
+
+        return Math.max(1, Number(itemsPerPage) || 10);
+    }
+
+    function applySearchAndRender() {
+        const query = searchInput ? String(searchInput.value || '').trim() : '';
+
+        filteredSubmissions = submissions.filter(function (item) {
+            const status = getDisplayStatus(item);
+            const passFilter = activeFilter === 'all' || status.key === activeFilter;
+            const passSearch = matchesSearch(item, query);
+            return passFilter && passSearch;
+        });
+
+        const pageSize = getEffectivePageSize();
+        const totalPages = Math.max(1, Math.ceil(filteredSubmissions.length / pageSize));
+        if (currentPage > totalPages) {
+            currentPage = totalPages;
+        }
+        if (currentPage < 1) {
+            currentPage = 1;
+        }
+
+        renderTable();
+        renderPagination();
+    }
+
+    function renderEmpty() {
+        if (!tableBody) return;
+        tableBody.innerHTML = '';
+
+        const empty = createEl('div', 'spj26res-empty');
+        empty.appendChild(createEl('span', 'material-symbols-outlined', 'description'));
+        empty.appendChild(createEl('div', 'spj26res-empty-title', 'Belum ada data yang sesuai'));
+        empty.appendChild(createEl('div', 'spj26res-empty-text', 'Pengajuan yang Anda kirim akan tampil di sini. Gunakan filter lain atau ubah kata kunci pencarian jika diperlukan.'));
+
+        tableBody.appendChild(empty);
+    }
+
+    function buildCodeCell(item) {
+        const wrapper = createEl('div', 'spj26res-table-cell');
+        wrapper.appendChild(createEl('div', 'spj26res-code', item.code || '-'));
+
+        const chips = createEl('div', 'spj26res-code-chips');
+
+        if (item.article_type) {
+            chips.appendChild(createEl('span', 'spj26res-mini-chip', item.article_type));
+        }
+
+        const quartiles = getQuartileSummary(item);
+        if (quartiles) {
+            chips.appendChild(createEl('span', 'spj26res-mini-chip', quartiles));
+        }
+
+        if (chips.childNodes.length > 0) {
+            wrapper.appendChild(chips);
+        }
+
+        const dates = createEl('div', 'spj26res-code-dates');
+
+        if (item.submitted_at) {
+            const submit = createEl('div', 'spj26res-table-cell-note');
+            submit.innerHTML = '<strong>Submit:</strong> ' + escapeHtml(item.submitted_at);
+            dates.appendChild(submit);
+        }
+
+        if (item.completed_at) {
+            const completed = createEl('div', 'spj26res-table-cell-note');
+            completed.innerHTML = '<strong>Selesai:</strong> ' + escapeHtml(item.completed_at);
+            dates.appendChild(completed);
+        } else if (item.updated_at) {
+            const updated = createEl('div', 'spj26res-table-cell-note');
+            updated.innerHTML = '<strong>Update:</strong> ' + escapeHtml(item.updated_at);
+            dates.appendChild(updated);
+        }
+
+        if (dates.childNodes.length > 0) {
+            wrapper.appendChild(dates);
+        }
+
+        return wrapper;
+    }
+
+    function buildTitleCell(item) {
+        const wrapper = createEl('div', 'spj26res-table-cell');
+        wrapper.appendChild(createEl('div', 'spj26res-title', item.article_title || '-'));
+
+
+        if (item.article_abstract) {
+            const abstractSnippet = item.article_abstract.length > 140
+                ? item.article_abstract.slice(0, 140) + '...'
+                : item.article_abstract;
+            wrapper.appendChild(createEl('div', 'spj26res-table-cell-note', abstractSnippet));
+        }
+
+        return wrapper;
+    }
+
+    function buildPeopleCell(item) {
+        const wrapper = createEl('div', 'spj26res-table-cell');
+
+        wrapper.appendChild(createEl('div', 'spj26res-person-name', item.supervisor_name || '-'));
+
+        return wrapper;
+    }
+
+    function buildStatusCell(item) {
+        const status = getDisplayStatus(item);
+        const wrapper = createEl('div', 'spj26res-table-cell');
+        wrapper.appendChild(createEl('span', 'spj26res-status-pill ' + status.className, status.label));
+        return wrapper;
+    }
+
+    function buildActionButton(text, className, onClick, iconName) {
+        const button = createEl('button', 'spj26res-btn ' + (className || ''));
+        button.type = 'button';
+
+        if (iconName) {
+            button.appendChild(createEl('span', 'material-symbols-outlined', iconName));
+        }
+        button.appendChild(createEl('span', '', text));
+        button.addEventListener('click', onClick);
+        return button;
+    }
+
+    function resolveLoaUrl(item) {
+        const config = getPortalConfig();
+
+        const directUrl =
+            (item && (item.loa_url || item.loaUrl || item.loa_download_url || item.loaDownloadUrl)) ||
+            '';
+
+        if (directUrl) {
+            return String(directUrl);
+        }
+
+        if (config.loaUrlTemplate) {
+            return String(config.loaUrlTemplate)
+                .replaceAll('{id}', encodeURIComponent(String(item && item.id ? item.id : '')))
+                .replaceAll('{code}', encodeURIComponent(String(item && item.code ? item.code : '')));
+        }
+
+        if (config.loaDownloadUrl) {
+            try {
+                const url = new URL(String(config.loaDownloadUrl), window.location.origin);
+                if (item && item.id) {
+                    url.searchParams.set('submission_id', String(item.id));
+                }
+                if (item && item.code) {
+                    url.searchParams.set('code', String(item.code));
+                }
+                return url.toString();
+            } catch (error) {
+                console.error('SIPATUJU Residen - URL LoA tidak valid:', error);
+            }
+        }
+
+        return '';
+    }
+
+    function goToLoaDownload(item) {
+        const loaUrl = resolveLoaUrl(item);
+
+        if (!loaUrl) {
+            showToast('URL halaman Unduh Surat belum dikonfigurasi pada backend.');
+            return;
+        }
+
+        window.location.assign(loaUrl);
+    }
+
+    function buildActionsCell(item) {
+        const wrapper = createEl('div', 'spj26res-table-cell');
+        const actions = createEl('div', 'spj26res-row-actions');
+        const status = getDisplayStatus(item);
+
+        if (status.key === 'completed') {
+            const loaUrl = resolveLoaUrl(item);
+            const loaAvailable =
+                item &&
+                (item.loa_available === true || item.loa_available === 1 || item.loa_available === '1') &&
+                !!loaUrl;
+
+            if (loaAvailable) {
+                actions.appendChild(
+                    buildActionButton('Unduh Surat', 'spj26res-btn-primary', function () {
+                        goToLoaDownload(item);
+                    }, 'download')
+                );
+            } else {
+                const unavailableButton =
+                    buildActionButton('LoA Belum Tersedia', '', function () {
+                        showToast('LoA belum tersedia untuk artikel ini.');
+                    }, 'hourglass_empty');
+
+                unavailableButton.disabled = true;
+                unavailableButton.setAttribute('aria-disabled', 'true');
+                unavailableButton.style.cursor = 'not-allowed';
+                unavailableButton.style.opacity = '0.58';
+
+                actions.appendChild(unavailableButton);
+            }
+        } else if (status.key === 'not_eligible') {
+            actions.appendChild(
+                buildActionButton('Lihat Detail', '', function () {
+                    openDetailModal(item, true);
+                })
+            );
+        } else {
+            actions.appendChild(
+                buildActionButton('Lihat Detail', '', function () {
+                    openDetailModal(item, false);
+                })
+            );
+        }
+
+        wrapper.appendChild(actions);
+        return wrapper;
+    }
+
+    function renderTable() {
+        if (!tableBody) return;
+
+        if (filteredSubmissions.length === 0) {
+            renderEmpty();
+            return;
+        }
+
+        const pageSize = getEffectivePageSize();
+        const startIndex = (currentPage - 1) * pageSize;
+        const endIndex = startIndex + pageSize;
+        const pageItems = filteredSubmissions.slice(startIndex, endIndex);
+
+        tableBody.innerHTML = '';
+
+        pageItems.forEach(function (item) {
+            const row = createEl('div', 'spj26res-table-row');
+            row.appendChild(buildCodeCell(item));
+            row.appendChild(buildTitleCell(item));
+            row.appendChild(buildPeopleCell(item));
+            row.appendChild(buildStatusCell(item));
+            row.appendChild(buildActionsCell(item));
+            tableBody.appendChild(row);
+        });
+
+    }
+
+    function renderPagination() {
+        const pageSize = getEffectivePageSize();
+        const totalPages = Math.max(1, Math.ceil(filteredSubmissions.length / pageSize));
+
+        if (pageIndicator) {
+            pageIndicator.textContent = String(currentPage);
+        }
+
+        if (prevButton) {
+            prevButton.disabled = currentPage <= 1;
+        }
+
+        if (nextButton) {
+            nextButton.disabled = currentPage >= totalPages;
+        }
+    }
+
+    function openDetailModal(item, emphasizeNotEligible) {
+        if (!detailModal || !detailContent) return;
+
+        const status = getDisplayStatus(item);
+        detailTitle.textContent = item.code || 'Detail Artikel';
+        detailSubtitle.textContent = status.label + ' • ' + (item.article_title || '-');
+
+        const journals = Array.isArray(item.journals) ? item.journals : [];
+
+        const detailHtml = [
+            '<div class="spj26res-detail-grid">',
+                '<div class="spj26res-detail-box">',
+                    '<div class="spj26res-detail-label">Judul Artikel</div>',
+                    '<div class="spj26res-detail-value">' + escapeHtml(item.article_title || '-') + '</div>',
+                '</div>',
+                '<div class="spj26res-detail-box">',
+                    '<div class="spj26res-detail-label">Jenis Artikel</div>',
+                    '<div class="spj26res-detail-value">' + escapeHtml(item.article_type || '-') + '</div>',
+                '</div>',
+                '<div class="spj26res-detail-box spj26res-detail-box-full">',
+                    '<div class="spj26res-detail-label">Abstrak</div>',
+                    '<div class="spj26res-detail-value">' + escapeHtml(item.article_abstract || '-') + '</div>',
+                '</div>',
+                '<div class="spj26res-detail-box spj26res-detail-box-full">',
+                    '<div class="spj26res-detail-label">Pembimbing</div>',
+                    '<div class="spj26res-detail-value">' + escapeHtml(item.supervisor_name || '-') + '</div>',
+                '</div>',
+                '<div class="spj26res-detail-box">',
+                    '<div class="spj26res-detail-label">Tanggal Submit</div>',
+                    '<div class="spj26res-detail-value">' + escapeHtml(item.submitted_at || '-') + '</div>',
+                '</div>',
+                '<div class="spj26res-detail-box">',
+                    '<div class="spj26res-detail-label">Pembaruan Terakhir</div>',
+                    '<div class="spj26res-detail-value">' + escapeHtml(item.completed_at || item.updated_at || '-') + '</div>',
+                '</div>',
+            '</div>',
+            '<div class="spj26res-journal-list">'
+        ];
+
+        journals.forEach(function (journal) {
+            const decision = journal.decision === 'layak'
+                ? 'Layak'
+                : journal.decision === 'tidak_layak'
+                    ? 'Tidak Layak'
+                    : 'Belum Tersedia';
+            const statusClass = journal.decision === 'layak'
+                ? 'completed'
+                : journal.decision === 'tidak_layak'
+                    ? 'not-eligible'
+                    : 'processing';
+            const comment = journal.comment
+                ? journal.comment
+                : (item.status === 'done'
+                    ? 'Tidak ada komentar tambahan.'
+                    : 'Hasil pemeriksaan belum tersedia.');
+
+            detailHtml.push(
+                '<div class="spj26res-journal-card">' +
+                    '<div class="spj26res-journal-top">' +
+                        '<div>' +
+                            '<div class="spj26res-journal-name">Jurnal Kandidat ' + escapeHtml(journal.order) + ': ' + escapeHtml(journal.name || '-') + '</div>' +
+                            '<div class="spj26res-journal-meta">ISSN: ' + escapeHtml(journal.issn || '-') + ' • Kuartil: ' + escapeHtml(journal.quartile || '-') + '</div>' +
+                        '</div>' +
+                        '<span class="spj26res-status-pill ' + statusClass + '">' + escapeHtml(decision) + '</span>' +
+                    '</div>' +
+                    '<div class="spj26res-journal-comment"' + ((emphasizeNotEligible && journal.decision === 'tidak_layak') ? ' style="background:#fff8ea;"' : '') + '>' +
+                        '<div class="spj26res-journal-comment-label">Catatan Pemeriksaan</div>' +
+                        '<div class="spj26res-journal-comment-text">' + escapeHtml(comment) + '</div>' +
+                    '</div>' +
+                '</div>'
+            );
+        });
+
+        detailHtml.push('</div>');
+        detailContent.innerHTML = detailHtml.join('');
+
+        detailModal.classList.add('open');
+        detailModal.setAttribute('aria-hidden', 'false');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeDetailModal() {
+        if (!detailModal) return;
+        detailModal.classList.remove('open');
+        detailModal.setAttribute('aria-hidden', 'true');
+        document.body.style.overflow = '';
+    }
+
+    if (detailBackdrop) {
+        detailBackdrop.addEventListener('click', closeDetailModal);
+    }
+
+    if (detailClose) {
+        detailClose.addEventListener('click', closeDetailModal);
+    }
+
+    document.addEventListener('keydown', function (event) {
+        if (event.key === 'Escape') {
+            closeDetailModal();
+        }
+    });
+
+    let resultsRequestInFlight = false;
+    let resultsRefreshTimer = null;
+
+
+    function showSubmittedConfirmationFromQuery() {
+
+        const params =
+            new URLSearchParams(
+                window.location.search
+            );
+
+
+        const submittedCode =
+            String(
+                params.get('submitted')
+                ||
+                ''
+            ).trim();
+
+
+        if (!submittedCode) {
+            return;
+        }
+
+
+        showToast(
+            'Pengajuan '
+            +
+            submittedCode
+            +
+            ' berhasil dikirim dan sudah masuk ke Hasil Pemeriksaan.'
+        );
+
+
+        params.delete(
+            'submitted'
+        );
+
+
+        const cleanQuery =
+            params.toString();
+
+
+        const cleanUrl =
+            window.location.pathname
+            +
+            (
+                cleanQuery
+                ?
+                '?'
+                +
+                cleanQuery
+                :
+                ''
+            )
+            +
+            window.location.hash;
+
+
+        window.history.replaceState(
+            {},
+            document.title,
+            cleanUrl
+        );
+
+    }
+
+
+    async function loadResults(options) {
+        const settings = options || {};
+
+        if (resultsRequestInFlight) {
+            return;
+        }
+
+        resultsRequestInFlight = true;
+
+        try {
+            const data = await backendRequest('spj26_resident_results_data', {});
+
+            submissions = Array.isArray(data.submissions) ? data.submissions : [];
+            updatedText.textContent = formatUpdatedText();
+            renderFilters();
+            applySearchAndRender();
+
+            /*
+             * Halaman Hasil Pemeriksaan adalah titik "dibaca".
+             * Setelah data berhasil ditampilkan, kondisi terbaru disimpan
+             * sebagai baseline dan badge notifikasi langsung dibersihkan.
+             */
+            markResultsAsSeen(submissions);
+        } catch (error) {
+            console.error('SIPATUJU Residen - Hasil Pemeriksaan:', error);
+
+            if (!settings.silent) {
+                showToast(error.message || 'Data Hasil Pemeriksaan gagal dimuat.');
+            }
+        } finally {
+            resultsRequestInFlight = false;
+        }
+    }
+
+    function startAutoRefresh() {
+        if (resultsRefreshTimer) {
+            window.clearInterval(resultsRefreshTimer);
+        }
+
+        resultsRefreshTimer = window.setInterval(function () {
+            loadResults({ silent: true });
+        }, 30000);
+    }
+
+    if (searchInput) {
+        searchInput.addEventListener('input', function () {
+            currentPage = 1;
+            applySearchAndRender();
+        });
+    }
+
+    if (pageSizeSelect) {
+        pageSizeSelect.addEventListener('change', function () {
+            const selectedValue = String(this.value || '10');
+
+            itemsPerPage = selectedValue === 'all'
+                ? 'all'
+                : Number(selectedValue);
+
+            currentPage = 1;
+            applySearchAndRender();
+        });
+    }
+
+    if (prevButton) {
+        prevButton.addEventListener('click', function () {
+            if (currentPage > 1) {
+                currentPage -= 1;
+                renderTable();
+                renderPagination();
+            }
+        });
+    }
+
+    if (nextButton) {
+        nextButton.addEventListener('click', function () {
+            const pageSize = getEffectivePageSize();
+            const totalPages = Math.max(1, Math.ceil(filteredSubmissions.length / pageSize));
+            if (currentPage < totalPages) {
+                currentPage += 1;
+                renderTable();
+                renderPagination();
+            }
+        });
+    }
+
+    function initializeResultsPage() {
+        if (!window.spj26ResidentResultsConfig || !window.spj26ResidentResultsConfig.ajaxUrl || !window.spj26ResidentResultsConfig.nonce) {
+            console.error('SIPATUJU Residen: spj26ResidentResultsConfig tidak ditemukan.');
+            showToast('Konfigurasi backend Hasil Pemeriksaan belum tersedia.');
+            return;
+        }
+
+        applyPortalConfig();
+        loadResults();
+        startAutoRefresh();
+    }
+
+    window.addEventListener('pagehide', function () {
+        if (resultsRefreshTimer) {
+            window.clearInterval(resultsRefreshTimer);
+            resultsRefreshTimer = null;
+        }
+    });
+
+    if (document.readyState === 'complete') {
+        initializeResultsPage();
+    } else {
+        window.addEventListener('load', initializeResultsPage, { once: true });
+    }
+})();
+</script>

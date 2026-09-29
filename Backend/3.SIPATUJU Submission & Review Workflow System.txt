@@ -1,0 +1,3546 @@
+/**
+ * SIPATUJU PPDS FK UNHAS
+ * 000 — 03 - SIPATUJU Submission & Review Workflow — CANONICAL 2026.4
+ *
+ * Fungsi:
+ * - Membuat tabel pengajuan SIPATUJU
+ * - Menyimpan beberapa pengajuan milik 1 Residen
+ * - Menyimpan tepat 3 jurnal kandidat beserta link jurnal resmi di bawah 1 pengajuan
+ * - Menyediakan endpoint riwayat Reviewer khusus untuk page Riwayat Pemeriksaan
+ * - Kompatibel dengan URL live /riwayat-pemeriksaan/ untuk config Reviewer
+ * - Memvalidasi jenis artikel, judul, abstrak, pembimbing, ISSN, dan kuartil
+ * - Menolak jurnal kandidat yang sama berdasarkan nama jurnal atau ISSN
+ * - Membuat kode pengajuan unik
+ * - Status awal: Menunggu Pemeriksaan
+ * - Menyediakan AJAX submit untuk page:
+ *   /residen-sipatuju/pengajuan-baru/
+ * - Mengirim config frontend untuk form pengajuan
+ * - Mengintegrasikan jumlah pengajuan ke User Management
+ * - Mengintegrasikan pengajuan nyata ke Dashboard Admin
+ * - Menyediakan assignment Admin → Reviewer secara atomic
+ * - Mengizinkan Residen membuat pengajuan baru meskipun masih ada pengajuan aktif
+ * - Mengirim status pengajuan aktif ke Dashboard Residen
+ * - Menyediakan Dashboard Reviewer, pengambilan pengajuan, dan submit hasil pemeriksaan
+ * - Mengirim config Reviewer ke root /reviewer-sipatuju/ dan seluruh child page
+ * - Menyediakan Hasil Pemeriksaan Residen dan keputusan per jurnal
+ * - Mengintegrasikan Surat Persetujuan PDF melalui plugin SIPATUJU LoA Generator
+ * - Tidak mendaftarkan endpoint LoA admin-post legacy; download tetap melalui modul plugin
+ *
+ * Dependency:
+ * - 000 — 01 - SIPATUJU Core & Authentication
+ * - 000 — 02 - SIPATUJU User Management
+ *
+ * Namespace PHP: spj26_sub_
+ *
+ * PENTING:
+ * - Paste langsung ke Code Snippets tanpa tag pembuka PHP
+ * - Location: Run everywhere
+ * - Priority: 10
+ */
+
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
+
+/* =========================================================
+ * 1. DATABASE
+ * ========================================================= */
+
+function spj26_sub_table_submissions() {
+	global $wpdb;
+
+	return $wpdb->prefix . 'spj26_submissions';
+}
+
+
+function spj26_sub_table_journals() {
+	global $wpdb;
+
+	return $wpdb->prefix . 'spj26_submission_journals';
+}
+
+
+function spj26_sub_maybe_install_tables() {
+
+	$db_version =
+		'1.2.0';
+
+	$installed_version =
+		get_option(
+			'spj26_submission_db_version',
+			''
+		);
+
+	if (
+		$installed_version ===
+		$db_version
+	) {
+		return;
+	}
+
+	global $wpdb;
+
+	$submissions_table =
+		spj26_sub_table_submissions();
+
+	$journals_table =
+		spj26_sub_table_journals();
+
+	$charset_collate =
+		$wpdb->get_charset_collate();
+
+	require_once
+		ABSPATH .
+		'wp-admin/includes/upgrade.php';
+
+
+	$sql_submissions = "
+		CREATE TABLE {$submissions_table} (
+			id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+			code varchar(64) DEFAULT NULL,
+			request_token varchar(64) NOT NULL,
+			resident_id bigint(20) unsigned NOT NULL,
+			article_type varchar(40) NOT NULL,
+			article_title text NOT NULL,
+			article_abstract longtext NOT NULL,
+			supervisor_name varchar(255) NOT NULL,
+			status varchar(30) NOT NULL DEFAULT 'waiting',
+			assigned_reviewer_id bigint(20) unsigned DEFAULT NULL,
+			assignment_source varchar(30) DEFAULT NULL,
+			assigned_at datetime DEFAULT NULL,
+			submitted_at datetime NOT NULL,
+			created_at datetime NOT NULL,
+			updated_at datetime NOT NULL,
+			PRIMARY KEY  (id),
+			UNIQUE KEY code (code),
+			UNIQUE KEY request_token (request_token),
+			KEY resident_id (resident_id),
+			KEY status (status),
+			KEY assigned_reviewer_id (assigned_reviewer_id),
+			KEY resident_status (resident_id,status),
+			KEY status_reviewer (status,assigned_reviewer_id),
+			KEY status_submitted (status,submitted_at)
+		) {$charset_collate};
+	";
+
+
+	$sql_journals = "
+		CREATE TABLE {$journals_table} (
+			id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+			submission_id bigint(20) unsigned NOT NULL,
+			journal_order tinyint(3) unsigned NOT NULL,
+			journal_name varchar(255) NOT NULL,
+			issn varchar(20) NOT NULL,
+			quartile varchar(2) NOT NULL,
+			journal_url varchar(2048) DEFAULT NULL,
+			decision varchar(30) DEFAULT NULL,
+			reviewer_comment longtext DEFAULT NULL,
+			created_at datetime NOT NULL,
+			updated_at datetime NOT NULL,
+			PRIMARY KEY  (id),
+			UNIQUE KEY submission_journal_order (submission_id,journal_order),
+			KEY submission_id (submission_id),
+			KEY issn (issn)
+		) {$charset_collate};
+	";
+
+
+	dbDelta(
+		$sql_submissions
+	);
+
+	dbDelta(
+		$sql_journals
+	);
+
+
+	update_option(
+		'spj26_submission_db_version',
+		$db_version
+	);
+}
+
+add_action(
+	'init',
+	'spj26_sub_maybe_install_tables',
+	5
+);
+
+
+/* =========================================================
+ * 2. SECURITY / ROLE HELPERS
+ * ========================================================= */
+
+function spj26_sub_is_resident(
+	$user = null
+) {
+
+	if ( ! $user ) {
+		$user =
+			wp_get_current_user();
+	}
+
+	if (
+		! $user
+		||
+		! $user->exists()
+	) {
+		return false;
+	}
+
+	if (
+		function_exists(
+			'spj26_user_has_role'
+		)
+	) {
+
+		return
+			spj26_user_has_role(
+				'sipatuju_residen',
+				$user
+			);
+	}
+
+	return in_array(
+		'sipatuju_residen',
+		(array) $user->roles,
+		true
+	);
+}
+
+
+function spj26_sub_is_admin(
+	$user = null
+) {
+
+	if ( ! $user ) {
+		$user =
+			wp_get_current_user();
+	}
+
+	if (
+		! $user
+		||
+		! $user->exists()
+	) {
+		return false;
+	}
+
+	if (
+		function_exists(
+			'spj26_is_system_admin'
+		)
+	) {
+
+		return
+			spj26_is_system_admin(
+				$user
+			);
+	}
+
+	return user_can(
+		$user,
+		'manage_options'
+	);
+}
+
+
+function spj26_sub_is_account_active(
+	$user
+) {
+
+	if (
+		function_exists(
+			'spj26_is_account_active'
+		)
+	) {
+
+		return
+			spj26_is_account_active(
+				$user
+			);
+	}
+
+	$value =
+		get_user_meta(
+			$user->ID,
+			'spj26_account_active',
+			true
+		);
+
+	return
+		$value === ''
+		||
+		(string) $value === '1';
+}
+
+
+/* =========================================================
+ * 3. NORMALIZATION / VALIDATION HELPERS
+ * ========================================================= */
+
+function spj26_sub_normalize_journal_name(
+	$value
+) {
+
+	$value =
+		remove_accents(
+			wp_strip_all_tags(
+				(string) $value
+			)
+		);
+
+	$value =
+		mb_strtolower(
+			$value,
+			'UTF-8'
+		);
+
+	$value =
+		preg_replace(
+			'/[^\p{L}\p{N}]+/u',
+			' ',
+			$value
+		);
+
+	return trim(
+		preg_replace(
+			'/\s+/u',
+			' ',
+			(string) $value
+		)
+	);
+}
+
+
+function spj26_sub_normalize_issn(
+	$value
+) {
+
+	$value =
+		strtoupper(
+			(string) $value
+		);
+
+	$value =
+		preg_replace(
+			'/[^0-9X]/',
+			'',
+			$value
+		);
+
+	if (
+		strlen(
+			$value
+		) !== 8
+	) {
+		return '';
+	}
+
+	return
+		substr(
+			$value,
+			0,
+			4
+		)
+		.
+		'-'
+		.
+		substr(
+			$value,
+			4,
+			4
+		);
+}
+
+
+function spj26_sub_validate_issn(
+	$value
+) {
+
+	return
+		(bool) preg_match(
+			'/^\d{4}-\d{3}[\dX]$/',
+			(string) $value
+		);
+}
+
+
+function spj26_sub_allowed_article_types() {
+
+	return array(
+		'Research Article',
+		'Review Article',
+		'Case Report',
+	);
+}
+
+
+function spj26_sub_allowed_quartiles() {
+
+	return array(
+		'Q1',
+		'Q2',
+		'Q3',
+		'Q4',
+	);
+}
+
+
+function spj26_sub_generate_code(
+	$submission_id
+) {
+
+	return sprintf(
+		'SPJ26-%s-%06d',
+		current_time(
+			'Ymd'
+		),
+		(int) $submission_id
+	);
+}
+
+
+/* =========================================================
+ * 4. STATUS PENGAJUAN AKTIF RESIDEN
+ * ========================================================= */
+
+/**
+ * Pengajuan dianggap masih aktif selama status:
+ * - waiting  = Menunggu Pemeriksaan
+ * - progress = Dalam Pemeriksaan
+ *
+ * Status done tidak dianggap aktif.
+ */
+function spj26_sub_get_active_submission(
+	$resident_id
+) {
+
+	global $wpdb;
+
+	$table =
+		spj26_sub_table_submissions();
+
+	return $wpdb->get_row(
+		$wpdb->prepare(
+			"
+			SELECT
+				id,
+				code,
+				status,
+				submitted_at
+			FROM
+				{$table}
+			WHERE
+				resident_id = %d
+				AND status IN (
+					'waiting',
+					'progress'
+				)
+			ORDER BY
+				id DESC
+			LIMIT 1
+			",
+			(int) $resident_id
+		)
+	);
+}
+
+
+function spj26_sub_status_label(
+	$status
+) {
+
+	if (
+		$status ===
+		'progress'
+	) {
+		return 'Dalam Pemeriksaan';
+	}
+
+	if (
+		$status ===
+		'done'
+	) {
+		return 'Selesai';
+	}
+
+	return 'Menunggu Pemeriksaan';
+}
+
+
+/* =========================================================
+ * 5. FRONTEND CONFIG - BUAT PENGAJUAN
+ * ========================================================= */
+
+function spj26_sub_request_path() {
+
+	if (
+		function_exists(
+			'spj26_get_request_path'
+		)
+	) {
+		return spj26_get_request_path();
+	}
+
+	$request_uri =
+		isset(
+			$_SERVER['REQUEST_URI']
+		)
+		? wp_unslash(
+			$_SERVER['REQUEST_URI']
+		)
+		: '/';
+
+	$path =
+		wp_parse_url(
+			$request_uri,
+			PHP_URL_PATH
+		);
+
+	return
+		'/' .
+		trim(
+			(string) $path,
+			'/'
+		) .
+		'/';
+}
+
+
+function spj26_sub_print_submit_config() {
+
+	if (
+		! is_user_logged_in()
+	) {
+		return;
+	}
+
+	$path =
+		spj26_sub_request_path();
+
+	if (
+		$path !==
+		'/residen-sipatuju/pengajuan-baru/'
+	) {
+		return;
+	}
+
+	$user =
+		wp_get_current_user();
+
+	if (
+		! spj26_sub_is_resident(
+			$user
+		)
+		||
+		! spj26_sub_is_account_active(
+			$user
+		)
+	) {
+		return;
+	}
+
+
+	$login_url =
+		function_exists(
+			'spj26_login_url'
+		)
+		? spj26_login_url()
+		: home_url(
+			'/sipatuju-login/'
+		);
+
+
+	$logout_url =
+		html_entity_decode(
+			wp_logout_url(
+				$login_url
+			),
+			ENT_QUOTES,
+			'UTF-8'
+		);
+
+
+	$config = array(
+		'ajaxUrl' =>
+			admin_url(
+				'admin-ajax.php'
+			),
+		'nonce' =>
+			wp_create_nonce(
+				'spj26_submission_action'
+			),
+		'submissionToken' =>
+			wp_generate_uuid4(),
+		'name' =>
+			(string) $user->display_name,
+		'nim' =>
+			(string) $user->user_login,
+		'program' =>
+			(string) get_user_meta(
+				$user->ID,
+				'spj26_program_ppds',
+				true
+			),
+		'logoutUrl' =>
+			$logout_url,
+		'portalPath' =>
+			$path,
+	);
+
+
+	echo '<script>';
+	echo 'window.spj26SubmissionConfig = ';
+	echo wp_json_encode(
+		$config
+	);
+	echo ';</script>';
+}
+
+add_action(
+	'wp_footer',
+	'spj26_sub_print_submit_config',
+	97
+);
+
+
+/* =========================================================
+ * 5B. FRONTEND STATE - DASHBOARD RESIDEN
+ * ========================================================= */
+
+function spj26_sub_print_resident_submission_state() {
+
+	if (
+		! is_user_logged_in()
+	) {
+		return;
+	}
+
+	$path =
+		spj26_sub_request_path();
+
+	if (
+		$path !==
+		'/residen-sipatuju/'
+	) {
+		return;
+	}
+
+	$user =
+		wp_get_current_user();
+
+	if (
+		! spj26_sub_is_resident(
+			$user
+		)
+		||
+		! spj26_sub_is_account_active(
+			$user
+		)
+	) {
+		return;
+	}
+
+	$active =
+		spj26_sub_get_active_submission(
+			$user->ID
+		);
+
+	$config = array(
+		'hasActiveSubmission' =>
+			(bool) $active,
+		'id' =>
+			$active
+			? (int) $active->id
+			: 0,
+		'code' =>
+			$active
+			? (string) $active->code
+			: '',
+		'status' =>
+			$active
+			? (string) $active->status
+			: '',
+		'statusLabel' =>
+			$active
+			? spj26_sub_status_label(
+				(string) $active->status
+			)
+			: '',
+	);
+
+	echo '<script>';
+	echo 'window.spj26ResidentSubmissionState = ';
+	echo wp_json_encode(
+		$config
+	);
+	echo ';</script>';
+}
+
+add_action(
+	'wp_footer',
+	'spj26_sub_print_resident_submission_state',
+	99
+);
+
+
+/* =========================================================
+ * 5C. KEBIJAKAN PENGAJUAN BERULANG
+ *
+ * Residen boleh membuka halaman Pengajuan Baru meskipun masih
+ * memiliki pengajuan berstatus waiting/progress. Pembatasan
+ * berbasis pengajuan aktif sengaja tidak diterapkan di sini.
+ * ========================================================= */
+
+
+add_filter(
+	'spj26_resident_can_resubmit',
+	'spj26_sub_allow_resident_resubmit',
+	10,
+	2
+);
+
+
+function spj26_sub_allow_resident_resubmit(
+	$current,
+	$user_id
+) {
+
+	unset(
+		$current,
+		$user_id
+	);
+
+	return true;
+}
+
+
+/* =========================================================
+ * 6. AJAX - CREATE SUBMISSION
+ * ========================================================= */
+
+add_action(
+	'wp_ajax_spj26_create_submission',
+	'spj26_sub_ajax_create_submission'
+);
+
+
+function spj26_sub_ajax_create_submission() {
+
+	check_ajax_referer(
+		'spj26_submission_action',
+		'nonce'
+	);
+
+
+	$user =
+		wp_get_current_user();
+
+
+	if (
+		! $user
+		||
+		! $user->exists()
+		||
+		! spj26_sub_is_resident(
+			$user
+		)
+	) {
+
+		wp_send_json_error(
+			array(
+				'message' =>
+					'Hanya akun Residen yang dapat membuat pengajuan.',
+			),
+			403
+		);
+	}
+
+
+	if (
+		! spj26_sub_is_account_active(
+			$user
+		)
+	) {
+
+		wp_send_json_error(
+			array(
+				'message' =>
+					'Akun Residen sedang nonaktif.',
+			),
+			403
+		);
+	}
+
+
+	$request_token =
+		isset(
+			$_POST['request_token']
+		)
+		? sanitize_text_field(
+			wp_unslash(
+				$_POST['request_token']
+			)
+		)
+		: '';
+
+
+	if (
+		$request_token === ''
+		||
+		! preg_match(
+			'/^[a-f0-9-]{36}$/i',
+			$request_token
+		)
+	) {
+
+		wp_send_json_error(
+			array(
+				'message' =>
+					'Token pengajuan tidak valid. Muat ulang halaman dan coba lagi.',
+			),
+			400
+		);
+	}
+
+
+	global $wpdb;
+
+	$submissions_table =
+		spj26_sub_table_submissions();
+
+	$journals_table =
+		spj26_sub_table_journals();
+
+
+	/*
+	 * Idempotency:
+	 * request_token yang sama tidak membuat pengajuan kedua.
+	 */
+	$existing =
+		$wpdb->get_row(
+			$wpdb->prepare(
+				"
+				SELECT
+					id,
+					code,
+					status
+				FROM
+					{$submissions_table}
+				WHERE
+					request_token = %s
+					AND resident_id = %d
+				LIMIT 1
+				",
+				$request_token,
+				$user->ID
+			)
+		);
+
+
+	if ( $existing ) {
+
+		wp_send_json_success(
+			array(
+				'message' =>
+					'Pengajuan ini sudah tersimpan.',
+				'id' =>
+					(int) $existing->id,
+				'code' =>
+					(string) $existing->code,
+				'status' =>
+					(string) $existing->status,
+				'already_exists' =>
+					true,
+			)
+		);
+	}
+
+
+	/*
+	 * Multiple active submissions are intentionally allowed.
+	 * Idempotency tetap dijaga oleh request_token di atas, sehingga
+	 * retry/double-submit dari form yang sama tidak membuat record baru.
+	 */
+
+
+	$article_type =
+		isset(
+			$_POST['article_type']
+		)
+		? sanitize_text_field(
+			wp_unslash(
+				$_POST['article_type']
+			)
+		)
+		: '';
+
+	$article_title =
+		isset(
+			$_POST['article_title']
+		)
+		? sanitize_text_field(
+			wp_unslash(
+				$_POST['article_title']
+			)
+		)
+		: '';
+
+	$article_abstract =
+		isset(
+			$_POST['article_abstract']
+		)
+		? sanitize_textarea_field(
+			wp_unslash(
+				$_POST['article_abstract']
+			)
+		)
+		: '';
+
+	$supervisor_name =
+		isset(
+			$_POST['supervisor_name']
+		)
+		? sanitize_text_field(
+			wp_unslash(
+				$_POST['supervisor_name']
+			)
+		)
+		: '';
+
+
+	if (
+		! in_array(
+			$article_type,
+			spj26_sub_allowed_article_types(),
+			true
+		)
+	) {
+
+		wp_send_json_error(
+			array(
+				'message' =>
+					'Jenis artikel tidak valid.',
+			),
+			400
+		);
+	}
+
+
+	if (
+		$article_title === ''
+		||
+		$article_abstract === ''
+		||
+		$supervisor_name === ''
+	) {
+
+		wp_send_json_error(
+			array(
+				'message' =>
+					'Judul, abstrak, dan nama pembimbing wajib diisi.',
+			),
+			400
+		);
+	}
+
+
+	if (
+		mb_strlen(
+			$article_title
+		) > 500
+	) {
+
+		wp_send_json_error(
+			array(
+				'message' =>
+					'Judul artikel terlalu panjang.',
+			),
+			400
+		);
+	}
+
+
+	if (
+		mb_strlen(
+			$supervisor_name
+		) > 255
+	) {
+
+		wp_send_json_error(
+			array(
+				'message' =>
+					'Nama pembimbing terlalu panjang.',
+			),
+			400
+		);
+	}
+
+
+	$journals =
+		array();
+
+
+	for (
+		$i = 1;
+		$i <= 3;
+		$i++
+	) {
+
+		$name_key =
+			'journal_' .
+			$i .
+			'_name';
+
+		$issn_key =
+			'journal_' .
+			$i .
+			'_issn';
+
+		$quartile_key =
+			'journal_' .
+			$i .
+			'_quartile';
+
+		$link_key =
+			'journal_' .
+			$i .
+			'_link';
+
+
+		$name =
+			isset(
+				$_POST[
+					$name_key
+				]
+			)
+			? sanitize_text_field(
+				wp_unslash(
+					$_POST[
+						$name_key
+					]
+				)
+			)
+			: '';
+
+
+		$issn_raw =
+			isset(
+				$_POST[
+					$issn_key
+				]
+			)
+			? sanitize_text_field(
+				wp_unslash(
+					$_POST[
+						$issn_key
+					]
+				)
+			)
+			: '';
+
+
+		$quartile =
+			isset(
+				$_POST[
+					$quartile_key
+				]
+			)
+			? sanitize_text_field(
+				wp_unslash(
+					$_POST[
+						$quartile_key
+					]
+				)
+			)
+			: '';
+
+		$link_raw =
+			isset(
+				$_POST[
+					$link_key
+				]
+			)
+			? trim(
+				(string) wp_unslash(
+					$_POST[
+						$link_key
+					]
+				)
+			)
+			: '';
+
+		$link =
+			esc_url_raw(
+				$link_raw,
+				array(
+					'http',
+					'https',
+				)
+			);
+
+
+		$issn =
+			spj26_sub_normalize_issn(
+				$issn_raw
+			);
+
+
+		if (
+			$name === ''
+			||
+			$issn === ''
+			||
+			$quartile === ''
+			||
+			$link === ''
+		) {
+
+			wp_send_json_error(
+				array(
+					'message' =>
+						sprintf(
+							'Data Jurnal Kandidat %d belum lengkap. Nama jurnal, ISSN, kuartil, dan link jurnal wajib diisi.',
+							$i
+						),
+				),
+				400
+			);
+		}
+
+
+		if (
+			! spj26_sub_validate_issn(
+				$issn
+			)
+		) {
+
+			wp_send_json_error(
+				array(
+					'message' =>
+						sprintf(
+							'Format ISSN Jurnal Kandidat %d tidak valid.',
+							$i
+						),
+				),
+				400
+			);
+		}
+
+
+		if (
+			! in_array(
+				$quartile,
+				spj26_sub_allowed_quartiles(),
+				true
+			)
+		) {
+
+			wp_send_json_error(
+				array(
+					'message' =>
+						sprintf(
+							'Kuartil Jurnal Kandidat %d tidak valid.',
+							$i
+						),
+				),
+				400
+			);
+		}
+
+
+		if (
+			mb_strlen(
+				$link
+			) > 2048
+			||
+			! wp_http_validate_url(
+				$link
+			)
+		) {
+
+			wp_send_json_error(
+				array(
+					'message' =>
+						sprintf(
+							'Link Jurnal Kandidat %d tidak valid. Gunakan URL resmi yang diawali http:// atau https://.',
+							$i
+						),
+				),
+				400
+			);
+		}
+
+
+		$journals[] =
+			array(
+				'order' =>
+					$i,
+				'name' =>
+					$name,
+				'normalized_name' =>
+					spj26_sub_normalize_journal_name(
+						$name
+					),
+				'issn' =>
+					$issn,
+				'quartile' =>
+					$quartile,
+				'link' =>
+					$link,
+			);
+	}
+
+
+	/*
+	 * Ketiga jurnal harus berbeda.
+	 * Nama jurnal ATAU ISSN yang sama dianggap duplikat.
+	 */
+	for (
+		$i = 0;
+		$i < 3;
+		$i++
+	) {
+
+		for (
+			$j = $i + 1;
+			$j < 3;
+			$j++
+		) {
+
+			$same_name =
+				$journals[ $i ]['normalized_name'] !== ''
+				&&
+				$journals[ $i ]['normalized_name'] ===
+				$journals[ $j ]['normalized_name'];
+
+			$same_issn =
+				$journals[ $i ]['issn'] ===
+				$journals[ $j ]['issn'];
+
+
+			if (
+				$same_name
+				||
+				$same_issn
+			) {
+
+				wp_send_json_error(
+					array(
+						'message' =>
+							sprintf(
+								'Jurnal Kandidat %d dan Jurnal Kandidat %d terdeteksi sama. Masukkan tiga jurnal yang berbeda.',
+								$i + 1,
+								$j + 1
+							),
+					),
+					409
+				);
+			}
+		}
+	}
+
+
+	$now =
+		current_time(
+			'mysql'
+		);
+
+
+	/*
+	 * Simpan submission + 3 jurnal sebagai satu unit.
+	 */
+	$wpdb->query(
+		'START TRANSACTION'
+	);
+
+
+	$inserted =
+		$wpdb->insert(
+			$submissions_table,
+			array(
+				'code' =>
+					null,
+				'request_token' =>
+					$request_token,
+				'resident_id' =>
+					$user->ID,
+				'article_type' =>
+					$article_type,
+				'article_title' =>
+					$article_title,
+				'article_abstract' =>
+					$article_abstract,
+				'supervisor_name' =>
+					$supervisor_name,
+				'status' =>
+					'waiting',
+				'assigned_reviewer_id' =>
+					null,
+				'assignment_source' =>
+					null,
+				'assigned_at' =>
+					null,
+				'submitted_at' =>
+					$now,
+				'created_at' =>
+					$now,
+				'updated_at' =>
+					$now,
+			),
+			array(
+				'%s',
+				'%s',
+				'%d',
+				'%s',
+				'%s',
+				'%s',
+				'%s',
+				'%s',
+				'%d',
+				'%s',
+				'%s',
+				'%s',
+				'%s',
+				'%s',
+			)
+		);
+
+
+	if (
+		$inserted === false
+	) {
+
+		$wpdb->query(
+			'ROLLBACK'
+		);
+
+		wp_send_json_error(
+			array(
+				'message' =>
+					'Pengajuan gagal disimpan.',
+			),
+			500
+		);
+	}
+
+
+	$submission_id =
+		(int) $wpdb->insert_id;
+
+	$code =
+		spj26_sub_generate_code(
+			$submission_id
+		);
+
+
+	$code_updated =
+		$wpdb->update(
+			$submissions_table,
+			array(
+				'code' =>
+					$code,
+				'updated_at' =>
+					$now,
+			),
+			array(
+				'id' =>
+					$submission_id,
+			),
+			array(
+				'%s',
+				'%s',
+			),
+			array(
+				'%d',
+			)
+		);
+
+
+	if (
+		$code_updated === false
+	) {
+
+		$wpdb->query(
+			'ROLLBACK'
+		);
+
+		wp_send_json_error(
+			array(
+				'message' =>
+					'Kode pengajuan gagal dibuat.',
+			),
+			500
+		);
+	}
+
+
+	foreach (
+		$journals as
+		$journal
+	) {
+
+		$journal_inserted =
+			$wpdb->insert(
+				$journals_table,
+				array(
+					'submission_id' =>
+						$submission_id,
+					'journal_order' =>
+						$journal['order'],
+					'journal_name' =>
+						$journal['name'],
+					'issn' =>
+						$journal['issn'],
+					'quartile' =>
+						$journal['quartile'],
+					'journal_url' =>
+						$journal['link'],
+					'decision' =>
+						null,
+					'reviewer_comment' =>
+						null,
+					'created_at' =>
+						$now,
+					'updated_at' =>
+						$now,
+				),
+				array(
+					'%d',
+					'%d',
+					'%s',
+					'%s',
+					'%s',
+					'%s',
+					'%s',
+					'%s',
+					'%s',
+					'%s',
+				)
+			);
+
+
+		if (
+			$journal_inserted === false
+		) {
+
+			$wpdb->query(
+				'ROLLBACK'
+			);
+
+			wp_send_json_error(
+				array(
+					'message' =>
+						'Data jurnal kandidat gagal disimpan.',
+				),
+				500
+			);
+		}
+	}
+
+
+	$wpdb->query(
+		'COMMIT'
+	);
+
+
+	do_action(
+		'spj26_submission_created',
+		$submission_id,
+		$user->ID
+	);
+
+
+	wp_send_json_success(
+		array(
+			'message' =>
+				'Pengajuan berhasil dikirim.',
+			'id' =>
+				$submission_id,
+			'code' =>
+				$code,
+			'status' =>
+				'waiting',
+			'status_label' =>
+				'Menunggu Pemeriksaan',
+		)
+	);
+}
+
+
+/* =========================================================
+ * 7. COUNT INTEGRATION
+ * ========================================================= */
+
+add_filter(
+	'spj26_user_submission_count',
+	'spj26_sub_filter_user_submission_count',
+	10,
+	3
+);
+
+
+function spj26_sub_filter_user_submission_count(
+	$current,
+	$user_id,
+	$user_type
+) {
+
+	if (
+		$user_type !==
+		'residen'
+	) {
+		return $current;
+	}
+
+	global $wpdb;
+
+	$table =
+		spj26_sub_table_submissions();
+
+	return (int) $wpdb->get_var(
+		$wpdb->prepare(
+			"
+			SELECT COUNT(*)
+			FROM {$table}
+			WHERE resident_id = %d
+			",
+			$user_id
+		)
+	);
+}
+
+
+add_filter(
+	'spj26_reviewer_active_submission_count',
+	'spj26_sub_filter_reviewer_active_count',
+	10,
+	2
+);
+
+
+function spj26_sub_filter_reviewer_active_count(
+	$current,
+	$user_id
+) {
+
+	global $wpdb;
+
+	$table =
+		spj26_sub_table_submissions();
+
+	return (int) $wpdb->get_var(
+		$wpdb->prepare(
+			"
+			SELECT COUNT(*)
+			FROM {$table}
+			WHERE
+				assigned_reviewer_id = %d
+				AND status = 'progress'
+			",
+			$user_id
+		)
+	);
+}
+
+
+add_filter(
+	'spj26_reviewer_completed_review_count',
+	'spj26_sub_filter_reviewer_completed_count',
+	10,
+	2
+);
+
+
+function spj26_sub_filter_reviewer_completed_count(
+	$current,
+	$user_id
+) {
+
+	global $wpdb;
+
+	$table =
+		spj26_sub_table_submissions();
+
+	return (int) $wpdb->get_var(
+		$wpdb->prepare(
+			"
+			SELECT COUNT(*)
+			FROM {$table}
+			WHERE
+				assigned_reviewer_id = %d
+				AND status = 'done'
+			",
+			$user_id
+		)
+	);
+}
+
+
+/* =========================================================
+ * 8. ADMIN DASHBOARD INTEGRATION
+ * ========================================================= */
+
+add_filter(
+	'spj26_admin_dashboard_data',
+	'spj26_sub_filter_admin_dashboard_data',
+	10,
+	1
+);
+
+
+function spj26_sub_filter_admin_dashboard_data(
+	$data
+) {
+
+	global $wpdb;
+
+	$table =
+		spj26_sub_table_submissions();
+
+
+	$waiting =
+		(int) $wpdb->get_var(
+			"
+			SELECT COUNT(*)
+			FROM {$table}
+			WHERE status = 'waiting'
+		"
+		);
+
+	$progress =
+		(int) $wpdb->get_var(
+			"
+			SELECT COUNT(*)
+			FROM {$table}
+			WHERE status = 'progress'
+		"
+		);
+
+	$done =
+		(int) $wpdb->get_var(
+			"
+			SELECT COUNT(*)
+			FROM {$table}
+			WHERE status = 'done'
+		"
+		);
+
+
+	if (
+		! isset(
+			$data['counts']
+		)
+		||
+		! is_array(
+			$data['counts']
+		)
+	) {
+
+		$data['counts'] =
+			array();
+	}
+
+
+	$data['counts']['waiting'] =
+		$waiting;
+
+	$data['counts']['progress'] =
+		$progress;
+
+	$data['counts']['done'] =
+		$done;
+
+
+	$rows =
+		$wpdb->get_results(
+			"
+			SELECT
+				id,
+				code,
+				resident_id,
+				status,
+				assigned_reviewer_id,
+				assignment_source,
+				created_at
+			FROM
+				{$table}
+			ORDER BY
+				id DESC
+			LIMIT 50
+		"
+		);
+
+
+	$submissions =
+		array();
+
+
+	foreach (
+		$rows as
+		$row
+	) {
+
+		$resident =
+			get_userdata(
+				(int) $row->resident_id
+			);
+
+		$reviewer =
+			$row->assigned_reviewer_id
+			? get_userdata(
+				(int) $row->assigned_reviewer_id
+			)
+			: false;
+
+
+		$timestamp =
+			strtotime(
+				$row->created_at
+			);
+
+
+		$submissions[] =
+			array(
+				'id' =>
+					(int) $row->id,
+				'code' =>
+					(string) $row->code,
+				'resident_name' =>
+					$resident
+					? (string) $resident->display_name
+					: '-',
+				'resident_program' =>
+					(string) get_user_meta(
+						(int) $row->resident_id,
+						'spj26_program_ppds',
+						true
+					),
+				'date' =>
+					$timestamp
+					? wp_date(
+						'd M Y',
+						$timestamp
+					)
+					: '',
+				'time' =>
+					$timestamp
+					? wp_date(
+						'H:i',
+						$timestamp
+					)
+					: '',
+				'status' =>
+					(string) $row->status,
+				'reviewer_id' =>
+					$row->assigned_reviewer_id
+					? (int) $row->assigned_reviewer_id
+					: 0,
+				'reviewer_name' =>
+					$reviewer
+					? (string) $reviewer->display_name
+					: '',
+				'assignment_source' =>
+					(string) (
+						$row->assignment_source
+						? $row->assignment_source
+						: ''
+					),
+				'detail_url' =>
+					'',
+			);
+	}
+
+
+	$data['submissions'] =
+		$submissions;
+
+
+	$activities =
+		array();
+
+	foreach (
+		array_slice(
+			$submissions,
+			0,
+			6
+		)
+		as
+		$item
+	) {
+
+		$activities[] =
+			array(
+				'type' =>
+					'new',
+				'icon' =>
+					'post_add',
+				'text' =>
+					'Pengajuan ' .
+					$item['code'] .
+					' dibuat oleh ' .
+					$item['resident_name'] .
+					'.',
+				'time' =>
+					trim(
+						$item['date'] .
+						' ' .
+						$item['time']
+					),
+			);
+	}
+
+
+	$data['activities'] =
+		$activities;
+
+
+	return $data;
+}
+
+
+/* =========================================================
+ * 8. FALLBACK ADMIN DASHBOARD ENDPOINT
+ *
+ * Hanya dipasang jika snippet 000 — 02 yang aktif belum
+ * menyediakan wp_ajax_spj26_admin_dashboard_data.
+ * ========================================================= */
+
+function spj26_sub_register_admin_dashboard_fallback() {
+
+	if (
+		has_action(
+			'wp_ajax_spj26_admin_dashboard_data'
+		)
+	) {
+		return;
+	}
+
+	add_action(
+		'wp_ajax_spj26_admin_dashboard_data',
+		'spj26_sub_ajax_admin_dashboard_data_fallback'
+	);
+}
+
+add_action(
+	'init',
+	'spj26_sub_register_admin_dashboard_fallback',
+	20
+);
+
+
+function spj26_sub_ajax_admin_dashboard_data_fallback() {
+
+	if (
+		! spj26_sub_is_admin()
+	) {
+
+		wp_send_json_error(
+			array(
+				'message' =>
+					'Anda tidak memiliki izin.',
+			),
+			403
+		);
+	}
+
+
+	check_ajax_referer(
+		'spj26_user_management_action',
+		'nonce'
+	);
+
+
+	$reviewers =
+		array();
+
+	$active_reviewer_count =
+		0;
+
+
+	if (
+		function_exists(
+			'spj26_um_get_reviewer_users'
+		)
+		&&
+		function_exists(
+			'spj26_um_serialize_reviewer'
+		)
+	) {
+
+		foreach (
+			spj26_um_get_reviewer_users()
+			as
+			$user
+		) {
+
+			$item =
+				spj26_um_serialize_reviewer(
+					$user
+				);
+
+			if (
+				! empty(
+					$item['active']
+				)
+			) {
+
+				$active_reviewer_count++;
+
+				$reviewers[] =
+					array(
+						'id' =>
+							(int) $item['id'],
+						'name' =>
+							(string) $item['name'],
+						'active' =>
+							true,
+						'active_submissions' =>
+							(int) $item['active_submissions'],
+					);
+			}
+		}
+	}
+
+
+	$data =
+		array(
+			'counts' =>
+				array(
+					'waiting' =>
+						0,
+					'progress' =>
+						0,
+					'done' =>
+						0,
+					'reviewers' =>
+						$active_reviewer_count,
+				),
+			'submissions' =>
+				array(),
+			'activities' =>
+				array(),
+			'reviewers' =>
+				$reviewers,
+		);
+
+
+	$data =
+		apply_filters(
+			'spj26_admin_dashboard_data',
+			$data
+		);
+
+
+	wp_send_json_success(
+		$data
+	);
+}
+
+
+/* =========================================================
+ * 9. ADMIN DASHBOARD CONFIG FALLBACK
+ * ========================================================= */
+
+function spj26_sub_print_admin_dashboard_config_fallback() {
+
+	if (
+		! is_user_logged_in()
+		||
+		! spj26_sub_is_admin()
+	) {
+		return;
+	}
+
+
+	if (
+		spj26_sub_request_path() !==
+		'/admin-sipatuju/'
+	) {
+		return;
+	}
+
+
+	$config =
+		array(
+			'ajaxUrl' =>
+				admin_url(
+					'admin-ajax.php'
+				),
+			'nonce' =>
+				wp_create_nonce(
+					'spj26_user_management_action'
+				),
+		);
+
+
+	echo '<script>';
+	echo 'if(!window.spj26AdminDashboardConfig){';
+	echo 'window.spj26AdminDashboardConfig = ';
+	echo wp_json_encode(
+		$config
+	);
+	echo ';';
+	echo '}';
+	echo '</script>';
+}
+
+add_action(
+	'wp_footer',
+	'spj26_sub_print_admin_dashboard_config_fallback',
+	96
+);
+
+
+/* =========================================================
+ * 10. AJAX - ADMIN ASSIGN REVIEWER
+ *
+ * Atomic assignment:
+ * UPDATE hanya berhasil jika submission masih waiting dan
+ * belum memiliki assigned_reviewer_id.
+ * ========================================================= */
+
+add_action(
+	'wp_ajax_spj26_admin_assign_reviewer',
+	'spj26_sub_ajax_admin_assign_reviewer'
+);
+
+
+function spj26_sub_ajax_admin_assign_reviewer() {
+
+	if (
+		! spj26_sub_is_admin()
+	) {
+
+		wp_send_json_error(
+			array(
+				'message' =>
+					'Anda tidak memiliki izin untuk menugaskan reviewer.',
+			),
+			403
+		);
+	}
+
+
+	check_ajax_referer(
+		'spj26_user_management_action',
+		'nonce'
+	);
+
+
+	$submission_id =
+		isset(
+			$_POST['submission_id']
+		)
+		? absint(
+			$_POST['submission_id']
+		)
+		: 0;
+
+	$reviewer_id =
+		isset(
+			$_POST['reviewer_id']
+		)
+		? absint(
+			$_POST['reviewer_id']
+		)
+		: 0;
+
+
+	if (
+		! $submission_id
+		||
+		! $reviewer_id
+	) {
+
+		wp_send_json_error(
+			array(
+				'message' =>
+					'Pengajuan dan reviewer wajib dipilih.',
+			),
+			400
+		);
+	}
+
+
+	$reviewer =
+		get_userdata(
+			$reviewer_id
+		);
+
+
+	if (
+		! $reviewer
+		||
+		! in_array(
+			'sipatuju_reviewer',
+			(array) $reviewer->roles,
+			true
+		)
+		||
+		! spj26_sub_is_account_active(
+			$reviewer
+		)
+	) {
+
+		wp_send_json_error(
+			array(
+				'message' =>
+					'Reviewer tidak valid atau sedang nonaktif.',
+			),
+			400
+		);
+	}
+
+
+	global $wpdb;
+
+	$table =
+		spj26_sub_table_submissions();
+
+	$now =
+		current_time(
+			'mysql'
+		);
+
+
+	/*
+	 * Query atomic: satu submission hanya dapat direbut satu pihak.
+	 */
+	$result =
+		$wpdb->query(
+			$wpdb->prepare(
+				"
+				UPDATE {$table}
+				SET
+					assigned_reviewer_id = %d,
+					status = 'progress',
+					assignment_source = 'Admin',
+					assigned_at = %s,
+					updated_at = %s
+				WHERE
+					id = %d
+					AND status = 'waiting'
+					AND assigned_reviewer_id IS NULL
+				",
+				$reviewer_id,
+				$now,
+				$now,
+				$submission_id
+			)
+		);
+
+
+	if (
+		$result !== 1
+	) {
+
+		wp_send_json_error(
+			array(
+				'message' =>
+					'Pengajuan sudah ditangani atau telah ditugaskan oleh proses lain.',
+			),
+			409
+		);
+	}
+
+
+	wp_send_json_success(
+		array(
+			'message' =>
+				'Reviewer berhasil ditugaskan.',
+			'submission_id' =>
+				$submission_id,
+			'reviewer_id' =>
+				$reviewer_id,
+			'status' =>
+				'progress',
+		)
+	);
+}
+
+/* =========================================================
+ * 11. REVIEWER DASHBOARD / REVIEW WORKFLOW
+ * ========================================================= */
+
+function spj26_sub_is_reviewer(
+	$user = null
+) {
+
+	if ( ! $user ) {
+		$user =
+			wp_get_current_user();
+	}
+
+	if (
+		! $user
+		||
+		! $user->exists()
+	) {
+		return false;
+	}
+
+	if (
+		function_exists(
+			'spj26_user_has_role'
+		)
+	) {
+
+		return
+			spj26_user_has_role(
+				'sipatuju_reviewer',
+				$user
+			);
+	}
+
+	return in_array(
+		'sipatuju_reviewer',
+		(array) $user->roles,
+		true
+	);
+}
+
+
+function spj26_sub_format_datetime(
+	$value
+) {
+
+	if ( ! $value ) {
+		return null;
+	}
+
+	$timestamp =
+		strtotime(
+			$value
+		);
+
+	if ( ! $timestamp ) {
+		return $value;
+	}
+
+	return wp_date(
+		'd M Y, H:i',
+		$timestamp
+	);
+}
+
+
+function spj26_sub_get_journals_for_submission(
+	$submission_id
+) {
+
+	global $wpdb;
+
+	$table =
+		spj26_sub_table_journals();
+
+	$rows =
+		$wpdb->get_results(
+			$wpdb->prepare(
+				"
+				SELECT
+					id,
+					journal_order,
+					journal_name,
+					issn,
+					quartile,
+					journal_url,
+					decision,
+					reviewer_comment
+				FROM
+					{$table}
+				WHERE
+					submission_id = %d
+				ORDER BY
+					journal_order ASC
+				",
+				(int) $submission_id
+			)
+		);
+
+	$journals = array();
+
+	foreach ( $rows as $row ) {
+
+		$journals[] = array(
+			'id' =>
+				(int) $row->id,
+			'order' =>
+				(int) $row->journal_order,
+			'name' =>
+				(string) $row->journal_name,
+			'issn' =>
+				(string) $row->issn,
+			'quartile' =>
+				(string) $row->quartile,
+			'link' =>
+				$row->journal_url
+				? (string) $row->journal_url
+				: '',
+			'decision' =>
+				$row->decision
+				? (string) $row->decision
+				: '',
+			'comment' =>
+				$row->reviewer_comment
+				? (string) $row->reviewer_comment
+				: '',
+		);
+	}
+
+
+	return $journals;
+}
+
+
+/* =========================================================
+ * 11X. LoA / SURAT PERSETUJUAN - MODULE BRIDGE
+ *
+ * Generator dokumen dipindahkan ke plugin:
+ * SIPATUJU LoA Generator
+ *
+ * Backend ini hanya mengekspos availability + download URL
+ * kepada akun Residen.
+ * ========================================================= */
+
+
+function spj26_sub_serialize_for_reviewer(
+	$row
+) {
+
+	$journals =
+		spj26_sub_get_journals_for_submission(
+			(int) $row->id
+		);
+
+	$resident =
+		get_userdata(
+			(int) $row->resident_id
+		);
+
+	$resident_program =
+		$resident
+		? (string) get_user_meta(
+			$resident->ID,
+			'spj26_program_ppds',
+			true
+		)
+		: '';
+
+	return array(
+		'id' =>
+			(int) $row->id,
+		'code' =>
+			(string) $row->code,
+		'resident_id' =>
+			(int) $row->resident_id,
+		'resident_name' =>
+			$resident
+			? (string) $resident->display_name
+			: '-',
+		'resident_nim' =>
+			$resident
+			? (string) $resident->user_login
+			: '-',
+		'resident_program' =>
+			$resident_program,
+		'article_type' =>
+			(string) $row->article_type,
+		'article_title' =>
+			(string) $row->article_title,
+		'article_abstract' =>
+			(string) $row->article_abstract,
+		'supervisor_name' =>
+			(string) $row->supervisor_name,
+		'status' =>
+			(string) $row->status,
+		'status_label' =>
+			spj26_sub_status_label(
+				(string) $row->status
+			),
+		'assignment_source' =>
+			$row->assignment_source
+			? (string) $row->assignment_source
+			: '',
+		'submitted_at' =>
+			spj26_sub_format_datetime(
+				$row->submitted_at
+			),
+		'assigned_at' =>
+			spj26_sub_format_datetime(
+				$row->assigned_at
+			),
+		'updated_at' =>
+			spj26_sub_format_datetime(
+				$row->updated_at
+			),
+		'completed_at' =>
+			$row->status === 'done'
+			? spj26_sub_format_datetime(
+				$row->updated_at
+			)
+			: null,
+		'journals' =>
+			$journals,
+	);
+}
+
+
+/* =========================================================
+ * 11A. FRONTEND CONFIG - REVIEWER
+ * ========================================================= */
+
+function spj26_sub_print_reviewer_portal_config() {
+
+	if (
+		! is_user_logged_in()
+	) {
+		return;
+	}
+
+	$path =
+		spj26_sub_request_path();
+
+	/*
+	 * Gunakan route classifier dari Core sebagai source of truth.
+	 * Fallback dipertahankan agar snippet tetap gagal-aman jika urutan
+	 * load WordPress berbeda.
+	 */
+	$is_reviewer_portal_path =
+		function_exists(
+			'spj26_is_reviewer_frontend_path'
+		)
+		? spj26_is_reviewer_frontend_path(
+			$path
+		)
+		: (
+			strpos(
+				$path,
+				'/reviewer-sipatuju/'
+			) === 0
+			||
+			$path === '/riwayat-pemeriksaan/'
+		);
+
+	if (
+		! $is_reviewer_portal_path
+	) {
+		return;
+	}
+
+	$user =
+		wp_get_current_user();
+
+	if (
+		! spj26_sub_is_reviewer(
+			$user
+		)
+		||
+		! spj26_sub_is_account_active(
+			$user
+		)
+	) {
+		return;
+	}
+
+	$login_url =
+		function_exists(
+			'spj26_login_url'
+		)
+		? spj26_login_url()
+		: home_url(
+			'/sipatuju-login/'
+		);
+
+	$logout_url =
+		html_entity_decode(
+			wp_logout_url(
+				$login_url
+			),
+			ENT_QUOTES,
+			'UTF-8'
+		);
+
+	$config = array(
+		'ajaxUrl' =>
+			admin_url(
+				'admin-ajax.php'
+			),
+		'nonce' =>
+			wp_create_nonce(
+				'spj26_reviewer_action'
+			),
+		'name' =>
+			(string) $user->display_name,
+		'username' =>
+			(string) $user->user_login,
+		'unit' =>
+			(string) get_user_meta(
+				$user->ID,
+				'spj26_reviewer_unit',
+				true
+			),
+		'logoutUrl' =>
+			$logout_url,
+		'portalPath' =>
+			$path,
+	);
+
+	echo '<script>';
+	echo 'window.spj26ReviewerPortalConfig = ';
+	echo wp_json_encode(
+		$config
+	);
+	echo ';</script>';
+}
+
+add_action(
+	'wp_footer',
+	'spj26_sub_print_reviewer_portal_config',
+	97
+);
+
+
+/* =========================================================
+ * 11B. REVIEWER REQUEST SECURITY
+ * ========================================================= */
+
+function spj26_sub_require_reviewer_ajax() {
+
+	check_ajax_referer(
+		'spj26_reviewer_action',
+		'nonce'
+	);
+
+	$user =
+		wp_get_current_user();
+
+	if (
+		! $user
+		||
+		! $user->exists()
+		||
+		! spj26_sub_is_reviewer(
+			$user
+		)
+		||
+		! spj26_sub_is_account_active(
+			$user
+		)
+	) {
+
+		wp_send_json_error(
+			array(
+				'message' =>
+					'Anda tidak memiliki akses Reviewer yang aktif.',
+			),
+			403
+		);
+	}
+
+	return $user;
+}
+
+
+/* =========================================================
+ * 11C. REVIEWER DASHBOARD DATA
+ * AJAX: spj26_reviewer_dashboard_data
+ * ========================================================= */
+
+add_action(
+	'wp_ajax_spj26_reviewer_dashboard_data',
+	'spj26_sub_ajax_reviewer_dashboard_data'
+);
+
+
+function spj26_sub_ajax_reviewer_dashboard_data() {
+
+	$user =
+		spj26_sub_require_reviewer_ajax();
+
+	global $wpdb;
+
+	$table =
+		spj26_sub_table_submissions();
+
+
+	$available_rows =
+		$wpdb->get_results(
+			"
+			SELECT *
+			FROM {$table}
+			WHERE
+				status = 'waiting'
+				AND assigned_reviewer_id IS NULL
+			ORDER BY
+				submitted_at ASC,
+				id ASC
+			LIMIT 100
+		"
+	);
+
+
+	$active_rows =
+		$wpdb->get_results(
+			$wpdb->prepare(
+				"
+					SELECT *
+					FROM {$table}
+					WHERE
+						status = 'progress'
+						AND assigned_reviewer_id = %d
+					ORDER BY
+						assigned_at ASC,
+						id ASC
+				",
+				$user->ID
+			)
+		);
+
+
+	$completed_rows =
+		$wpdb->get_results(
+			$wpdb->prepare(
+				"
+					SELECT *
+					FROM {$table}
+					WHERE
+						status = 'done'
+						AND assigned_reviewer_id = %d
+					ORDER BY
+						updated_at DESC,
+						id DESC
+					LIMIT 50
+				",
+				$user->ID
+			)
+		);
+
+
+	$available = array();
+	$active    = array();
+	$completed = array();
+
+
+	foreach ( $available_rows as $row ) {
+
+		$available[] =
+			spj26_sub_serialize_for_reviewer(
+				$row
+			);
+	}
+
+
+	foreach ( $active_rows as $row ) {
+
+		$active[] =
+			spj26_sub_serialize_for_reviewer(
+				$row
+			);
+	}
+
+
+	foreach ( $completed_rows as $row ) {
+
+		$completed[] =
+			spj26_sub_serialize_for_reviewer(
+				$row
+			);
+	}
+
+
+	wp_send_json_success(
+		array(
+			'available' => $available,
+			'active'    => $active,
+			'completed' => $completed,
+		)
+	);
+}
+
+
+
+/* =========================================================
+ * 11C-1. REVIEWER HISTORY DATA
+ * AJAX: spj26_reviewer_history_data
+ *
+ * Endpoint khusus agar page Riwayat Pemeriksaan tidak
+ * bergantung pada payload Dashboard Reviewer.
+ * ========================================================= */
+
+add_action(
+    'wp_ajax_spj26_reviewer_history_data',
+    'spj26_sub_ajax_reviewer_history_data'
+);
+
+
+function spj26_sub_ajax_reviewer_history_data() {
+
+    $user =
+        spj26_sub_require_reviewer_ajax();
+
+    global $wpdb;
+
+    $table =
+        spj26_sub_table_submissions();
+
+
+    $rows =
+        $wpdb->get_results(
+            $wpdb->prepare(
+                "
+                    SELECT *
+                    FROM {$table}
+                    WHERE
+                        status = 'done'
+                        AND assigned_reviewer_id = %d
+                    ORDER BY
+                        updated_at DESC,
+                        id DESC
+                    LIMIT 100
+                ",
+                $user->ID
+            )
+        );
+
+
+    $completed =
+        array();
+
+
+    foreach ( $rows as $row ) {
+
+        $completed[] =
+            spj26_sub_serialize_for_reviewer(
+                $row
+            );
+    }
+
+
+    wp_send_json_success(
+        array(
+            'completed' => $completed,
+            'count'     => count(
+                $completed
+            ),
+        )
+    );
+}
+
+
+/* =========================================================
+ * 11D. REVIEWER TAKE SUBMISSION
+ * AJAX: spj26_reviewer_take_submission
+ * ========================================================= */
+
+add_action(
+	'wp_ajax_spj26_reviewer_take_submission',
+	'spj26_sub_ajax_reviewer_take_submission'
+);
+
+
+function spj26_sub_ajax_reviewer_take_submission() {
+
+	$user =
+		spj26_sub_require_reviewer_ajax();
+
+	$submission_id =
+		isset(
+			$_POST['submission_id']
+		)
+		? absint(
+			$_POST['submission_id']
+		)
+		: 0;
+
+	if ( ! $submission_id ) {
+
+		wp_send_json_error(
+			array(
+				'message' =>
+					'Pengajuan tidak valid.',
+			),
+			400
+		);
+	}
+
+
+	global $wpdb;
+
+	$table =
+		spj26_sub_table_submissions();
+
+	$now =
+		current_time(
+			'mysql'
+		);
+
+
+	$result =
+		$wpdb->query(
+			$wpdb->prepare(
+				"
+					UPDATE {$table}
+					SET
+						assigned_reviewer_id = %d,
+						status = 'progress',
+						assignment_source = 'Reviewer',
+						assigned_at = %s,
+						updated_at = %s
+					WHERE
+						id = %d
+						AND status = 'waiting'
+						AND assigned_reviewer_id IS NULL
+				",
+				$user->ID,
+				$now,
+				$now,
+				$submission_id
+			)
+		);
+
+
+	if ( $result !== 1 ) {
+
+		wp_send_json_error(
+			array(
+				'message' =>
+					'Pengajuan sudah diambil atau ditugaskan kepada Reviewer lain.',
+			),
+			409
+		);
+	}
+
+
+	wp_send_json_success(
+		array(
+			'message' =>
+				'Pengajuan berhasil diambil untuk diperiksa.',
+			'submission_id' =>
+				$submission_id,
+			'status' =>
+				'progress',
+		)
+	);
+}
+
+
+/* =========================================================
+ * 11E. REVIEWER SUBMIT RESULTS
+ * AJAX: spj26_reviewer_submit_review
+ * ========================================================= */
+
+add_action(
+	'wp_ajax_spj26_reviewer_submit_review',
+	'spj26_sub_ajax_reviewer_submit_review'
+);
+
+
+function spj26_sub_ajax_reviewer_submit_review() {
+
+	$user =
+		spj26_sub_require_reviewer_ajax();
+
+	$submission_id =
+		isset(
+			$_POST['submission_id']
+		)
+		? absint(
+			$_POST['submission_id']
+		)
+		: 0;
+
+	$journals_json =
+		isset(
+			$_POST['journals']
+		)
+		? wp_unslash(
+			$_POST['journals']
+		)
+		: '';
+
+	$review_input =
+		json_decode(
+			(string) $journals_json,
+			true
+		);
+
+
+	if (
+		! $submission_id
+		||
+		! is_array(
+			$review_input
+		)
+		||
+		count(
+			$review_input
+		) !== 3
+	) {
+
+		wp_send_json_error(
+			array(
+				'message' =>
+					'Hasil pemeriksaan harus mencakup tepat tiga jurnal.',
+			),
+			400
+		);
+	}
+
+
+	global $wpdb;
+
+	$submission_table =
+		spj26_sub_table_submissions();
+
+	$journal_table =
+		spj26_sub_table_journals();
+
+
+	$submission =
+		$wpdb->get_row(
+			$wpdb->prepare(
+				"
+					SELECT *
+					FROM {$submission_table}
+					WHERE
+						id = %d
+						AND status = 'progress'
+						AND assigned_reviewer_id = %d
+					LIMIT 1
+				",
+				$submission_id,
+				$user->ID
+			)
+		);
+
+
+	if ( ! $submission ) {
+
+		wp_send_json_error(
+			array(
+				'message' =>
+					'Pengajuan tidak ditemukan atau bukan pemeriksaan aktif Anda.',
+			),
+			404
+		);
+	}
+
+
+	$db_journals =
+		$wpdb->get_results(
+			$wpdb->prepare(
+				"
+					SELECT
+						id,
+						journal_order
+					FROM {$journal_table}
+					WHERE
+						submission_id = %d
+					ORDER BY
+						journal_order ASC
+				",
+				$submission_id
+			)
+		);
+
+
+	if (
+		count(
+			$db_journals
+		) !== 3
+	) {
+
+		wp_send_json_error(
+			array(
+				'message' =>
+					'Data jurnal pada pengajuan tidak lengkap.',
+			),
+			500
+		);
+	}
+
+
+	$allowed_ids = array();
+
+	foreach ( $db_journals as $journal ) {
+
+		$allowed_ids[
+			(int) $journal->id
+		] = true;
+	}
+
+
+	$validated = array();
+	$seen_ids  = array();
+
+
+	foreach ( $review_input as $item ) {
+
+		$journal_id =
+			isset(
+				$item['id']
+			)
+			? absint(
+				$item['id']
+			)
+			: 0;
+
+		$decision =
+			isset(
+				$item['decision']
+			)
+			? sanitize_key(
+				$item['decision']
+			)
+			: '';
+
+		$comment =
+			isset(
+				$item['comment']
+			)
+			? sanitize_textarea_field(
+				$item['comment']
+			)
+			: '';
+
+
+		if (
+			! $journal_id
+			||
+			! isset(
+				$allowed_ids[
+					$journal_id
+				]
+			)
+			||
+			isset(
+				$seen_ids[
+					$journal_id
+				]
+			)
+		) {
+
+			wp_send_json_error(
+				array(
+					'message' =>
+						'Data jurnal pemeriksaan tidak valid.',
+				),
+				400
+			);
+		}
+
+
+		if (
+			! in_array(
+				$decision,
+				array(
+					'layak',
+					'tidak_layak',
+				),
+				true
+			)
+		) {
+
+			wp_send_json_error(
+				array(
+					'message' =>
+						'Keputusan jurnal harus Layak atau Tidak Layak.',
+				),
+				400
+			);
+		}
+
+
+		if (
+			$decision ===
+			'tidak_layak'
+			&&
+			$comment === ''
+		) {
+
+			wp_send_json_error(
+				array(
+					'message' =>
+						'Komentar/alasan wajib diisi untuk jurnal yang dinyatakan Tidak Layak.',
+				),
+				400
+			);
+		}
+
+
+		$seen_ids[
+			$journal_id
+		] = true;
+
+		$validated[] = array(
+			'id' =>
+				$journal_id,
+			'decision' =>
+				$decision,
+			'comment' =>
+				$comment,
+		);
+	}
+
+
+	if (
+		count(
+			$validated
+		) !== 3
+	) {
+
+		wp_send_json_error(
+			array(
+				'message' =>
+					'Pemeriksaan harus mencakup seluruh jurnal kandidat.',
+			),
+			400
+		);
+	}
+
+
+	$now =
+		current_time(
+			'mysql'
+		);
+
+
+	$wpdb->query(
+		'START TRANSACTION'
+	);
+
+
+	foreach ( $validated as $item ) {
+
+		$result =
+			$wpdb->update(
+				$journal_table,
+				array(
+					'decision' =>
+						$item['decision'],
+					'reviewer_comment' =>
+						$item['comment'],
+					'updated_at' =>
+						$now,
+				),
+				array(
+					'id' =>
+						$item['id'],
+					'submission_id' =>
+						$submission_id,
+				),
+				array(
+					'%s',
+					'%s',
+					'%s',
+				),
+				array(
+					'%d',
+					'%d',
+				)
+			);
+
+
+		if ( $result === false ) {
+
+			$wpdb->query(
+				'ROLLBACK'
+			);
+
+			wp_send_json_error(
+				array(
+					'message' =>
+						'Penyimpanan hasil pemeriksaan jurnal gagal.',
+				),
+				500
+			);
+		}
+	}
+
+
+	$submission_result =
+		$wpdb->query(
+			$wpdb->prepare(
+				"
+					UPDATE {$submission_table}
+					SET
+						status = 'done',
+						updated_at = %s
+					WHERE
+						id = %d
+						AND status = 'progress'
+						AND assigned_reviewer_id = %d
+				",
+				$now,
+				$submission_id,
+				$user->ID
+			)
+		);
+
+
+	if (
+		$submission_result !== 1
+	) {
+
+		$wpdb->query(
+			'ROLLBACK'
+		);
+
+		wp_send_json_error(
+			array(
+				'message' =>
+					'Status pengajuan gagal diperbarui.',
+			),
+			409
+		);
+	}
+
+
+	$wpdb->query(
+		'COMMIT'
+	);
+
+
+	wp_send_json_success(
+		array(
+			'message' =>
+				'Hasil pemeriksaan berhasil dikirim.',
+			'submission_id' =>
+				$submission_id,
+			'status' =>
+				'done',
+		)
+	);
+}
+
+/* =========================================================
+ * 12. RESIDEN - HASIL PEMERIKSAAN
+ * ========================================================= */
+
+
+/* =========================================================
+ * 12A. FRONTEND CONFIG - RESIDEN FLOW
+ * Pages:
+ * - /residen-sipatuju/
+ * - /residen-sipatuju/pengajuan-baru/
+ * - /residen-sipatuju/hasil/
+ * ========================================================= */
+
+function spj26_sub_print_resident_results_config() {
+
+	if (
+		! is_user_logged_in()
+	) {
+		return;
+	}
+
+	$path =
+		spj26_sub_request_path();
+
+	$allowed_paths = array(
+		'/residen-sipatuju/',
+		'/residen-sipatuju/pengajuan-baru/',
+		'/residen-sipatuju/hasil/',
+	);
+
+	if (
+		! in_array(
+			$path,
+			$allowed_paths,
+			true
+		)
+	) {
+		return;
+	}
+
+	$user =
+		wp_get_current_user();
+
+	if (
+		! spj26_sub_is_resident(
+			$user
+		)
+		||
+		! spj26_sub_is_account_active(
+			$user
+		)
+	) {
+		return;
+	}
+
+	$login_url =
+		function_exists(
+			'spj26_login_url'
+		)
+		? spj26_login_url()
+		: home_url(
+			'/sipatuju-login/'
+		);
+
+	$logout_url =
+		html_entity_decode(
+			wp_logout_url(
+				$login_url
+			),
+			ENT_QUOTES,
+			'UTF-8'
+		);
+
+	$active =
+		spj26_sub_get_active_submission(
+			$user->ID
+		);
+
+	$can_resubmit =
+		(bool) apply_filters(
+			'spj26_resident_can_resubmit',
+			false,
+			$user->ID
+		);
+
+	$config = array(
+		'ajaxUrl' =>
+			admin_url(
+				'admin-ajax.php'
+			),
+		'nonce' =>
+			wp_create_nonce(
+				'spj26_resident_results_action'
+			),
+		'name' =>
+			(string) $user->display_name,
+		'nim' =>
+			(string) $user->user_login,
+		'program' =>
+			(string) get_user_meta(
+				$user->ID,
+				'spj26_program_ppds',
+				true
+			),
+		'logoutUrl' =>
+			$logout_url,
+		'dashboardUrl' =>
+			home_url(
+				'/residen-sipatuju/'
+			),
+		'newSubmissionUrl' =>
+			home_url(
+				'/residen-sipatuju/pengajuan-baru/'
+			),
+		'resultsUrl' =>
+			home_url(
+				'/residen-sipatuju/hasil/'
+			),
+		'hasActiveSubmission' =>
+			(bool) $active,
+		'canResubmit' =>
+			$can_resubmit,
+		'portalPath' =>
+			$path,
+	);
+
+	echo '<script>';
+	echo 'window.spj26ResidentResultsConfig = ';
+	echo wp_json_encode(
+		$config
+	);
+	echo ';</script>';
+}
+
+add_action(
+	'wp_footer',
+	'spj26_sub_print_resident_results_config',
+	97
+);
+
+
+/* =========================================================
+ * 12B. AJAX SECURITY
+ * ========================================================= */
+
+function spj26_sub_require_resident_results_ajax() {
+
+	check_ajax_referer(
+		'spj26_resident_results_action',
+		'nonce'
+	);
+
+	$user =
+		wp_get_current_user();
+
+	if (
+		! $user
+		||
+		! $user->exists()
+		||
+		! spj26_sub_is_resident(
+			$user
+		)
+		||
+		! spj26_sub_is_account_active(
+			$user
+		)
+	) {
+
+		wp_send_json_error(
+			array(
+				'message' =>
+					'Anda tidak memiliki akses Residen yang aktif.',
+			),
+			403
+		);
+	}
+
+	return $user;
+}
+
+
+/* =========================================================
+ * 12C. SERIALIZE SUBMISSION FOR RESIDEN
+ * ========================================================= */
+
+function spj26_sub_serialize_for_resident_result(
+	$row
+) {
+
+	$journals =
+		spj26_sub_get_journals_for_submission(
+			(int) $row->id
+		);
+
+	$loa_available =
+		function_exists(
+			'spj26_loa_module_is_available'
+		)
+		?
+		spj26_loa_module_is_available(
+			$row,
+			$journals
+		)
+		:
+		false;
+
+	/*
+	 * PRIVACY BOUNDARY:
+	 * Identitas pemeriksa tidak dikirim ke endpoint Residen.
+	 * Data internal assignment tetap tersedia untuk workflow Admin/Reviewer,
+	 * tetapi tidak diekspos ke browser akun Residen.
+	 */
+
+	return array(
+		'id' =>
+			(int) $row->id,
+		'code' =>
+			(string) $row->code,
+		'article_type' =>
+			(string) $row->article_type,
+		'article_title' =>
+			(string) $row->article_title,
+		'article_abstract' =>
+			(string) $row->article_abstract,
+		'supervisor_name' =>
+			(string) $row->supervisor_name,
+		'status' =>
+			(string) $row->status,
+		'status_label' =>
+			spj26_sub_status_label(
+				(string) $row->status
+			),
+		'submitted_at' =>
+			spj26_sub_format_datetime(
+				$row->submitted_at
+			),
+		'updated_at' =>
+			spj26_sub_format_datetime(
+				$row->updated_at
+			),
+		'completed_at' =>
+			$row->status === 'done'
+			? spj26_sub_format_datetime(
+				$row->updated_at
+			)
+			: null,
+		'journals' =>
+			$journals,
+		'loa_available' =>
+			(bool) $loa_available,
+		'loa_url' =>
+			(
+				$loa_available
+				&&
+				function_exists(
+					'spj26_loa_module_download_url'
+				)
+			)
+			?
+			spj26_loa_module_download_url(
+				(int) $row->id
+			)
+			:
+			'',
+	);
+}
+
+
+/* =========================================================
+ * 12D. RESULTS DATA
+ * AJAX: spj26_resident_results_data
+ * ========================================================= */
+
+add_action(
+	'wp_ajax_spj26_resident_results_data',
+	'spj26_sub_ajax_resident_results_data'
+);
+
+
+function spj26_sub_ajax_resident_results_data() {
+
+	$user =
+		spj26_sub_require_resident_results_ajax();
+
+	global $wpdb;
+
+	$table =
+		spj26_sub_table_submissions();
+
+	$rows =
+		$wpdb->get_results(
+			$wpdb->prepare(
+				"
+					SELECT *
+					FROM {$table}
+					WHERE
+						resident_id = %d
+					ORDER BY
+						submitted_at DESC,
+						id DESC
+					LIMIT 50
+				",
+				$user->ID
+			)
+		);
+
+	$submissions = array();
+
+	foreach ( $rows as $row ) {
+
+		$submissions[] =
+			spj26_sub_serialize_for_resident_result(
+				$row
+			);
+	}
+
+	wp_send_json_success(
+		array(
+			'submissions' =>
+				$submissions,
+			'total' =>
+				count(
+					$submissions
+				),
+		)
+	);
+}

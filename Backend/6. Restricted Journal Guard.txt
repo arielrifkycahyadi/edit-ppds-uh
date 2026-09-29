@@ -1,0 +1,875 @@
+/**
+ * SIPATUJU PPDS FK UNHAS
+ * 000 — 05 - Restricted Journal Guard
+ *
+ * Fungsi:
+ * - Menyediakan satu source of truth Jurnal Predator / Discontinued.
+ * - Menyimpan nama jurnal dan ISSN yang dibatasi dalam tabel khusus.
+ * - Mencocokkan berdasarkan: normalized journal name OR normalized ISSN.
+ * - Menyediakan AJAX pre-check untuk Step 4 Residen.
+ * - Memblokir spj26_create_submission SEBELUM handler submission melakukan INSERT.
+ * - Menyediakan AJAX list/remove untuk halaman Admin Jurnal Predator / Discontinued.
+ * - Menyimpan riwayat removal secara soft-delete; riwayat pemeriksaan tidak dihapus.
+ *
+ * Dependency:
+ * - 000 — 01 - SIPATUJU Core & Authentication
+ * - 000 — 02 - SIPATUJU User Management
+ * - 000 — 03 - SIPATUJU Submission System
+ *
+ * Namespace PHP: spj26_rj_
+ *
+ * PENTING:
+ * - Paste langsung ke Code Snippets tanpa tag pembuka PHP.
+ * - Location: Run everywhere.
+ * - Priority snippet: 10 (guard AJAX sendiri didaftarkan pada priority 1).
+ */
+
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
+
+/* =========================================================
+ * 1. DATABASE
+ * ========================================================= */
+
+function spj26_rj_table() {
+	global $wpdb;
+
+	return $wpdb->prefix . 'spj26_restricted_journals';
+}
+
+
+function spj26_rj_maybe_install_table() {
+
+	$db_version = '1.0.0';
+
+	$installed_version = get_option(
+		'spj26_restricted_journal_db_version',
+		''
+	);
+
+	if ( $installed_version === $db_version ) {
+		return;
+	}
+
+	global $wpdb;
+
+	$table = spj26_rj_table();
+	$charset_collate = $wpdb->get_charset_collate();
+
+	require_once ABSPATH . 'wp-admin/includes/upgrade.php';
+
+	$sql = "
+		CREATE TABLE {$table} (
+			id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+			journal_name varchar(255) NOT NULL DEFAULT '',
+			issn varchar(20) NOT NULL DEFAULT '',
+			normalized_name varchar(255) NOT NULL DEFAULT '',
+			normalized_issn varchar(20) NOT NULL DEFAULT '',
+			source varchar(50) NOT NULL DEFAULT 'system',
+			source_reference varchar(255) NOT NULL DEFAULT '',
+			is_active tinyint(1) unsigned NOT NULL DEFAULT 1,
+			created_by bigint(20) unsigned DEFAULT NULL,
+			created_at datetime NOT NULL,
+			updated_at datetime NOT NULL,
+			removed_by bigint(20) unsigned DEFAULT NULL,
+			removed_at datetime DEFAULT NULL,
+			PRIMARY KEY  (id),
+			KEY normalized_name (normalized_name(191)),
+			KEY normalized_issn (normalized_issn),
+			KEY is_active (is_active)
+		) {$charset_collate};
+	";
+
+	dbDelta( $sql );
+
+	update_option(
+		'spj26_restricted_journal_db_version',
+		$db_version
+	);
+}
+
+add_action(
+	'init',
+	'spj26_rj_maybe_install_table',
+	5
+);
+
+
+/* =========================================================
+ * 2. NORMALIZATION
+ * ========================================================= */
+
+function spj26_rj_normalize_name( $value ) {
+
+	$value = sanitize_text_field(
+		(string) $value
+	);
+
+	$value = remove_accents( $value );
+
+	if ( function_exists( 'mb_strtolower' ) ) {
+		$value = mb_strtolower(
+			$value,
+			'UTF-8'
+		);
+	} else {
+		$value = strtolower( $value );
+	}
+
+	$value = preg_replace(
+		'/[.,;:()\[\]{}\'"`]+/u',
+		'',
+		$value
+	);
+
+	$value = preg_replace(
+		'/\s+/u',
+		' ',
+		$value
+	);
+
+	return trim( (string) $value );
+}
+
+
+function spj26_rj_normalize_issn( $value ) {
+
+	$value = strtoupper(
+		sanitize_text_field(
+			(string) $value
+		)
+	);
+
+	return (string) preg_replace(
+		'/[^0-9X]/',
+		'',
+		$value
+	);
+}
+
+
+/* =========================================================
+ * 3. ROLE / SECURITY HELPERS
+ * ========================================================= */
+
+function spj26_rj_is_resident( $user = null ) {
+
+	if ( function_exists( 'spj26_sub_is_resident' ) ) {
+		return (bool) spj26_sub_is_resident( $user );
+	}
+
+	if ( ! $user ) {
+		$user = wp_get_current_user();
+	}
+
+	return (
+		$user
+		&&
+		$user->exists()
+		&&
+		in_array(
+			'sipatuju_residen',
+			(array) $user->roles,
+			true
+		)
+	);
+}
+
+
+function spj26_rj_is_admin( $user = null ) {
+
+	if ( function_exists( 'spj26_sub_is_admin' ) ) {
+		return (bool) spj26_sub_is_admin( $user );
+	}
+
+	if ( ! $user ) {
+		$user = wp_get_current_user();
+	}
+
+	if ( ! $user || ! $user->exists() ) {
+		return false;
+	}
+
+	return (
+		current_user_can( 'manage_options' )
+		||
+		in_array(
+			'sipatuju_admin',
+			(array) $user->roles,
+			true
+		)
+	);
+}
+
+
+function spj26_rj_require_resident_submission_ajax() {
+
+	check_ajax_referer(
+		'spj26_submission_action',
+		'nonce'
+	);
+
+	$user = wp_get_current_user();
+
+	if (
+		! spj26_rj_is_resident( $user )
+		||
+		(
+			function_exists( 'spj26_sub_is_account_active' )
+			&&
+			! spj26_sub_is_account_active( $user )
+		)
+	) {
+		wp_send_json_error(
+			array(
+				'message' => 'Akses Residen tidak valid atau akun sedang nonaktif.',
+			),
+			403
+		);
+	}
+
+	return $user;
+}
+
+
+function spj26_rj_require_admin_ajax() {
+
+	if ( ! spj26_rj_is_admin() ) {
+		wp_send_json_error(
+			array(
+				'message' => 'Anda tidak memiliki izin untuk mengelola daftar jurnal.',
+			),
+			403
+		);
+	}
+
+	check_ajax_referer(
+		'spj26_user_management_action',
+		'nonce'
+	);
+}
+
+
+/* =========================================================
+ * 4. RESTRICTED JOURNAL DATA ACCESS
+ * ========================================================= */
+
+function spj26_rj_find_name_match( $normalized_name ) {
+
+	if ( $normalized_name === '' ) {
+		return null;
+	}
+
+	global $wpdb;
+	$table = spj26_rj_table();
+
+	return $wpdb->get_row(
+		$wpdb->prepare(
+			"
+			SELECT id, journal_name, issn
+			FROM {$table}
+			WHERE
+				is_active = 1
+				AND normalized_name = %s
+			ORDER BY id DESC
+			LIMIT 1
+			",
+			$normalized_name
+		)
+	);
+}
+
+
+function spj26_rj_find_issn_match( $normalized_issn ) {
+
+	if ( $normalized_issn === '' ) {
+		return null;
+	}
+
+	global $wpdb;
+	$table = spj26_rj_table();
+
+	return $wpdb->get_row(
+		$wpdb->prepare(
+			"
+			SELECT id, journal_name, issn
+			FROM {$table}
+			WHERE
+				is_active = 1
+				AND normalized_issn = %s
+			ORDER BY id DESC
+			LIMIT 1
+			",
+			$normalized_issn
+		)
+	);
+}
+
+
+function spj26_rj_check_one_journal(
+	$order,
+	$journal_name,
+	$issn
+) {
+
+	$normalized_name = spj26_rj_normalize_name(
+		$journal_name
+	);
+
+	$normalized_issn = spj26_rj_normalize_issn(
+		$issn
+	);
+
+	$name_row = spj26_rj_find_name_match(
+		$normalized_name
+	);
+
+	$issn_row = spj26_rj_find_issn_match(
+		$normalized_issn
+	);
+
+	if ( ! $name_row && ! $issn_row ) {
+		return null;
+	}
+
+	$reference_row = $name_row ?: $issn_row;
+
+	return array(
+		'order'                 => (int) $order,
+		'name_match'            => (bool) $name_row,
+		'issn_match'            => (bool) $issn_row,
+		'restricted_journal_id' => (int) $reference_row->id,
+		'matched_journal_name'  => (string) $reference_row->journal_name,
+		'matched_issn'          => (string) $reference_row->issn,
+	);
+}
+
+
+function spj26_rj_find_matches( $journals ) {
+
+	$matches = array();
+
+	foreach ( (array) $journals as $journal ) {
+
+		$order = isset( $journal['order'] )
+			? absint( $journal['order'] )
+			: 0;
+
+		$name = isset( $journal['journal_name'] )
+			? sanitize_text_field( (string) $journal['journal_name'] )
+			: '';
+
+		$issn = isset( $journal['issn'] )
+			? sanitize_text_field( (string) $journal['issn'] )
+			: '';
+
+		$match = spj26_rj_check_one_journal(
+			$order,
+			$name,
+			$issn
+		);
+
+		if ( $match ) {
+			$matches[] = $match;
+		}
+	}
+
+	return $matches;
+}
+
+
+function spj26_rj_build_block_message( $matches ) {
+
+	$parts = array();
+
+	foreach ( (array) $matches as $match ) {
+
+		$order = isset( $match['order'] )
+			? absint( $match['order'] )
+			: 0;
+
+		$name_match = ! empty( $match['name_match'] );
+		$issn_match = ! empty( $match['issn_match'] );
+
+		if ( $name_match && $issn_match ) {
+			$reason = 'nama jurnal dan ISSN terdaftar sebagai Predator / Discontinued';
+		} elseif ( $name_match ) {
+			$reason = 'nama jurnal terdaftar sebagai Predator / Discontinued';
+		} else {
+			$reason = 'ISSN terdaftar sebagai Predator / Discontinued';
+		}
+
+		$parts[] = sprintf(
+			'Jurnal Kandidat %d tidak dapat diajukan karena %s.',
+			$order,
+			$reason
+		);
+	}
+
+	return implode( ' ', $parts ) .
+		' Silakan ganti jurnal tersebut sebelum melanjutkan.';
+}
+
+
+/* =========================================================
+ * 5. PUBLIC UPSERT HELPER
+ *
+ * Dapat dipanggil modul/importer lain saat sebuah jurnal harus
+ * dimasukkan ke daftar Predator / Discontinued.
+ * ========================================================= */
+
+function spj26_rj_upsert_restricted_journal(
+	$journal_name,
+	$issn = '',
+	$source = 'system',
+	$source_reference = ''
+) {
+
+	$journal_name = sanitize_text_field(
+		(string) $journal_name
+	);
+
+	$issn = sanitize_text_field(
+		(string) $issn
+	);
+
+	$normalized_name = spj26_rj_normalize_name(
+		$journal_name
+	);
+
+	$normalized_issn = spj26_rj_normalize_issn(
+		$issn
+	);
+
+	if (
+		$normalized_name === ''
+		&&
+		$normalized_issn === ''
+	) {
+		return new WP_Error(
+			'spj26_rj_empty_identity',
+			'Nama jurnal atau ISSN wajib tersedia.'
+		);
+	}
+
+	global $wpdb;
+	$table = spj26_rj_table();
+	$now = current_time( 'mysql' );
+
+	$existing_id = 0;
+
+	if ( $normalized_issn !== '' ) {
+		$existing_id = (int) $wpdb->get_var(
+			$wpdb->prepare(
+				"
+				SELECT id
+				FROM {$table}
+				WHERE normalized_issn = %s
+				ORDER BY id DESC
+				LIMIT 1
+				",
+				$normalized_issn
+			)
+		);
+	}
+
+	if ( ! $existing_id && $normalized_name !== '' ) {
+		$existing_id = (int) $wpdb->get_var(
+			$wpdb->prepare(
+				"
+				SELECT id
+				FROM {$table}
+				WHERE normalized_name = %s
+				ORDER BY id DESC
+				LIMIT 1
+				",
+				$normalized_name
+			)
+		);
+	}
+
+	$data = array(
+		'journal_name'      => $journal_name,
+		'issn'              => $issn,
+		'normalized_name'   => $normalized_name,
+		'normalized_issn'   => $normalized_issn,
+		'source'            => sanitize_key( $source ) ?: 'system',
+		'source_reference'  => sanitize_text_field( (string) $source_reference ),
+		'is_active'         => 1,
+		'updated_at'        => $now,
+		'removed_by'        => null,
+		'removed_at'        => null,
+	);
+
+	if ( $existing_id ) {
+
+		$updated = $wpdb->update(
+			$table,
+			$data,
+			array( 'id' => $existing_id ),
+			null,
+			array( '%d' )
+		);
+
+		if ( $updated === false ) {
+			return new WP_Error(
+				'spj26_rj_update_failed',
+				'Data restricted journal gagal diperbarui.'
+			);
+		}
+
+		return $existing_id;
+	}
+
+	$data['created_by'] = get_current_user_id() ?: null;
+	$data['created_at'] = $now;
+
+	$inserted = $wpdb->insert(
+		$table,
+		$data
+	);
+
+	if ( $inserted === false ) {
+		return new WP_Error(
+			'spj26_rj_insert_failed',
+			'Data restricted journal gagal disimpan.'
+		);
+	}
+
+	return (int) $wpdb->insert_id;
+}
+
+
+/* Optional integration hook untuk importer / modul lain. */
+add_action(
+	'spj26_restricted_journal_add',
+	function(
+		$journal_name,
+		$issn = '',
+		$source = 'system',
+		$source_reference = ''
+	) {
+		spj26_rj_upsert_restricted_journal(
+			$journal_name,
+			$issn,
+			$source,
+			$source_reference
+		);
+	},
+	10,
+	4
+);
+
+
+/* =========================================================
+ * 6. RESIDEN PRE-CHECK AJAX
+ * AJAX: spj26_check_restricted_journals
+ * ========================================================= */
+
+add_action(
+	'wp_ajax_spj26_check_restricted_journals',
+	'spj26_rj_ajax_check_restricted_journals'
+);
+
+
+function spj26_rj_ajax_check_restricted_journals() {
+
+	spj26_rj_require_resident_submission_ajax();
+
+	$raw = isset( $_POST['journals'] )
+		? wp_unslash( $_POST['journals'] )
+		: '';
+
+	$journals = json_decode(
+		(string) $raw,
+		true
+	);
+
+	if (
+		! is_array( $journals )
+		||
+		count( $journals ) !== 3
+	) {
+		wp_send_json_error(
+			array(
+				'message' => 'Data tiga jurnal kandidat tidak valid.',
+			),
+			400
+		);
+	}
+
+	$matches = spj26_rj_find_matches(
+		$journals
+	);
+
+	wp_send_json_success(
+		array(
+			'allowed' => empty( $matches ),
+			'matches' => $matches,
+		)
+	);
+}
+
+
+/* =========================================================
+ * 7. HARD GUARD SEBELUM CREATE SUBMISSION
+ *
+ * Priority 1 memastikan pemeriksaan berjalan sebelum handler
+ * spj26_sub_ajax_create_submission (default priority 10).
+ * ========================================================= */
+
+add_action(
+	'wp_ajax_spj26_create_submission',
+	'spj26_rj_guard_create_submission',
+	1
+);
+
+
+function spj26_rj_guard_create_submission() {
+
+	spj26_rj_require_resident_submission_ajax();
+
+	$journals = array();
+
+	for ( $i = 1; $i <= 3; $i++ ) {
+
+		$name_key = 'journal_' . $i . '_name';
+		$issn_key = 'journal_' . $i . '_issn';
+
+		$journals[] = array(
+			'order' => $i,
+			'journal_name' => isset( $_POST[ $name_key ] )
+				? sanitize_text_field(
+					wp_unslash( $_POST[ $name_key ] )
+				)
+				: '',
+			'issn' => isset( $_POST[ $issn_key ] )
+				? sanitize_text_field(
+					wp_unslash( $_POST[ $issn_key ] )
+				)
+				: '',
+		);
+	}
+
+	$matches = spj26_rj_find_matches(
+		$journals
+	);
+
+	if ( ! empty( $matches ) ) {
+		wp_send_json_error(
+			array(
+				'message' => spj26_rj_build_block_message( $matches ),
+				'code'    => 'restricted_journal',
+				'matches' => $matches,
+			),
+			422
+		);
+	}
+
+	/*
+	 * Tidak ada match: jangan mengirim response.
+	 * WordPress melanjutkan ke handler spj26_create_submission
+	 * milik 000-03 pada priority berikutnya.
+	 */
+}
+
+
+/* =========================================================
+ * 8. ADMIN LIST AJAX
+ * AJAX: spj26_admin_restricted_journals_list
+ * ========================================================= */
+
+add_action(
+	'wp_ajax_spj26_admin_restricted_journals_list',
+	'spj26_rj_ajax_admin_list'
+);
+
+
+function spj26_rj_ajax_admin_list() {
+
+	spj26_rj_require_admin_ajax();
+
+	global $wpdb;
+	$table = spj26_rj_table();
+
+	$rows = $wpdb->get_results(
+		"
+		SELECT
+			id,
+			journal_name,
+			issn,
+			source,
+			created_at,
+			updated_at
+		FROM {$table}
+		WHERE is_active = 1
+		ORDER BY journal_name ASC, id ASC
+		"
+	);
+
+	$journals = array();
+
+	foreach ( (array) $rows as $row ) {
+		$journals[] = array(
+			'id'           => (int) $row->id,
+			'journal_name' => (string) $row->journal_name,
+			'issn'         => (string) $row->issn,
+			'source'       => (string) $row->source,
+			'created_at'   => (string) $row->created_at,
+			'updated_at'   => (string) $row->updated_at,
+		);
+	}
+
+	wp_send_json_success(
+		array(
+			'journals' => $journals,
+		)
+	);
+}
+
+
+/* =========================================================
+ * 9. ADMIN REMOVE AJAX
+ * AJAX: spj26_admin_restricted_journal_remove
+ * ========================================================= */
+
+add_action(
+	'wp_ajax_spj26_admin_restricted_journal_remove',
+	'spj26_rj_ajax_admin_remove'
+);
+
+
+function spj26_rj_ajax_admin_remove() {
+
+	spj26_rj_require_admin_ajax();
+
+	$journal_id = isset( $_POST['journal_id'] )
+		? absint( $_POST['journal_id'] )
+		: 0;
+
+	if ( ! $journal_id ) {
+		wp_send_json_error(
+			array(
+				'message' => 'Jurnal tidak valid.',
+			),
+			400
+		);
+	}
+
+	global $wpdb;
+	$table = spj26_rj_table();
+
+	$updated = $wpdb->update(
+		$table,
+		array(
+			'is_active'  => 0,
+			'updated_at' => current_time( 'mysql' ),
+			'removed_by' => get_current_user_id(),
+			'removed_at' => current_time( 'mysql' ),
+		),
+		array(
+			'id'        => $journal_id,
+			'is_active' => 1,
+		),
+		array(
+			'%d',
+			'%s',
+			'%d',
+			'%s',
+		),
+		array(
+			'%d',
+			'%d',
+		)
+	);
+
+	if ( $updated === false ) {
+		wp_send_json_error(
+			array(
+				'message' => 'Jurnal gagal dikeluarkan dari daftar.',
+			),
+			500
+		);
+	}
+
+	if ( $updated === 0 ) {
+		wp_send_json_error(
+			array(
+				'message' => 'Jurnal tidak ditemukan atau sudah dikeluarkan dari daftar.',
+			),
+			404
+		);
+	}
+
+	wp_send_json_success(
+		array(
+			'message' => 'Jurnal berhasil dikeluarkan dari daftar Predator / Discontinued.',
+		)
+	);
+}
+
+
+/* =========================================================
+ * 10. ADMIN PAGE CONFIG
+ * Page: /admin-sipatuju/jurnal-predator-discontinued/
+ * ========================================================= */
+
+function spj26_rj_request_path() {
+
+	$request_uri = isset( $_SERVER['REQUEST_URI'] )
+		? wp_unslash( $_SERVER['REQUEST_URI'] )
+		: '/';
+
+	$path = wp_parse_url(
+		$request_uri,
+		PHP_URL_PATH
+	);
+
+	return '/' . trim( (string) $path, '/' ) . '/';
+}
+
+
+function spj26_rj_print_admin_config() {
+
+	if (
+		! is_user_logged_in()
+		||
+		! spj26_rj_is_admin()
+	) {
+		return;
+	}
+
+	if (
+		spj26_rj_request_path() !==
+		'/admin-sipatuju/jurnal-predator-discontinued/'
+	) {
+		return;
+	}
+
+	$login_url = function_exists( 'spj26_login_url' )
+		? spj26_login_url()
+		: home_url( '/sipatuju-login/' );
+
+	$config = array(
+		'ajaxUrl' => admin_url( 'admin-ajax.php' ),
+		'nonce'   => wp_create_nonce( 'spj26_user_management_action' ),
+		'logoutUrl' => html_entity_decode(
+			wp_logout_url( $login_url ),
+			ENT_QUOTES,
+			'UTF-8'
+		),
+	);
+
+	echo '<script>';
+	echo 'window.spj26AdminJournalConfig = ';
+	echo wp_json_encode( $config );
+	echo ';</script>';
+}
+
+add_action(
+	'wp_footer',
+	'spj26_rj_print_admin_config',
+	96
+);

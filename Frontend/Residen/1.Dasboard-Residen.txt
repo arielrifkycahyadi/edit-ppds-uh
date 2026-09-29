@@ -1,0 +1,2802 @@
+<!-- =========================================================
+     SIPATUJU PPDS FK UNHAS
+     PAGE      : DASHBOARD RESIDEN
+     WORDPRESS : 00 Dashboard Residen
+     PARENT    : Main Page / no parent
+     SLUG      : residen-sipatuju
+     URL       : /residen-sipatuju/
+     ROLE      : Residen
+     FORMAT    : Elementor HTML Widget
+     NAMESPACE : spj26res
+     ROOT      : #spj26res-root
+     SYNC      : Residen Flow v5 - fullpage canonical UI
+
+     Fungsi:
+     - Menampilkan identitas Residen yang sedang login
+     - Akses ke Buat Pengajuan
+     - Akses ke Hasil Pemeriksaan dengan indikator hasil tersedia
+     - Buat Pengajuan selalu aktif dan dapat dilakukan berulang
+     - Sinkronisasi indikator Hasil Pemeriksaan setiap 30 detik
+     - Desktop: tidak ada scroll browser/page utama
+     - Sidebar tetap; dashboard berada dalam satu viewport
+     - Data akun berasal dari WordPress/SIPATUJU, bukan hard-coded
+========================================================== -->
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:wght@600;700;800&family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap');
+
+#spj26res-root {
+
+    --spj26res-maroon: #800000;
+    --spj26res-maroon-dark: #5c0000;
+    --spj26res-maroon-medium: #8b1e1e;
+
+    --spj26res-primary: #6a020a;
+
+    --spj26res-white: #ffffff;
+
+    --spj26res-background: #f8fafc;
+    --spj26res-surface: #ffffff;
+    --spj26res-surface-soft: #f1f5f9;
+
+    --spj26res-text: #0f172a;
+    --spj26res-text-secondary: #475569;
+    --spj26res-text-muted: #64748b;
+
+    --spj26res-border: #e2e8f0;
+
+    width: 100%;
+    height: 100vh;
+    height: 100dvh;
+    min-height: 0;
+
+    margin: 0;
+    padding: 0;
+
+    overflow: hidden;
+
+    background: var(--spj26res-background);
+
+    font-family: "Inter", Arial, sans-serif;
+    color: var(--spj26res-text);
+
+    box-sizing: border-box;
+}
+
+#spj26res-root *,
+#spj26res-root *::before,
+#spj26res-root *::after {
+    box-sizing: border-box;
+}
+
+#spj26res-root h1,
+#spj26res-root h2,
+#spj26res-root h3,
+#spj26res-root p {
+    margin: 0;
+}
+
+#spj26res-root a {
+    color: inherit;
+    text-decoration: none;
+}
+
+#spj26res-root button {
+    font: inherit;
+}
+
+
+
+
+/* =========================================================
+   PAGE VIEWPORT LOCK
+   Desktop: tidak ada scrollbar browser/page utama.
+========================================================= */
+
+html.spj26res-page-lock,
+body.spj26res-page-lock {
+
+    width: 100% !important;
+    height: 100% !important;
+    min-height: 100% !important;
+
+    margin: 0 !important;
+    padding: 0 !important;
+
+    overflow: hidden !important;
+}
+
+body.spj26res-page-lock #page,
+body.spj26res-page-lock .site,
+body.spj26res-page-lock .site-content,
+body.spj26res-page-lock .elementor,
+body.spj26res-page-lock .elementor-section-wrap,
+body.spj26res-page-lock .elementor-element,
+body.spj26res-page-lock .elementor-widget,
+body.spj26res-page-lock .elementor-widget-container {
+
+    max-height: none !important;
+}
+
+/* =========================================================
+   MAIN LAYOUT
+========================================================= */
+
+#spj26res-root .spj26res-layout {
+
+    width: 100%;
+    height: 100%;
+
+    display: grid;
+
+    grid-template-columns:
+        300px
+        minmax(0, 1fr);
+
+    grid-template-rows:
+        76px
+        minmax(0, 1fr)
+        58px;
+}
+
+
+/* =========================================================
+   HEADER
+========================================================= */
+
+#spj26res-root .spj26res-header {
+
+    grid-column: 1 / -1;
+    grid-row: 1;
+
+    background: var(--spj26res-white);
+
+    border-bottom: 1px solid var(--spj26res-border);
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 24px;
+
+    padding: 0 30px;
+
+    min-width: 0;
+
+    z-index: 10;
+}
+
+
+/* HEADER LEFT */
+
+#spj26res-root .spj26res-header-left {
+
+    display: flex;
+    align-items: center;
+
+    gap: 14px;
+
+    min-width: 0;
+}
+
+
+#spj26res-root .spj26res-logo {
+
+    width: 48px;
+    height: 48px;
+
+    flex: 0 0 48px;
+
+    border-radius: 6px;
+
+    background: var(--spj26res-maroon);
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    color: var(--spj26res-white);
+}
+
+
+#spj26res-root .spj26res-logo .material-symbols-outlined {
+    font-size: 25px;
+}
+
+
+#spj26res-root .spj26res-brand {
+    min-width: 0;
+}
+
+
+#spj26res-root .spj26res-brand-row {
+
+    display: flex;
+    align-items: center;
+
+    gap: 10px;
+
+    min-width: 0;
+}
+
+
+#spj26res-root .spj26res-brand-name {
+
+    font-family: "Plus Jakarta Sans", sans-serif;
+
+    color: var(--spj26res-maroon);
+
+    font-size: 15px;
+
+    font-weight: 800;
+
+    letter-spacing: -0.02em;
+
+    white-space: nowrap;
+}
+
+
+#spj26res-root .spj26res-brand-divider {
+
+    color: #cbd5e1;
+
+    font-size: 16px;
+}
+
+
+#spj26res-root .spj26res-brand-description {
+
+    color: #6b5b58;
+
+    font-size: 12px;
+
+    font-weight: 500;
+
+    white-space: nowrap;
+
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+
+#spj26res-root .spj26res-faculty {
+
+    margin-top: 3px;
+
+    color: #695653;
+
+    font-family: "JetBrains Mono", monospace;
+
+    font-size: 10px;
+
+    font-weight: 600;
+
+    letter-spacing: 0.08em;
+
+    text-transform: uppercase;
+}
+
+
+/* HEADER RIGHT */
+
+#spj26res-root .spj26res-header-right {
+
+    display: flex;
+    align-items: center;
+
+    gap: 10px;
+
+    flex: 0 0 auto;
+}
+
+
+#spj26res-root .spj26res-user {
+
+    display: flex;
+    align-items: center;
+
+    gap: 10px;
+}
+
+
+#spj26res-root .spj26res-user-text {
+    text-align: right;
+}
+
+
+#spj26res-root .spj26res-user-name {
+
+    display: block;
+
+    font-family: "Plus Jakarta Sans", sans-serif;
+
+    font-size: 13px;
+
+    font-weight: 700;
+
+    color: var(--spj26res-text);
+}
+
+
+#spj26res-root .spj26res-user-role {
+
+    display: block;
+
+    margin-top: 1px;
+
+    font-size: 10px;
+
+    font-weight: 600;
+
+    color: var(--spj26res-maroon);
+}
+
+
+#spj26res-root .spj26res-avatar {
+
+    width: 38px;
+    height: 38px;
+
+    border-radius: 50%;
+
+    background: var(--spj26res-maroon);
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    color: var(--spj26res-white);
+}
+
+
+#spj26res-root .spj26res-avatar .material-symbols-outlined {
+    font-size: 21px;
+}
+
+
+/* =========================================================
+   SIDEBAR
+========================================================= */
+
+#spj26res-root .spj26res-sidebar {
+
+    grid-column: 1;
+    grid-row: 2 / 4;
+
+    min-height: 0;
+
+    background: var(--spj26res-white);
+
+    border-right: 1px solid var(--spj26res-border);
+
+    padding: 18px 16px 14px 16px;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+
+    overflow: hidden;
+}
+
+
+/* NAVIGATION */
+
+#spj26res-root .spj26res-sidebar-main {
+    min-height: 0;
+}
+
+
+#spj26res-root .spj26res-nav-title {
+
+    margin:
+        4px
+        8px
+        7px
+        8px;
+
+    color: #6c5a57;
+
+    font-size: 10px;
+
+    font-weight: 700;
+
+    text-transform: uppercase;
+
+    letter-spacing: 0.04em;
+}
+
+
+#spj26res-root .spj26res-nav {
+
+    display: flex;
+    flex-direction: column;
+
+    gap: 5px;
+}
+
+
+#spj26res-root .spj26res-nav-link {
+
+    width: 100%;
+
+    min-height: 42px;
+
+    padding: 9px 13px;
+
+    border-radius: 5px;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 10px;
+
+    color: #5b4744;
+
+    font-size: 13px;
+
+    font-weight: 500;
+
+    transition:
+        background-color 0.18s ease,
+        color 0.18s ease;
+}
+
+
+#spj26res-root .spj26res-nav-link:hover {
+
+    background: var(--spj26res-surface-soft);
+
+    color: var(--spj26res-text);
+}
+
+
+#spj26res-root .spj26res-nav-link.active {
+
+    background: #941c1c;
+
+    color: var(--spj26res-white);
+
+    font-weight: 700;
+}
+
+
+#spj26res-root .spj26res-nav-link.is-disabled {
+
+    background: #f1f5f9;
+
+    color: #94a3b8;
+
+    cursor: not-allowed;
+
+    pointer-events: none;
+
+    font-weight: 600;
+}
+
+#spj26res-root .spj26res-nav-link.is-disabled:hover {
+
+    background: #f1f5f9;
+
+    color: #94a3b8;
+}
+
+
+#spj26res-root .spj26res-nav-left {
+
+    display: flex;
+    align-items: center;
+
+    gap: 10px;
+
+    min-width: 0;
+}
+
+
+#spj26res-root .spj26res-nav-link .material-symbols-outlined {
+    font-size: 19px;
+}
+
+
+#spj26res-root .spj26res-nav-badge {
+
+    min-width: 22px;
+    height: 22px;
+
+    padding: 0 6px;
+
+    border-radius: 3px;
+
+    background: #fee2e2;
+
+    color: var(--spj26res-maroon);
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    font-size: 9px;
+
+    font-weight: 700;
+}
+
+
+#spj26res-root .spj26res-nav-alert {
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 10px;
+    height: 10px;
+
+    border-radius: 999px;
+
+    background: #6ff0aa;
+
+    box-shadow:
+        0 0 0 0
+        rgba(111, 240, 170, 0.72);
+
+    animation:
+        spj26resPulse
+        1.6s
+        infinite;
+
+    flex: 0 0 auto;
+}
+
+
+#spj26res-root .spj26res-nav-alert[hidden] {
+    display: none;
+}
+
+
+@keyframes spj26resPulse {
+
+    0% {
+        box-shadow:
+            0 0 0 0
+            rgba(111, 240, 170, 0.72);
+    }
+
+    70% {
+        box-shadow:
+            0 0 0 10px
+            rgba(111, 240, 170, 0);
+    }
+
+    100% {
+        box-shadow:
+            0 0 0 0
+            rgba(111, 240, 170, 0);
+    }
+}
+
+
+#spj26res-root .spj26res-nav-count {
+
+    min-width: 20px;
+    height: 20px;
+
+    padding: 0 6px;
+
+    border-radius: 999px;
+
+    background: #edf2f7;
+    color: var(--spj26res-maroon);
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    font-size: 9px;
+    font-weight: 800;
+    line-height: 1;
+}
+
+
+#spj26res-root .spj26res-nav-count[hidden] {
+    display: none;
+}
+
+
+#spj26res-root .spj26res-nav-section-gap {
+    height: 20px;
+}
+
+
+/* SIDEBAR INFORMATION */
+
+#spj26res-root .spj26res-sidebar-info {
+
+    padding: 14px 15px;
+
+    border-radius: 7px;
+
+    background: #f8fafc;
+}
+
+
+#spj26res-root .spj26res-sidebar-info-title {
+
+    display: flex;
+    align-items: center;
+
+    gap: 7px;
+
+    color: var(--spj26res-maroon);
+
+    font-size: 10px;
+
+    font-weight: 700;
+}
+
+
+#spj26res-root
+.spj26res-sidebar-info-title
+.material-symbols-outlined {
+
+    font-size: 16px;
+}
+
+
+#spj26res-root .spj26res-version {
+
+    margin-top: 5px;
+
+    font-family: "JetBrains Mono", monospace;
+
+    color: #594b48;
+
+    font-size: 10px;
+
+    letter-spacing: 0.02em;
+}
+
+
+#spj26res-root .spj26res-department {
+
+    margin-top: 4px;
+
+    color: #665855;
+
+    font-size: 10px;
+
+    line-height: 1.45;
+}
+
+
+/* =========================================================
+   MAIN CONTENT
+========================================================= */
+
+#spj26res-root .spj26res-main {
+
+    grid-column: 2;
+    grid-row: 2;
+
+    min-width: 0;
+    min-height: 0;
+
+    padding: 28px 28px 20px 28px;
+
+    background: var(--spj26res-background);
+
+    overflow: hidden;
+}
+
+
+/* =========================================================
+   HERO CARD
+========================================================= */
+
+#spj26res-root .spj26res-hero {
+
+    width: 100%;
+
+    min-height: 275px;
+
+    position: relative;
+
+    overflow: hidden;
+
+    border-radius: 10px;
+
+    background:
+        linear-gradient(
+            110deg,
+            #720000 0%,
+            #8c0c11 50%,
+            #780008 100%
+        );
+
+    box-shadow:
+        0 18px 30px
+        rgba(73, 0, 0, 0.14);
+
+    color: var(--spj26res-white);
+}
+
+
+#spj26res-root .spj26res-hero::before {
+
+    content: "";
+
+    position: absolute;
+
+    width: 370px;
+    height: 370px;
+
+    top: -165px;
+    right: 270px;
+
+    border-radius: 50%;
+
+    background:
+        radial-gradient(
+            circle,
+            rgba(255,255,255,0.07),
+            rgba(255,255,255,0)
+        );
+}
+
+
+#spj26res-root .spj26res-hero-inner {
+
+    position: relative;
+
+    z-index: 2;
+
+    width: 100%;
+    min-height: 275px;
+
+    padding: 38px 42px;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 50px;
+}
+
+
+/* HERO LEFT */
+
+#spj26res-root .spj26res-hero-content {
+    max-width: 720px;
+}
+
+
+#spj26res-root .spj26res-page-label {
+
+    display: flex;
+    align-items: center;
+
+    gap: 7px;
+
+    margin-bottom: 14px;
+
+    color: rgba(255,255,255,0.76);
+
+    font-size: 9px;
+
+    font-weight: 700;
+
+    text-transform: uppercase;
+
+    letter-spacing: 0.07em;
+}
+
+
+#spj26res-root .spj26res-page-label-dot {
+
+    width: 7px;
+    height: 7px;
+
+    border-radius: 50%;
+
+    background: #86efac;
+}
+
+
+#spj26res-root .spj26res-hero-title {
+
+    font-family:
+        "Plus Jakarta Sans",
+        sans-serif;
+
+    font-size: 30px;
+
+    line-height: 1.2;
+
+    letter-spacing: -0.025em;
+
+    font-weight: 800;
+
+    color: var(--spj26res-white);
+}
+
+
+#spj26res-root .spj26res-resident-info {
+
+    margin-top: 15px;
+
+    display: flex;
+    align-items: center;
+
+    gap: 9px;
+
+    flex-wrap: wrap;
+}
+
+
+#spj26res-root .spj26res-resident-meta {
+
+    padding: 5px 8px;
+
+    border-radius: 4px;
+
+    background: rgba(64,0,0,0.40);
+
+    font-family: "JetBrains Mono", monospace;
+
+    font-size: 10px;
+
+    font-weight: 600;
+}
+
+
+#spj26res-root .spj26res-resident-program {
+
+    padding: 5px 8px;
+
+    border-radius: 4px;
+
+    background: rgba(64,0,0,0.40);
+
+    font-size: 10px;
+
+    font-weight: 500;
+}
+
+
+#spj26res-root .spj26res-hero-description {
+
+    max-width: 650px;
+
+    margin-top: 17px;
+
+    color: rgba(255,255,255,0.90);
+
+    font-size: 13px;
+
+    line-height: 1.6;
+}
+
+
+/* HERO BUTTON */
+
+#spj26res-root .spj26res-hero-action {
+    flex: 0 0 auto;
+}
+
+
+#spj26res-root .spj26res-new-button {
+
+    min-width: 280px;
+    min-height: 58px;
+
+    padding: 14px 24px;
+
+    border: none;
+
+    border-radius: 6px;
+
+    background: var(--spj26res-white);
+
+    color: var(--spj26res-maroon);
+
+    box-shadow:
+        0 8px 20px
+        rgba(0,0,0,0.13);
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    gap: 10px;
+
+    font-family:
+        "Plus Jakarta Sans",
+        sans-serif;
+
+    font-size: 13px;
+
+    font-weight: 700;
+
+    cursor: pointer;
+
+    transition:
+        transform 0.18s ease,
+        box-shadow 0.18s ease,
+        background-color 0.18s ease;
+}
+
+
+#spj26res-root .spj26res-new-button:hover {
+
+    background: #f8fafc;
+
+    transform: translateY(-1px);
+
+    box-shadow:
+        0 10px 24px
+        rgba(0,0,0,0.16);
+}
+
+
+#spj26res-root .spj26res-new-button.is-disabled {
+
+    background: rgba(255,255,255,0.16);
+
+    color: rgba(255,255,255,0.82);
+
+    border: 1px solid rgba(255,255,255,0.28);
+
+    box-shadow: none;
+
+    cursor: not-allowed;
+
+    pointer-events: none;
+}
+
+#spj26res-root .spj26res-new-button.is-disabled:hover {
+
+    background: rgba(255,255,255,0.16);
+
+    transform: none;
+
+    box-shadow: none;
+}
+
+
+#spj26res-root
+.spj26res-new-button
+.material-symbols-outlined {
+
+    font-size: 21px;
+}
+
+
+/* =========================================================
+   FOOTER
+========================================================= */
+
+#spj26res-root .spj26res-footer {
+
+    grid-column: 2;
+    grid-row: 3;
+
+    background: var(--spj26res-white);
+
+    border-top: 1px solid var(--spj26res-border);
+
+    padding: 0 28px;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 20px;
+
+    min-width: 0;
+}
+
+
+#spj26res-root .spj26res-footer-left {
+
+    display: flex;
+    align-items: center;
+
+    gap: 9px;
+
+    min-width: 0;
+
+    color: #6b5b58;
+
+    font-size: 10px;
+}
+
+
+#spj26res-root .spj26res-footer-brand {
+
+    color: var(--spj26res-maroon);
+
+    font-weight: 700;
+}
+
+
+#spj26res-root .spj26res-footer-right {
+
+    color: #625451;
+
+    font-family:
+        "JetBrains Mono",
+        monospace;
+
+    font-size: 9px;
+
+    white-space: nowrap;
+}
+
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+#spj26res-root .spj26res-mobile-menu {
+    display: none;
+}
+
+
+#spj26res-root .spj26res-overlay {
+    display: none;
+}
+
+
+@media (max-width: 1050px) {
+
+    #spj26res-root .spj26res-layout {
+
+        grid-template-columns:
+            240px
+            minmax(0, 1fr);
+    }
+
+
+    #spj26res-root .spj26res-brand-description,
+    #spj26res-root .spj26res-brand-divider {
+
+        display: none;
+    }
+
+
+    #spj26res-root .spj26res-hero-inner {
+        padding: 32px;
+    }
+
+
+    #spj26res-root .spj26res-new-button {
+        min-width: 220px;
+    }
+
+}
+
+
+@media (max-width: 800px) {
+
+    html.spj26res-page-lock,
+    body.spj26res-page-lock {
+
+        height: auto !important;
+        min-height: 100% !important;
+
+        overflow-x: hidden !important;
+        overflow-y: auto !important;
+    }
+
+
+    #spj26res-root {
+
+        height: auto;
+
+        min-height: 100vh;
+
+        overflow: visible;
+    }
+
+
+    #spj26res-root .spj26res-layout {
+
+        min-height: 100vh;
+
+        display: flex;
+        flex-direction: column;
+    }
+
+
+    #spj26res-root .spj26res-header {
+
+        min-height: 64px;
+
+        padding: 8px 14px;
+    }
+
+
+    #spj26res-root .spj26res-mobile-menu {
+
+        display: flex;
+
+        width: 38px;
+        height: 38px;
+
+        align-items: center;
+        justify-content: center;
+
+        border: 1px solid var(--spj26res-border);
+
+        border-radius: 6px;
+
+        background: var(--spj26res-white);
+
+        color: var(--spj26res-maroon);
+
+        cursor: pointer;
+
+        flex: 0 0 auto;
+    }
+
+
+    #spj26res-root .spj26res-logo {
+
+        width: 38px;
+        height: 38px;
+
+        flex-basis: 38px;
+    }
+
+
+    #spj26res-root .spj26res-brand-name {
+        font-size: 11px;
+    }
+
+
+    #spj26res-root .spj26res-faculty,
+    #spj26res-root .spj26res-user-text {
+
+        display: none;
+    }
+
+
+    #spj26res-root .spj26res-sidebar {
+
+        position: fixed;
+
+        left: 0;
+        top: 0;
+
+        width: 270px;
+        height: 100vh;
+        height: 100dvh;
+
+        overflow-y: auto;
+        overflow-x: hidden;
+
+        z-index: 100;
+
+        transform:
+            translateX(-102%);
+
+        transition:
+            transform 0.22s ease;
+
+        box-shadow:
+            8px 0 24px
+            rgba(15,23,42,0.14);
+    }
+
+
+    #spj26res-root .spj26res-sidebar.open {
+
+        transform:
+            translateX(0);
+    }
+
+
+    #spj26res-root .spj26res-overlay {
+
+        position: fixed;
+
+        inset: 0;
+
+        z-index: 90;
+
+        background:
+            rgba(15,23,42,0.40);
+    }
+
+
+    #spj26res-root .spj26res-overlay.open {
+
+        display: block;
+    }
+
+
+    #spj26res-root .spj26res-main {
+
+        padding: 16px;
+
+        overflow: visible;
+    }
+
+
+    #spj26res-root .spj26res-hero {
+
+        min-height: 0;
+    }
+
+
+    #spj26res-root .spj26res-hero-inner {
+
+        min-height: 0;
+
+        padding: 24px;
+
+        flex-direction: column;
+
+        align-items: stretch;
+
+        gap: 24px;
+    }
+
+
+    #spj26res-root .spj26res-hero-title {
+        font-size: 23px;
+    }
+
+
+    #spj26res-root .spj26res-hero-action {
+
+        width: 100%;
+    }
+
+
+    #spj26res-root .spj26res-new-button {
+
+        width: 100%;
+
+        min-width: 0;
+    }
+
+
+    #spj26res-root .spj26res-footer {
+
+        min-height: 58px;
+
+        padding: 12px 16px;
+
+        flex-direction: column;
+
+        align-items: flex-start;
+        justify-content: center;
+
+        gap: 4px;
+    }
+
+}
+
+
+/* =========================================================
+   SIDEBAR NOTIFICATION - REFINED
+   Dot indikator ditempelkan ke badge angka agar tidak
+   mengganggu alignment teks menu.
+========================================================= */
+#spj26res-root .spj26res-nav-link > .spj26res-nav-left:first-child {
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+#spj26res-root .spj26res-nav-notification {
+    position: relative;
+    margin-left: auto;
+    min-width: 24px;
+    min-height: 24px;
+    flex: 0 0 auto;
+    display: inline-flex;
+    align-items: center;
+    justify-content: flex-end;
+    padding-left: 10px;
+}
+
+#spj26res-root .spj26res-nav-notification .spj26res-nav-count {
+    min-width: 24px;
+    height: 24px;
+    padding: 0 7px;
+    font-size: 10px;
+    line-height: 1;
+}
+
+#spj26res-root .spj26res-nav-notification .spj26res-nav-alert {
+    position: absolute;
+    top: -2px;
+    right: -2px;
+    width: 8px;
+    height: 8px;
+    z-index: 2;
+    background: #4ade80;
+    border: 2px solid #ffffff;
+    box-shadow: 0 0 0 0 rgba(74, 222, 128, 0.55);
+    animation: spj26resPulse 1.8s infinite;
+}
+
+#spj26res-root .spj26res-nav-link.active .spj26res-nav-notification .spj26res-nav-alert {
+    border-color: #8f1919;
+}
+
+@media (max-width: 800px) {
+    #spj26res-root .spj26res-nav-notification {
+        padding-left: 8px;
+    }
+}
+
+
+
+/* =========================================================
+   SIDEBAR GLOBAL SYNC v3
+   Canonical sidebar untuk Dashboard, Buat Pengajuan, dan
+   Hasil Pemeriksaan. Menyamakan ukuran, spacing, active state,
+   dan posisi notifikasi Hasil Pemeriksaan.
+========================================================= */
+#spj26res-root .spj26res-nav-link {
+    min-height: 42px;
+    padding: 9px 13px;
+    border-radius: 8px;
+    color: #5b4744;
+    font-size: 13px;
+    font-weight: 500;
+}
+
+#spj26res-root .spj26res-nav-link.active {
+    background: #8f1919;
+    color: #ffffff;
+    font-weight: 700;
+}
+
+#spj26res-root .spj26res-nav-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+}
+
+#spj26res-root .spj26res-nav-link .material-symbols-outlined {
+    font-size: 19px;
+    flex: 0 0 auto;
+}
+
+/* Hasil Pemeriksaan: label kiri, notification kanan. */
+#spj26res-root #spj26res-results-nav {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    column-gap: 16px;
+    width: 100%;
+}
+
+#spj26res-root #spj26res-results-nav > .spj26res-nav-left {
+    width: 100%;
+    min-width: 0;
+    flex: none;
+}
+
+#spj26res-root #spj26res-results-nav > .spj26res-nav-left > span:last-child {
+    min-width: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+#spj26res-root #spj26res-results-nav > .spj26res-nav-notification {
+    position: relative;
+    justify-self: end;
+    width: auto;
+    min-width: 28px;
+    min-height: 28px;
+    margin-left: 0;
+    padding-left: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 auto;
+}
+
+#spj26res-root #spj26res-results-nav .spj26res-nav-count {
+    min-width: 26px;
+    height: 26px;
+    padding: 0 8px;
+    border-radius: 999px;
+    background: #edf2f7;
+    color: #8f1919;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    font-weight: 800;
+    line-height: 1;
+}
+
+#spj26res-root #spj26res-results-nav.active .spj26res-nav-count {
+    background: rgba(255,255,255,0.18);
+    color: #ffffff;
+}
+
+#spj26res-root #spj26res-results-nav .spj26res-nav-alert {
+    position: absolute;
+    top: -1px;
+    right: -3px;
+    width: 8px;
+    height: 8px;
+    z-index: 2;
+    border-radius: 999px;
+    background: #4ade80;
+    border: 2px solid #ffffff;
+    box-shadow: 0 0 0 0 rgba(74, 222, 128, 0.55);
+}
+
+#spj26res-root #spj26res-results-nav.active .spj26res-nav-alert {
+    border-color: #8f1919;
+}
+
+#spj26res-root #spj26res-results-nav .spj26res-nav-count[hidden],
+#spj26res-root #spj26res-results-nav .spj26res-nav-alert[hidden] {
+    display: none !important;
+}
+
+@media (max-width: 800px) {
+    #spj26res-root #spj26res-results-nav {
+        column-gap: 12px;
+    }
+}
+
+
+
+/* =========================================================
+   TRUE FULLPAGE UI SYNC v6B — VIEWPORT SHELL
+   Dashboard / Buat Pengajuan / Hasil Pemeriksaan
+   ========================================================= */
+#spj26res-root {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    margin: 0 !important;
+    padding: 0 !important;
+    --spj26res-maroon: #800000;
+    --spj26res-maroon-dark: #5c0000;
+    --spj26res-background: #f5f7fb;
+    --spj26res-surface: #ffffff;
+    --spj26res-surface-soft: #f8fafc;
+    --spj26res-border: #e2e8f0;
+    --spj26res-text: #0f172a;
+    --spj26res-text-secondary: #475569;
+    --spj26res-text-muted: #64748b;
+    width: 100vw;
+    max-width: none;
+    height: 100vh;
+    height: 100dvh;
+    min-height: 0;
+    overflow: hidden;
+    background: var(--spj26res-background);
+}
+
+body.spj26res-page-lock #page,
+body.spj26res-page-lock .site,
+body.spj26res-page-lock .site-content,
+body.spj26res-page-lock .elementor,
+body.spj26res-page-lock .elementor-section-wrap,
+body.spj26res-page-lock .elementor-section,
+body.spj26res-page-lock .elementor-container,
+body.spj26res-page-lock .elementor-column,
+body.spj26res-page-lock .elementor-widget-wrap,
+body.spj26res-page-lock .elementor-widget,
+body.spj26res-page-lock .elementor-widget-container {
+    width: 100% !important;
+    max-width: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+#spj26res-root .spj26res-layout {
+    width: 100%;
+    height: 100%;
+    grid-template-columns: 300px minmax(0, 1fr);
+    grid-template-rows: 76px minmax(0, 1fr) 58px;
+}
+
+#spj26res-root .spj26res-header {
+    height: 76px;
+    min-height: 76px;
+    padding: 0 30px;
+    background: #ffffff;
+    border-bottom: 1px solid var(--spj26res-border);
+}
+
+#spj26res-root .spj26res-logo {
+    width: 48px;
+    height: 48px;
+    flex: 0 0 48px;
+    border-radius: 8px;
+    background: var(--spj26res-maroon);
+}
+
+#spj26res-root .material-symbols-outlined {
+    line-height: 1;
+    font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+}
+
+#spj26res-root .spj26res-brand-name,
+#spj26res-root .spj26res-user-role,
+#spj26res-root .spj26res-sidebar-info-title,
+#spj26res-root .spj26res-footer-brand {
+    color: var(--spj26res-maroon);
+}
+
+#spj26res-root .spj26res-sidebar {
+    grid-column: 1;
+    grid-row: 2 / 4;
+    padding: 18px 16px 14px;
+    background: #ffffff;
+    border-right: 1px solid var(--spj26res-border);
+}
+
+#spj26res-root .spj26res-nav-title {
+    margin: 4px 8px 7px;
+    color: #6c5a57;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: .04em;
+}
+
+#spj26res-root .spj26res-nav { gap: 5px; }
+
+#spj26res-root .spj26res-nav-link {
+    width: 100%;
+    min-height: 42px;
+    padding: 9px 13px;
+    border-radius: 8px;
+    color: #5b4744;
+    font-size: 13px;
+    font-weight: 500;
+}
+
+#spj26res-root .spj26res-nav-link:hover {
+    background: #f8fafc;
+    color: var(--spj26res-text);
+}
+
+#spj26res-root .spj26res-nav-link.active {
+    background: #8f1919;
+    color: #ffffff;
+    font-weight: 700;
+}
+
+#spj26res-root .spj26res-nav-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+}
+
+#spj26res-root .spj26res-nav-link .material-symbols-outlined {
+    width: 19px;
+    height: 19px;
+    flex: 0 0 19px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 19px;
+}
+
+#spj26res-root .spj26res-sidebar-info {
+    padding: 14px 15px;
+    border-radius: 8px;
+    background: #f8fafc;
+}
+
+#spj26res-root #spj26res-results-nav {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    column-gap: 16px;
+}
+
+#spj26res-root #spj26res-results-nav > .spj26res-nav-left > span:last-child {
+    min-width: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+#spj26res-root #spj26res-results-nav > .spj26res-nav-notification {
+    position: relative;
+    justify-self: end;
+    min-width: 28px;
+    min-height: 28px;
+    margin: 0;
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#spj26res-root #spj26res-results-nav .spj26res-nav-count {
+    min-width: 26px;
+    height: 26px;
+    padding: 0 8px;
+    border-radius: 999px;
+    background: #edf2f7;
+    color: #8f1919;
+    font-size: 10px;
+    font-weight: 800;
+}
+
+#spj26res-root #spj26res-results-nav .spj26res-nav-alert {
+    position: absolute;
+    top: -1px;
+    right: -3px;
+    width: 8px;
+    height: 8px;
+    border: 2px solid #ffffff;
+    background: #4ade80;
+}
+
+#spj26res-root .spj26res-main {
+    background: var(--spj26res-background);
+    padding: 28px;
+}
+
+#spj26res-root .spj26res-footer {
+    min-height: 58px;
+    height: 58px;
+    padding: 0 28px;
+    background: #ffffff;
+    border-top: 1px solid var(--spj26res-border);
+}
+
+@media (max-width: 1050px) {
+    #spj26res-root .spj26res-layout {
+        grid-template-columns: 240px minmax(0, 1fr);
+    }
+}
+
+@media (max-width: 800px) {
+    #spj26res-root {
+        position: relative;
+        inset: auto;
+        z-index: auto;
+        margin: 0 !important;
+        width: 100%;
+        height: auto;
+        min-height: 100vh;
+        min-height: 100dvh;
+        overflow: visible;
+    }
+
+    body.spj26res-page-lock #page,
+    body.spj26res-page-lock .site,
+    body.spj26res-page-lock .site-content,
+    body.spj26res-page-lock .elementor,
+    body.spj26res-page-lock .elementor-section-wrap,
+    body.spj26res-page-lock .elementor-section,
+    body.spj26res-page-lock .elementor-container,
+    body.spj26res-page-lock .elementor-column,
+    body.spj26res-page-lock .elementor-widget-wrap,
+    body.spj26res-page-lock .elementor-widget,
+    body.spj26res-page-lock .elementor-widget-container {
+        min-height: 0 !important;
+    }
+
+    #spj26res-root .spj26res-header {
+        height: 64px;
+        min-height: 64px;
+        padding: 8px 14px;
+    }
+
+    #spj26res-root .spj26res-logo {
+        width: 38px;
+        height: 38px;
+        flex-basis: 38px;
+        border-radius: 7px;
+    }
+
+    #spj26res-root .spj26res-main { padding: 16px; }
+
+    #spj26res-root .spj26res-footer {
+        height: auto;
+        min-height: 58px;
+        padding: 12px 16px;
+    }
+}
+
+</style>
+
+
+<div id="spj26res-root">
+
+    <div
+        class="spj26res-overlay"
+        id="spj26res-overlay">
+    </div>
+
+
+    <div class="spj26res-layout">
+
+
+        <!-- =================================================
+             HEADER
+        ================================================== -->
+
+        <header class="spj26res-header">
+
+
+            <div class="spj26res-header-left">
+
+
+                <button
+                    class="spj26res-mobile-menu"
+                    id="spj26res-menu-button"
+                    type="button"
+                    aria-label="Buka Menu"
+                >
+
+                    <span class="material-symbols-outlined">
+                        menu
+                    </span>
+
+                </button>
+
+
+                <div class="spj26res-logo">
+
+                    <span class="material-symbols-outlined">
+                        school
+                    </span>
+
+                </div>
+
+
+                <div class="spj26res-brand">
+
+
+                    <div class="spj26res-brand-row">
+
+                        <div class="spj26res-brand-name">
+                            SIPATUJU PPDS
+                        </div>
+
+
+                        <div class="spj26res-brand-divider">
+                            |
+                        </div>
+
+
+                        <div class="spj26res-brand-description">
+                            Sistem Pemeriksaan Kelayakan Jurnal PPDS FK UNHAS
+                        </div>
+
+                    </div>
+
+
+                    <div class="spj26res-faculty">
+                        Fakultas Kedokteran • Akreditasi Unggul
+                    </div>
+
+
+                </div>
+
+
+            </div>
+
+
+
+            <div class="spj26res-header-right">
+
+
+                <div class="spj26res-user">
+
+
+                    <div class="spj26res-user-text">
+
+                        <span
+                            class="spj26res-user-name"
+                            id="spj26res-user-name"
+                        >
+                            Residen
+                        </span>
+
+
+                        <span class="spj26res-user-role">
+                            Residen
+                        </span>
+
+                    </div>
+
+
+                    <div class="spj26res-avatar">
+
+                        <span class="material-symbols-outlined">
+                            person
+                        </span>
+
+                    </div>
+
+
+                </div>
+
+
+            </div>
+
+
+        </header>
+
+
+
+        <!-- =================================================
+             SIDEBAR
+        ================================================== -->
+
+        <aside
+            class="spj26res-sidebar"
+            id="spj26res-sidebar"
+        >
+
+
+            <div class="spj26res-sidebar-main">
+
+
+                <div class="spj26res-nav-title">
+                    Menu Utama
+                </div>
+
+
+                <nav class="spj26res-nav">
+
+
+                    <a
+                        class="spj26res-nav-link active"
+                        href="/residen-sipatuju/"
+                    >
+
+                        <span class="spj26res-nav-left">
+
+                            <span class="material-symbols-outlined">
+                                grid_view
+                            </span>
+
+                            <span>
+                                Dashboard
+                            </span>
+
+                        </span>
+
+                    </a>
+
+<a
+                        class="spj26res-nav-link"
+                        id="spj26res-new-submission-nav"
+                        href="/residen-sipatuju/pengajuan-baru/"
+                    >
+
+                        <span class="spj26res-nav-left">
+
+                            <span
+                                class="material-symbols-outlined"
+                                id="spj26res-new-submission-nav-icon"
+                            >
+                                post_add
+                            </span>
+
+                            <span id="spj26res-new-submission-nav-label">
+                                Buat Pengajuan
+                            </span>
+
+                        </span>
+
+                    </a>
+
+
+
+                    
+<a
+                        class="spj26res-nav-link"
+                        id="spj26res-results-nav"
+                        href="/residen-sipatuju/hasil/"
+                    >
+
+                        <span class="spj26res-nav-left">
+
+                            <span class="material-symbols-outlined">
+                                fact_check
+                            </span>
+
+                            <span>
+                                Hasil Pemeriksaan
+                            </span>
+
+                        </span>
+
+                        <span class="spj26res-nav-notification">
+<span
+                                class="spj26res-nav-alert"
+                                id="spj26res-results-nav-alert"
+                                hidden
+                                aria-hidden="true"
+                            ></span>
+
+                            <span
+                                class="spj26res-nav-count"
+                                id="spj26res-results-nav-count"
+                                hidden
+                            >0</span>
+
+                        </span>
+
+                    </a>
+
+                </nav>
+
+
+
+                <div class="spj26res-nav-section-gap"></div>
+
+
+                <div class="spj26res-nav-title">
+                    Akses &amp; Akun
+                </div>
+
+
+                <nav class="spj26res-nav">
+
+
+                    <a
+                        class="spj26res-nav-link"
+                        href="/residen-sipatuju/profil/"
+                    >
+
+                        <span class="spj26res-nav-left">
+
+                            <span class="material-symbols-outlined">
+                                manage_accounts
+                            </span>
+
+                            <span>
+                                Profil &amp; Password
+                            </span>
+
+                        </span>
+
+                    </a>
+
+
+
+                    <a
+                        class="spj26res-nav-link"
+                        href="/residen-sipatuju/panduan/"
+                    >
+
+                        <span class="spj26res-nav-left">
+
+                            <span class="material-symbols-outlined">
+                                menu_book
+                            </span>
+
+                            <span>
+                                Panduan Sistem
+                            </span>
+
+                        </span>
+
+                    </a>
+
+
+
+                    <a
+                        class="spj26res-nav-link"
+                        id="spj26res-logout"
+                        href="#"
+                    >
+
+                        <span class="spj26res-nav-left">
+
+                            <span class="material-symbols-outlined">
+                                logout
+                            </span>
+
+                            <span>
+                                Logout
+                            </span>
+
+                        </span>
+
+                    </a>
+
+
+                </nav>
+
+
+            </div>
+
+
+
+            <!-- SIDEBAR BOTTOM -->
+
+            <div class="spj26res-sidebar-info">
+
+
+                <div class="spj26res-sidebar-info-title">
+
+                    <span class="material-symbols-outlined">
+                        verified
+                    </span>
+
+                    <span>
+                        PPDS FK UNHAS
+                    </span>
+
+                </div>
+
+
+                <div class="spj26res-version">
+                    Versi Sistem 2026.1
+                </div>
+
+
+                <div class="spj26res-department">
+                    Program Pendidikan Dokter Spesialis
+                </div>
+
+
+            </div>
+
+
+        </aside>
+
+
+
+        <!-- =================================================
+             MAIN CONTENT
+        ================================================== -->
+
+        <main class="spj26res-main">
+
+
+            <section class="spj26res-hero">
+
+
+                <div class="spj26res-hero-inner">
+
+
+                    <!-- LEFT -->
+
+                    <div class="spj26res-hero-content">
+
+
+                        <div class="spj26res-page-label">
+
+                            <span class="spj26res-page-label-dot"></span>
+
+                            <span>
+                                Dashboard Residen
+                            </span>
+
+                        </div>
+
+
+
+                        <h1
+                            class="spj26res-hero-title"
+                            id="spj26res-hero-title"
+                        >
+                            Selamat Datang
+                        </h1>
+
+
+
+                        <div class="spj26res-resident-info">
+
+
+                            <span
+                                class="spj26res-resident-meta"
+                                id="spj26res-resident-nim"
+                            >
+                                NIM: -
+                            </span>
+
+
+                            <span
+                                class="spj26res-resident-program"
+                                id="spj26res-resident-program"
+                            >
+                                Program PPDS: -
+                            </span>
+
+
+                        </div>
+
+
+
+                        <p class="spj26res-hero-description">
+
+                            Ajukan tiga jurnal kandidat untuk diperiksa
+                            kelayakannya sebelum melakukan submission
+                            artikel ke jurnal tujuan.
+
+                        </p>
+
+
+                    </div>
+
+
+
+                    <!-- RIGHT -->
+
+                    <div class="spj26res-hero-action">
+
+
+                        <a
+                            class="spj26res-new-button"
+                            id="spj26res-new-submission-button"
+                            href="/residen-sipatuju/pengajuan-baru/"
+                        >
+
+                            <span
+                                class="material-symbols-outlined"
+                                id="spj26res-new-submission-button-icon"
+                            >
+                                post_add
+                            </span>
+
+
+                            <span id="spj26res-new-submission-button-label">
+                                Buat Pengajuan
+                            </span>
+
+
+                        </a>
+
+
+                    </div>
+
+
+                </div>
+
+
+            </section>
+
+
+        </main>
+
+
+
+        <!-- =================================================
+             FOOTER
+        ================================================== -->
+
+        <footer class="spj26res-footer">
+
+
+            <div class="spj26res-footer-left">
+
+
+                <span class="spj26res-footer-brand">
+                    SIPATUJU PPDS
+                </span>
+
+
+                <span>
+                    •
+                </span>
+
+
+                <span>
+                    Fakultas Kedokteran Universitas Hasanuddin
+                </span>
+
+
+            </div>
+
+
+
+            <div class="spj26res-footer-right">
+                PPDS FK UNHAS - Versi Sistem 2026.1
+            </div>
+
+
+        </footer>
+
+
+    </div>
+
+</div>
+
+
+<script>
+(function () {
+
+    /*
+     * Desktop page lock.
+     * Dashboard Residen tidak menggunakan scroll browser/page utama.
+     */
+    document.documentElement.classList.add(
+        'spj26res-page-lock'
+    );
+
+    document.body.classList.add(
+        'spj26res-page-lock'
+    );
+
+
+    const root =
+        document.getElementById(
+            'spj26res-root'
+        );
+
+    if (!root) return;
+
+    /* TRUE FULLPAGE v6B: bypass Elementor/theme wrapper spacing. */
+    const isElementorEditor =
+        document.body.classList.contains('elementor-editor-active') ||
+        /(?:^|[?&])elementor-preview=/.test(window.location.search);
+
+    if (!isElementorEditor && root.parentElement !== document.body) {
+        document.body.appendChild(root);
+    }
+
+
+    /* =====================================================
+       MOBILE SIDEBAR
+    ===================================================== */
+
+    const menuButton =
+        root.querySelector(
+            '#spj26res-menu-button'
+        );
+
+
+    const sidebar =
+        root.querySelector(
+            '#spj26res-sidebar'
+        );
+
+
+    const overlay =
+        root.querySelector(
+            '#spj26res-overlay'
+        );
+
+
+    function openSidebar() {
+
+        if (sidebar) {
+            sidebar.classList.add('open');
+        }
+
+        if (overlay) {
+            overlay.classList.add('open');
+        }
+
+    }
+
+
+    function closeSidebar() {
+
+        if (sidebar) {
+            sidebar.classList.remove('open');
+        }
+
+        if (overlay) {
+            overlay.classList.remove('open');
+        }
+
+    }
+
+
+    if (menuButton) {
+
+        menuButton.addEventListener(
+            'click',
+            openSidebar
+        );
+
+    }
+
+
+    if (overlay) {
+
+        overlay.addEventListener(
+            'click',
+            closeSidebar
+        );
+
+    }
+
+
+    root
+        .querySelectorAll(
+            '.spj26res-sidebar a'
+        )
+        .forEach(function (link) {
+
+            link.addEventListener(
+                'click',
+                function () {
+
+                    if (
+                        window.innerWidth <= 800
+                    ) {
+                        closeSidebar();
+                    }
+
+                }
+            );
+
+        });
+
+
+    /* =====================================================
+       USER DATA
+    ===================================================== */
+
+    const userName =
+        root.querySelector(
+            '#spj26res-user-name'
+        );
+
+    const heroTitle =
+        root.querySelector(
+            '#spj26res-hero-title'
+        );
+
+    const residentNim =
+        root.querySelector(
+            '#spj26res-resident-nim'
+        );
+
+    const residentProgram =
+        root.querySelector(
+            '#spj26res-resident-program'
+        );
+
+    const logoutLink =
+        root.querySelector(
+            '#spj26res-logout'
+        );
+    const newSubmissionNav =
+        root.querySelector(
+            '#spj26res-new-submission-nav'
+        );
+
+    const newSubmissionNavIcon =
+        root.querySelector(
+            '#spj26res-new-submission-nav-icon'
+        );
+
+    const newSubmissionNavLabel =
+        root.querySelector(
+            '#spj26res-new-submission-nav-label'
+        );
+
+    const newSubmissionButton =
+        root.querySelector(
+            '#spj26res-new-submission-button'
+        );
+
+    const newSubmissionButtonIcon =
+        root.querySelector(
+            '#spj26res-new-submission-button-icon'
+        );
+
+    const newSubmissionButtonLabel =
+        root.querySelector(
+            '#spj26res-new-submission-button-label'
+        );
+
+
+    const resultsNavAlert =
+        root.querySelector(
+            '#spj26res-results-nav-alert'
+        );
+
+
+    const resultsNavCount =
+        root.querySelector(
+            '#spj26res-results-nav-count'
+        );
+
+
+    let resultsNotificationRequestInFlight =
+        false;
+
+
+    let resultsNotificationTimer =
+        null;
+
+
+    function textOrDash(value) {
+
+        const text =
+            String(
+                value ?? ''
+            ).trim();
+
+        return text || '-';
+
+    }
+
+
+    function applyResidentData() {
+
+        const config =
+            window.spj26ResidentPortalConfig
+            ||
+            window.spj26ResidentResultsConfig;
+
+        if (!config) {
+
+            console.error(
+                'SIPATUJU Residen: spj26ResidentPortalConfig tidak ditemukan.'
+            );
+
+            if (heroTitle) {
+                heroTitle.textContent =
+                    'Data akun Residen belum tersedia';
+            }
+
+            if (residentNim) {
+                residentNim.textContent =
+                    'NIM: -';
+            }
+
+            if (residentProgram) {
+                residentProgram.textContent =
+                    'Program PPDS: -';
+            }
+
+            return;
+
+        }
+
+
+        const name =
+            textOrDash(
+                config.name
+            );
+
+        const nim =
+            textOrDash(
+                config.nim
+            );
+
+        const program =
+            textOrDash(
+                config.program
+            );
+
+
+        if (userName) {
+            userName.textContent = name;
+        }
+
+
+        if (heroTitle) {
+
+            heroTitle.textContent =
+                name === '-'
+                ? 'Selamat Datang'
+                : 'Selamat Datang, ' + name;
+
+        }
+
+
+        if (residentNim) {
+
+            residentNim.textContent =
+                'NIM: ' + nim;
+
+        }
+
+
+        if (residentProgram) {
+
+            residentProgram.textContent =
+                program === '-'
+                ? 'Program PPDS: -'
+                : program;
+
+        }
+
+
+        if (
+            logoutLink &&
+            config.logoutUrl
+        ) {
+
+            logoutLink.href =
+                config.logoutUrl;
+
+        }
+    }
+
+
+    /* =====================================================
+       BUAT PENGAJUAN: SELALU AKTIF
+       Pengajuan baru tidak dibatasi oleh status pengajuan
+       sebelumnya. Menu sidebar dan tombol utama selalu dapat
+       digunakan untuk membuka halaman pengajuan baru.
+    ===================================================== */
+
+    function enableNewSubmissionControl(
+        element,
+        labelElement,
+        iconElement,
+        iconName
+    ) {
+
+        if (!element) return;
+
+        element.classList.remove(
+            'is-disabled'
+        );
+
+        element.setAttribute(
+            'href',
+            '/residen-sipatuju/pengajuan-baru/'
+        );
+
+        element.removeAttribute(
+            'aria-disabled'
+        );
+
+        element.removeAttribute(
+            'tabindex'
+        );
+
+
+        if (labelElement) {
+
+            labelElement.textContent =
+                'Buat Pengajuan';
+
+        }
+
+
+        if (iconElement) {
+
+            iconElement.textContent =
+                iconName;
+
+        }
+
+    }
+
+
+    function applySubmissionState() {
+
+        /*
+         * Status pengajuan aktif tidak lagi digunakan untuk
+         * membatasi akses pembuatan pengajuan baru.
+         */
+        enableNewSubmissionControl(
+            newSubmissionNav,
+            newSubmissionNavLabel,
+            newSubmissionNavIcon,
+            'post_add'
+        );
+
+        enableNewSubmissionControl(
+            newSubmissionButton,
+            newSubmissionButtonLabel,
+            newSubmissionButtonIcon,
+            'post_add'
+        );
+
+    }
+
+    /* =====================================================
+       HASIL PEMERIKSAAN - UNREAD UPDATE NOTIFICATION
+       Badge hanya muncul jika ada perubahan baru yang belum
+       dilihat Residen. Jumlah = jumlah pengajuan yang berubah.
+    ===================================================== */
+
+
+    function getResultsNotificationStorageKey() {
+        const config = window.spj26ResidentResultsConfig || {};
+        const identity = String(config.nim || config.name || 'resident')
+            .trim()
+            .replace(/[^a-zA-Z0-9_-]/g, '_');
+
+        return 'spj26res_results_seen_v2_' + identity;
+    }
+
+    function buildResultsNotificationSnapshot(items) {
+        const snapshot = {};
+        const list = Array.isArray(items) ? items : [];
+
+        list.forEach(function (item) {
+            if (!item) return;
+
+            const key = String(item.id || item.code || '').trim();
+            if (!key) return;
+
+            const journals = Array.isArray(item.journals)
+                ? item.journals.map(function (journal) {
+                    return {
+                        order: journal && journal.order ? String(journal.order) : '',
+                        decision: journal && journal.decision ? String(journal.decision) : '',
+                        comment: journal && journal.comment ? String(journal.comment) : '',
+                        updated_at: journal && journal.updated_at ? String(journal.updated_at) : ''
+                    };
+                })
+                : [];
+
+            snapshot[key] = JSON.stringify({
+                status: item.status ? String(item.status) : '',
+                status_label: item.status_label ? String(item.status_label) : '',
+                updated_at: item.updated_at ? String(item.updated_at) : '',
+                completed_at: item.completed_at ? String(item.completed_at) : '',
+                journals: journals
+            });
+        });
+
+        return snapshot;
+    }
+
+    function readSeenResultsNotificationSnapshot() {
+        try {
+            const raw = window.localStorage.getItem(
+                getResultsNotificationStorageKey()
+            );
+
+            if (!raw) return null;
+
+            const parsed = JSON.parse(raw);
+            return parsed && typeof parsed === 'object' ? parsed : null;
+        } catch (error) {
+            console.warn('SIPATUJU Residen - snapshot notifikasi tidak dapat dibaca:', error);
+            return null;
+        }
+    }
+
+    function writeSeenResultsNotificationSnapshot(items) {
+        try {
+            window.localStorage.setItem(
+                getResultsNotificationStorageKey(),
+                JSON.stringify(buildResultsNotificationSnapshot(items))
+            );
+        } catch (error) {
+            console.warn('SIPATUJU Residen - snapshot notifikasi tidak dapat disimpan:', error);
+        }
+    }
+
+    function getUnreadResultsUpdateCount(items) {
+        const currentSnapshot = buildResultsNotificationSnapshot(items);
+        const seenSnapshot = readSeenResultsNotificationSnapshot();
+
+        /*
+         * Pertama kali fitur dipakai: jadikan kondisi saat ini sebagai baseline,
+         * sehingga data lama tidak langsung dianggap sebagai notifikasi baru.
+         */
+        if (!seenSnapshot) {
+            writeSeenResultsNotificationSnapshot(items);
+            return 0;
+        }
+
+        let unreadCount = 0;
+
+        Object.keys(currentSnapshot).forEach(function (key) {
+            /*
+             * Record baru tidak dihitung sebagai perubahan status.
+             * Notifikasi hanya untuk pengajuan yang sebelumnya sudah dikenal,
+             * lalu mengalami perubahan status/detail pemeriksaan.
+             */
+            if (!Object.prototype.hasOwnProperty.call(seenSnapshot, key)) {
+                return;
+            }
+
+            if (seenSnapshot[key] !== currentSnapshot[key]) {
+                unreadCount += 1;
+            }
+        });
+
+        return unreadCount;
+    }
+
+    function renderResultsUpdateNotification(count) {
+        const unreadCount = Math.max(0, Number(count) || 0);
+        const hasUnread = unreadCount > 0;
+
+        if (resultsNavAlert) {
+            resultsNavAlert.hidden = !hasUnread;
+        }
+
+        if (resultsNavCount) {
+            resultsNavCount.hidden = !hasUnread;
+            resultsNavCount.textContent = hasUnread ? String(unreadCount) : '0';
+        }
+    }
+
+    async function loadResultsNotification() {
+        if (resultsNotificationRequestInFlight) return;
+
+        const config = window.spj26ResidentResultsConfig;
+        if (!config || !config.ajaxUrl || !config.nonce) return;
+
+        resultsNotificationRequestInFlight = true;
+
+        try {
+            const body = new URLSearchParams();
+            body.append('action', 'spj26_resident_results_data');
+            body.append('nonce', config.nonce);
+
+            const response = await fetch(config.ajaxUrl, {
+                method: 'POST',
+                credentials: 'same-origin',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'
+                },
+                body: body.toString()
+            });
+
+            const result = await response.json();
+
+            if (!response.ok || !result || result.success !== true) return;
+
+            const items = result.data && Array.isArray(result.data.submissions)
+                ? result.data.submissions
+                : [];
+
+            renderResultsUpdateNotification(
+                getUnreadResultsUpdateCount(items)
+            );
+        } catch (error) {
+            console.error('SIPATUJU Residen - notifikasi hasil:', error);
+        } finally {
+            resultsNotificationRequestInFlight = false;
+        }
+    }
+
+    function startResultsNotificationRefresh() {
+        if (resultsNotificationTimer) {
+            window.clearInterval(resultsNotificationTimer);
+        }
+
+        resultsNotificationTimer = window.setInterval(
+            loadResultsNotification,
+            30000
+        );
+    }
+
+    /* =====================================================
+       INITIAL
+       Config dicetak melalui wp_footer, sehingga tunggu
+       seluruh page selesai dimuat.
+    ===================================================== */
+
+    function initializeResidentDashboard() {
+
+        applyResidentData();
+        applySubmissionState();
+        loadResultsNotification();
+        startResultsNotificationRefresh();
+
+    }
+
+
+    if (
+        document.readyState === 'complete'
+    ) {
+
+        initializeResidentDashboard();
+
+    } else {
+
+        window.addEventListener(
+            'load',
+            initializeResidentDashboard,
+            { once: true }
+        );
+
+    }
+
+})();
+</script>

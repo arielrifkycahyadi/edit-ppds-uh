@@ -1,0 +1,536 @@
+/*
+ * =========================================================
+ * SIPATUJU PPDS FK UNHAS
+ * PATCH     : ADMIN EDIT MAHASISWA
+ * VERSION   : 2026.5
+ * TYPE      : WordPress PHP / WPCode / Code Snippets
+ *
+ * AJAX:
+ * spj26_admin_update_resident
+ *
+ * REQUIREMENTS:
+ * - Snippet User Management SIPATUJU tetap aktif.
+ * - Helper spj26_um_verify_request() tersedia.
+ * - Helper spj26_um_serialize_resident() tersedia.
+ *
+ * DATABASE:
+ * - NIM          -> wp_users.user_login
+ * - Nama         -> wp_users.display_name + nickname
+ * - Program PPDS -> wp_usermeta.spj26_program_ppds
+ * - Password     -> WordPress password hash, hanya jika diisi
+ *
+ * SECURITY:
+ * - Authenticated AJAX only.
+ * - Admin authorization + nonce reuse dari User Management.
+ * - Input sanitization.
+ * - NIM uniqueness validation.
+ * - Program whitelist.
+ * =========================================================
+ */
+
+
+add_action(
+    'wp_ajax_spj26_admin_update_resident',
+    'spj26_um_ajax_update_resident'
+);
+
+
+function spj26_um_edit_allowed_programs() {
+
+    return array(
+            'Anestesiologi dan Terapi Intensif',
+            'Bedah Anak',
+            'Bedah Saraf',
+            'Bedah Toraks Kardiak dan Vaskular',
+            'Dermatologi dan Venereologi',
+            'Forensik dan Medikolegal',
+            'Gizi Klinik',
+            'Ilmu Bedah',
+            'Ilmu Kedokteran Fisik dan Rehabilitasi',
+            'Ilmu Kedokteran Jiwa',
+            'Ilmu Kesehatan Anak',
+            'Ilmu Kesehatan Mata',
+            'Ilmu Kesehatan THT-BKL',
+            'Ilmu Patologi Klinik',
+            'Ilmu Penyakit Dalam',
+            'Ilmu Penyakit Jantung dan Pembuluh Darah',
+            'Mikrobiologi Klinik',
+            'Neurologi',
+            'Obstetri dan Ginekologi',
+            'Orthopaedi dan Traumatologi',
+            'Patologi Anatomi',
+            'Pulmonologi dan Kedokteran Respirasi',
+            'Radiologi',
+            'Urologi',
+            'SP2 - Anestesiologi dan Terapi Intensif',
+            'SP2 - Bedah',
+            'SP2 - Dermatologi, Venerologi, dan Estetika',
+            'SP2 - Ilmu Penyakit Dalam',
+            'SP2 - Obstetri dan Ginekologi',
+            'SP2 - Orthopaedi dan Traumatologi'
+    );
+}
+
+
+function spj26_um_ajax_update_resident() {
+
+    /*
+     * 1. SECURITY / AUTHORIZATION
+     */
+    if (
+        ! function_exists(
+            'spj26_um_verify_request'
+        )
+    ) {
+
+        wp_send_json_error(
+            array(
+                'message' =>
+                    'Modul User Management SIPATUJU belum tersedia.',
+            ),
+            500
+        );
+    }
+
+    spj26_um_verify_request();
+
+
+    /*
+     * 2. INPUT
+     */
+    $user_id =
+        isset(
+            $_POST['user_id']
+        )
+        ? absint(
+            $_POST['user_id']
+        )
+        : 0;
+
+    $nim =
+        isset(
+            $_POST['nim']
+        )
+        ? sanitize_user(
+            wp_unslash(
+                $_POST['nim']
+            ),
+            true
+        )
+        : '';
+
+    $name =
+        isset(
+            $_POST['name']
+        )
+        ? sanitize_text_field(
+            wp_unslash(
+                $_POST['name']
+            )
+        )
+        : '';
+
+    $program =
+        isset(
+            $_POST['program']
+        )
+        ? sanitize_text_field(
+            wp_unslash(
+                $_POST['program']
+            )
+        )
+        : '';
+
+    /*
+     * Password tidak disanitasi dengan sanitize_text_field karena
+     * karakter khusus adalah bagian valid dari password.
+     */
+    $password =
+        isset(
+            $_POST['password']
+        )
+        ? (string) wp_unslash(
+            $_POST['password']
+        )
+        : '';
+
+
+    if (
+        ! $user_id
+        ||
+        $nim === ''
+        ||
+        $name === ''
+        ||
+        $program === ''
+    ) {
+
+        wp_send_json_error(
+            array(
+                'message' =>
+                    'NIM, nama lengkap, dan Program PPDS wajib diisi.',
+            ),
+            400
+        );
+    }
+
+
+    /*
+     * 3. TARGET ACCOUNT VALIDATION
+     */
+    $user =
+        get_userdata(
+            $user_id
+        );
+
+    if (
+        ! $user
+        ||
+        ! in_array(
+            'sipatuju_residen',
+            (array) $user->roles,
+            true
+        )
+    ) {
+
+        wp_send_json_error(
+            array(
+                'message' =>
+                    'Akun Mahasiswa tidak ditemukan.',
+            ),
+            404
+        );
+    }
+
+
+    /*
+     * 4. PROGRAM WHITELIST
+     */
+    if (
+        ! in_array(
+            $program,
+            spj26_um_edit_allowed_programs(),
+            true
+        )
+    ) {
+
+        wp_send_json_error(
+            array(
+                'message' =>
+                    'Program PPDS tidak dikenali.',
+            ),
+            400
+        );
+    }
+
+
+    /*
+     * 5. PASSWORD VALIDATION
+     * Password boleh kosong, artinya tidak diubah.
+     */
+    if (
+        $password !== ''
+        &&
+        strlen(
+            $password
+        ) < 8
+    ) {
+
+        wp_send_json_error(
+            array(
+                'message' =>
+                    'Password baru minimal 8 karakter.',
+            ),
+            400
+        );
+    }
+
+
+    /*
+     * 6. NIM / LOGIN UNIQUENESS
+     */
+    $existing_user_id =
+        username_exists(
+            $nim
+        );
+
+    if (
+        $existing_user_id
+        &&
+        (int) $existing_user_id !==
+        (int) $user_id
+    ) {
+
+        wp_send_json_error(
+            array(
+                'message' =>
+                    'NIM tersebut sudah digunakan oleh akun lain.',
+            ),
+            409
+        );
+    }
+
+
+    global $wpdb;
+
+    $old_nim =
+        (string) $user->user_login;
+
+    $nim_changed =
+        $old_nim !==
+        $nim;
+
+
+    /*
+     * 7. UPDATE USERNAME / NIM
+     *
+     * WordPress core tidak menyediakan perubahan user_login melalui
+     * wp_update_user(), sehingga perubahan login dilakukan langsung
+     * pada wp_users setelah uniqueness check.
+     */
+    if (
+        $nim_changed
+    ) {
+
+        $updated_login =
+            $wpdb->update(
+                $wpdb->users,
+                array(
+                    'user_login' =>
+                        $nim,
+                ),
+                array(
+                    'ID' =>
+                        $user_id,
+                ),
+                array(
+                    '%s',
+                ),
+                array(
+                    '%d',
+                )
+            );
+
+
+        if (
+            $updated_login === false
+        ) {
+
+            wp_send_json_error(
+                array(
+                    'message' =>
+                        'NIM gagal diperbarui pada database.',
+                ),
+                500
+            );
+        }
+
+        clean_user_cache(
+            $user_id
+        );
+
+        $user =
+            get_userdata(
+                $user_id
+            );
+    }
+
+
+    /*
+     * 8. UPDATE CORE PROFILE
+     */
+    $update_data =
+        array(
+            'ID' =>
+                $user_id,
+            'display_name' =>
+                $name,
+            'nickname' =>
+                $name,
+        );
+
+
+    if (
+        $password !== ''
+    ) {
+
+        $update_data['user_pass'] =
+            $password;
+    }
+
+
+    $updated_user_id =
+        wp_update_user(
+            $update_data
+        );
+
+
+    if (
+        is_wp_error(
+            $updated_user_id
+        )
+    ) {
+
+        /*
+         * Jika username tadi sempat berubah tetapi update profil gagal,
+         * kembalikan username lama sebagai best-effort rollback.
+         */
+        if (
+            $nim_changed
+        ) {
+
+            $wpdb->update(
+                $wpdb->users,
+                array(
+                    'user_login' =>
+                        $old_nim,
+                ),
+                array(
+                    'ID' =>
+                        $user_id,
+                ),
+                array(
+                    '%s',
+                ),
+                array(
+                    '%d',
+                )
+            );
+
+            clean_user_cache(
+                $user_id
+            );
+        }
+
+
+        wp_send_json_error(
+            array(
+                'message' =>
+                    $updated_user_id->get_error_message(),
+            ),
+            400
+        );
+    }
+
+
+    /*
+     * 9. UPDATE SIPATUJU USER META
+     */
+    $meta_result =
+        update_user_meta(
+            $user_id,
+            'spj26_program_ppds',
+            $program
+        );
+
+
+    /*
+     * update_user_meta() dapat mengembalikan false jika nilai baru
+     * identik dengan nilai lama; kondisi tersebut bukan kegagalan.
+     */
+    update_user_meta(
+        $user_id,
+        'spj26_updated_by',
+        get_current_user_id()
+    );
+
+    update_user_meta(
+        $user_id,
+        'spj26_updated_at',
+        current_time(
+            'mysql'
+        )
+    );
+
+
+    clean_user_cache(
+        $user_id
+    );
+
+    $updated_user =
+        get_userdata(
+            $user_id
+        );
+
+
+    if (
+        ! $updated_user
+    ) {
+
+        wp_send_json_error(
+            array(
+                'message' =>
+                    'Data mahasiswa telah diperbarui tetapi gagal dimuat ulang.',
+            ),
+            500
+        );
+    }
+
+
+    /*
+     * Jika password diganti, putus sesi mahasiswa agar kredensial baru
+     * langsung berlaku konsisten. Admin yang melakukan edit tidak terdampak.
+     */
+    if (
+        $password !== ''
+        &&
+        class_exists(
+            'WP_Session_Tokens'
+        )
+    ) {
+
+        $sessions =
+            WP_Session_Tokens::get_instance(
+                $user_id
+            );
+
+        $sessions->destroy_all();
+    }
+
+
+    do_action(
+        'spj26_admin_resident_updated',
+        $user_id,
+        array(
+            'old_nim' =>
+                $old_nim,
+            'nim' =>
+                $nim,
+            'name' =>
+                $name,
+            'program' =>
+                $program,
+            'password_changed' =>
+                $password !== '',
+        )
+    );
+
+
+    wp_send_json_success(
+        array(
+            'message' =>
+                'Data mahasiswa berhasil diperbarui.',
+            'resident' =>
+                function_exists(
+                    'spj26_um_serialize_resident'
+                )
+                ? spj26_um_serialize_resident(
+                    $updated_user
+                )
+                : array(
+                    'id' =>
+                        (int) $updated_user->ID,
+                    'nim' =>
+                        (string) $updated_user->user_login,
+                    'name' =>
+                        (string) $updated_user->display_name,
+                    'program' =>
+                        (string) get_user_meta(
+                            $user_id,
+                            'spj26_program_ppds',
+                            true
+                        ),
+                ),
+        )
+    );
+}

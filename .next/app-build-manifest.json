@@ -1,0 +1,190 @@
+{
+  "pages": {
+    "/_not-found/page": [
+      "static/chunks/webpack-290cfe55c30a2cf2.js",
+      "static/chunks/fd9d1056-c086d2baac1050e8.js",
+      "static/chunks/117-e31636e7136b7745.js",
+      "static/chunks/main-app-27ded4eb624df775.js",
+      "static/chunks/app/_not-found/page-f550d58852e73ff6.js"
+    ],
+    "/layout": [
+      "static/chunks/webpack-290cfe55c30a2cf2.js",
+      "static/chunks/fd9d1056-c086d2baac1050e8.js",
+      "static/chunks/117-e31636e7136b7745.js",
+      "static/chunks/main-app-27ded4eb624df775.js",
+      "static/css/42be504c29f62821.css",
+      "static/chunks/app/layout-fb17698f54366a2d.js"
+    ],
+    "/page": [
+      "static/chunks/webpack-290cfe55c30a2cf2.js",
+      "static/chunks/fd9d1056-c086d2baac1050e8.js",
+      "static/chunks/117-e31636e7136b7745.js",
+      "static/chunks/main-app-27ded4eb624df775.js",
+      "static/chunks/265-11ce05d9c47665a2.js",
+      "static/chunks/410-e68b31db0dc4742c.js",
+      "static/chunks/app/page-cc98fc27d5707f26.js"
+    ],
+    "/login/page": [
+      "static/chunks/webpack-290cfe55c30a2cf2.js",
+      "static/chunks/fd9d1056-c086d2baac1050e8.js",
+      "static/chunks/117-e31636e7136b7745.js",
+      "static/chunks/main-app-27ded4eb624df775.js",
+      "static/chunks/44530001-f9675aa827440b71.js",
+      "static/chunks/265-11ce05d9c47665a2.js",
+      "static/chunks/739-033d295cd96b7ff6.js",
+      "static/chunks/410-e68b31db0dc4742c.js",
+      "static/chunks/app/login/page-cb33dbd787ac43c2.js"
+    ],
+    "/admin/jurnal-predator/page": [
+      "static/chunks/webpack-290cfe55c30a2cf2.js",
+      "static/chunks/fd9d1056-c086d2baac1050e8.js",
+      "static/chunks/117-e31636e7136b7745.js",
+      "static/chunks/main-app-27ded4eb624df775.js",
+      "static/chunks/265-11ce05d9c47665a2.js",
+      "static/chunks/410-e68b31db0dc4742c.js",
+      "static/chunks/app/admin/jurnal-predator/page-8c88947d1ae74424.js"
+    ],
+    "/admin/layout": [
+      "static/chunks/webpack-290cfe55c30a2cf2.js",
+      "static/chunks/fd9d1056-c086d2baac1050e8.js",
+      "static/chunks/117-e31636e7136b7745.js",
+      "static/chunks/main-app-27ded4eb624df775.js",
+      "static/chunks/265-11ce05d9c47665a2.js",
+      "static/chunks/216-636d39fa7f20a759.js",
+      "static/chunks/410-e68b31db0dc4742c.js",
+      "static/chunks/770-71a6003a6acc9b80.js",
+      "static/chunks/app/admin/layout-37e135a62a43dc5c.js"
+    ],
+    "/admin/page": [
+      "static/chunks/webpack-290cfe55c30a2cf2.js",
+      "static/chunks/fd9d1056-c086d2baac1050e8.js",
+      "static/chunks/117-e31636e7136b7745.js",
+      "static/chunks/main-app-27ded4eb624df775.js",
+      "static/chunks/265-11ce05d9c47665a2.js",
+      "static/chunks/410-e68b31db0dc4742c.js",
+      "static/chunks/app/admin/page-4d582334d43a4374.js"
+    ],
+    "/admin/reviewer/page": [
+      "static/chunks/webpack-290cfe55c30a2cf2.js",
+      "static/chunks/fd9d1056-c086d2baac1050e8.js",
+      "static/chunks/117-e31636e7136b7745.js",
+      "static/chunks/main-app-27ded4eb624df775.js",
+      "static/chunks/265-11ce05d9c47665a2.js",
+      "static/chunks/410-e68b31db0dc4742c.js",
+      "static/chunks/846-e64e3d9be7e238d8.js",
+      "static/chunks/app/admin/reviewer/page-088c6133126be3a6.js"
+    ],
+    "/admin/residen/page": [
+      "static/chunks/webpack-290cfe55c30a2cf2.js",
+      "static/chunks/fd9d1056-c086d2baac1050e8.js",
+      "static/chunks/117-e31636e7136b7745.js",
+      "static/chunks/main-app-27ded4eb624df775.js",
+      "static/chunks/265-11ce05d9c47665a2.js",
+      "static/chunks/410-e68b31db0dc4742c.js",
+      "static/chunks/846-e64e3d9be7e238d8.js",
+      "static/chunks/app/admin/residen/page-d70c22238a3c8474.js"
+    ],
+    "/residen/page": [
+      "static/chunks/webpack-290cfe55c30a2cf2.js",
+      "static/chunks/fd9d1056-c086d2baac1050e8.js",
+      "static/chunks/117-e31636e7136b7745.js",
+      "static/chunks/main-app-27ded4eb624df775.js",
+      "static/chunks/265-11ce05d9c47665a2.js",
+      "static/chunks/216-636d39fa7f20a759.js",
+      "static/chunks/410-e68b31db0dc4742c.js",
+      "static/chunks/app/residen/page-d50db014a2dba3ed.js"
+    ],
+    "/residen/layout": [
+      "static/chunks/webpack-290cfe55c30a2cf2.js",
+      "static/chunks/fd9d1056-c086d2baac1050e8.js",
+      "static/chunks/117-e31636e7136b7745.js",
+      "static/chunks/main-app-27ded4eb624df775.js",
+      "static/chunks/265-11ce05d9c47665a2.js",
+      "static/chunks/216-636d39fa7f20a759.js",
+      "static/chunks/410-e68b31db0dc4742c.js",
+      "static/chunks/770-71a6003a6acc9b80.js",
+      "static/chunks/app/residen/layout-0af2ddf3d1071684.js"
+    ],
+    "/residen/hasil/page": [
+      "static/chunks/webpack-290cfe55c30a2cf2.js",
+      "static/chunks/fd9d1056-c086d2baac1050e8.js",
+      "static/chunks/117-e31636e7136b7745.js",
+      "static/chunks/main-app-27ded4eb624df775.js",
+      "static/chunks/164f4fb6-e9b72293e53f5e93.js",
+      "static/chunks/265-11ce05d9c47665a2.js",
+      "static/chunks/110-7641e6b4b9bd94dc.js",
+      "static/chunks/410-e68b31db0dc4742c.js",
+      "static/chunks/app/residen/hasil/page-20dffebd03ce5acc.js"
+    ],
+    "/reviewer/page": [
+      "static/chunks/webpack-290cfe55c30a2cf2.js",
+      "static/chunks/fd9d1056-c086d2baac1050e8.js",
+      "static/chunks/117-e31636e7136b7745.js",
+      "static/chunks/main-app-27ded4eb624df775.js",
+      "static/chunks/265-11ce05d9c47665a2.js",
+      "static/chunks/216-636d39fa7f20a759.js",
+      "static/chunks/410-e68b31db0dc4742c.js",
+      "static/chunks/app/reviewer/page-555f1fba94848bab.js"
+    ],
+    "/reviewer/layout": [
+      "static/chunks/webpack-290cfe55c30a2cf2.js",
+      "static/chunks/fd9d1056-c086d2baac1050e8.js",
+      "static/chunks/117-e31636e7136b7745.js",
+      "static/chunks/main-app-27ded4eb624df775.js",
+      "static/chunks/265-11ce05d9c47665a2.js",
+      "static/chunks/216-636d39fa7f20a759.js",
+      "static/chunks/410-e68b31db0dc4742c.js",
+      "static/chunks/770-71a6003a6acc9b80.js",
+      "static/chunks/app/reviewer/layout-09d426d19c35f1dc.js"
+    ],
+    "/reviewer/pemeriksaan-jurnal/[id]/page": [
+      "static/chunks/webpack-290cfe55c30a2cf2.js",
+      "static/chunks/fd9d1056-c086d2baac1050e8.js",
+      "static/chunks/117-e31636e7136b7745.js",
+      "static/chunks/main-app-27ded4eb624df775.js",
+      "static/chunks/265-11ce05d9c47665a2.js",
+      "static/chunks/216-636d39fa7f20a759.js",
+      "static/chunks/938-09ce17d9c9fb9bf2.js",
+      "static/chunks/410-e68b31db0dc4742c.js",
+      "static/chunks/app/reviewer/pemeriksaan-jurnal/[id]/page-92543296a97917f6.js"
+    ],
+    "/residen/pengajuan-baru/page": [
+      "static/chunks/webpack-290cfe55c30a2cf2.js",
+      "static/chunks/fd9d1056-c086d2baac1050e8.js",
+      "static/chunks/117-e31636e7136b7745.js",
+      "static/chunks/main-app-27ded4eb624df775.js",
+      "static/chunks/265-11ce05d9c47665a2.js",
+      "static/chunks/938-09ce17d9c9fb9bf2.js",
+      "static/chunks/410-e68b31db0dc4742c.js",
+      "static/chunks/app/residen/pengajuan-baru/page-09420d1d46fb91e5.js"
+    ],
+    "/reviewer/pemeriksaan-saya/page": [
+      "static/chunks/webpack-290cfe55c30a2cf2.js",
+      "static/chunks/fd9d1056-c086d2baac1050e8.js",
+      "static/chunks/117-e31636e7136b7745.js",
+      "static/chunks/main-app-27ded4eb624df775.js",
+      "static/chunks/265-11ce05d9c47665a2.js",
+      "static/chunks/216-636d39fa7f20a759.js",
+      "static/chunks/410-e68b31db0dc4742c.js",
+      "static/chunks/app/reviewer/pemeriksaan-saya/page-9f4127b160d7fa2e.js"
+    ],
+    "/reviewer/pengajuan-tersedia/page": [
+      "static/chunks/webpack-290cfe55c30a2cf2.js",
+      "static/chunks/fd9d1056-c086d2baac1050e8.js",
+      "static/chunks/117-e31636e7136b7745.js",
+      "static/chunks/main-app-27ded4eb624df775.js",
+      "static/chunks/265-11ce05d9c47665a2.js",
+      "static/chunks/410-e68b31db0dc4742c.js",
+      "static/chunks/app/reviewer/pengajuan-tersedia/page-745beced92ff65b4.js"
+    ],
+    "/reviewer/riwayat-pemeriksaan/page": [
+      "static/chunks/webpack-290cfe55c30a2cf2.js",
+      "static/chunks/fd9d1056-c086d2baac1050e8.js",
+      "static/chunks/117-e31636e7136b7745.js",
+      "static/chunks/main-app-27ded4eb624df775.js",
+      "static/chunks/265-11ce05d9c47665a2.js",
+      "static/chunks/410-e68b31db0dc4742c.js",
+      "static/chunks/app/reviewer/riwayat-pemeriksaan/page-db98ebf3449ee576.js"
+    ]
+  }
+}

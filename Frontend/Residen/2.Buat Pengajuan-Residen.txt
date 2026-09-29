@@ -1,0 +1,7901 @@
+<!-- =========================================================
+     SIPATUJU PPDS FK UNHAS
+     PAGE      : BUAT PENGAJUAN
+     URL       : /residen-sipatuju/pengajuan-baru/
+     ROLE      : Residen
+     FORMAT    : Elementor HTML Widget
+     ROOT      : #spj26res-submit-root
+     SYNC      : Residen Flow v6 - restricted journal guard + fullpage canonical UI
+========================================================== -->
+
+
+<style>
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:wght@600;700;800&family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap');
+
+
+/* =========================================================
+   ROOT
+========================================================= */
+
+#spj26res-submit-root{
+
+    --spj-maroon:#800000;
+    --spj-maroon-dark:#5c0000;
+    --spj-maroon-medium:#9b1c1c;
+
+    --spj-bg:#f3f5f8;
+    --spj-white:#ffffff;
+
+    --spj-text:#111827;
+    --spj-text-secondary:#475569;
+    --spj-text-muted:#64748b;
+
+    --spj-border:#e2e8f0;
+    --spj-border-strong:#cbd5e1;
+
+    --spj-green:#10b981;
+
+    --spj-danger:#b91c1c;
+    --spj-danger-bg:#fef2f2;
+
+    width:100%;
+
+    height:100vh;
+    height:100dvh;
+
+    min-height:0;
+
+    margin:0;
+    padding:0;
+
+    overflow:hidden;
+
+    background:var(--spj-bg);
+
+    color:var(--spj-text);
+
+    font-family:
+        "Inter",
+        Arial,
+        sans-serif;
+
+    box-sizing:border-box;
+}
+
+
+#spj26res-submit-root *,
+#spj26res-submit-root *::before,
+#spj26res-submit-root *::after{
+
+    box-sizing:border-box;
+
+}
+
+
+#spj26res-submit-root h1,
+#spj26res-submit-root h2,
+#spj26res-submit-root h3,
+#spj26res-submit-root p{
+
+    margin:0;
+
+}
+
+
+#spj26res-submit-root a{
+
+    color:inherit;
+
+    text-decoration:none;
+
+}
+
+
+#spj26res-submit-root button,
+#spj26res-submit-root input,
+#spj26res-submit-root textarea,
+#spj26res-submit-root select{
+
+    font:inherit;
+
+}
+
+
+#spj26res-submit-root [hidden]{
+
+    display:none !important;
+
+}
+
+
+/* =========================================================
+   PAGE LOCK
+========================================================= */
+
+html.spj26res-page-lock,
+body.spj26res-page-lock{
+
+    width:100% !important;
+
+    height:100% !important;
+
+    min-height:100% !important;
+
+    margin:0 !important;
+
+    padding:0 !important;
+
+    overflow:hidden !important;
+
+}
+
+
+/* =========================================================
+   HEADER
+========================================================= */
+
+#spj26res-submit-root .spj26res-header{
+
+    height:76px;
+
+    min-height:76px;
+
+    position:relative;
+
+    z-index:50;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:space-between;
+
+    gap:24px;
+
+    padding:
+        0
+        30px;
+
+    background:#ffffff;
+
+    border-bottom:
+        1px solid
+        var(--spj-border);
+
+}
+
+
+#spj26res-submit-root .spj26res-header-left,
+#spj26res-submit-root .spj26res-header-right,
+#spj26res-submit-root .spj26res-user{
+
+    display:flex;
+
+    align-items:center;
+
+}
+
+
+#spj26res-submit-root .spj26res-header-left{
+
+    gap:14px;
+
+    min-width:0;
+
+}
+
+
+#spj26res-submit-root .spj26res-logo{
+
+    width:48px;
+
+    height:48px;
+
+    flex:
+        0
+        0
+        48px;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    border-radius:8px;
+
+    background:
+        var(--spj-maroon);
+
+    color:#ffffff;
+
+}
+
+
+#spj26res-submit-root
+.spj26res-logo
+.material-symbols-outlined{
+
+    font-size:25px;
+
+}
+
+
+#spj26res-submit-root .spj26res-brand{
+
+    min-width:0;
+
+}
+
+
+#spj26res-submit-root .spj26res-brand-row{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:10px;
+
+    min-width:0;
+
+}
+
+
+#spj26res-submit-root .spj26res-brand-name{
+
+    color:
+        var(--spj-maroon);
+
+    font-family:
+        "Plus Jakarta Sans",
+        sans-serif;
+
+    font-size:15px;
+
+    font-weight:800;
+
+    letter-spacing:-.02em;
+
+    white-space:nowrap;
+
+}
+
+
+#spj26res-submit-root .spj26res-brand-divider{
+
+    color:#cbd5e1;
+
+}
+
+
+#spj26res-submit-root .spj26res-brand-description{
+
+    min-width:0;
+
+    color:#6b5b58;
+
+    font-size:12px;
+
+    font-weight:500;
+
+    white-space:nowrap;
+
+    overflow:hidden;
+
+    text-overflow:ellipsis;
+
+}
+
+
+#spj26res-submit-root .spj26res-faculty{
+
+    margin-top:3px;
+
+    color:#695653;
+
+    font-family:
+        "JetBrains Mono",
+        monospace;
+
+    font-size:10px;
+
+    font-weight:600;
+
+    letter-spacing:.08em;
+
+    text-transform:uppercase;
+
+}
+
+
+#spj26res-submit-root .spj26res-user{
+
+    gap:10px;
+
+}
+
+
+#spj26res-submit-root .spj26res-user-text{
+
+    text-align:right;
+
+}
+
+
+#spj26res-submit-root .spj26res-user-name{
+
+    display:block;
+
+    color:#111827;
+
+    font-family:
+        "Plus Jakarta Sans",
+        sans-serif;
+
+    font-size:13px;
+
+    font-weight:700;
+
+}
+
+
+#spj26res-submit-root .spj26res-user-role{
+
+    display:block;
+
+    margin-top:2px;
+
+    color:
+        var(--spj-maroon);
+
+    font-size:10px;
+
+    font-weight:600;
+
+}
+
+
+#spj26res-submit-root .spj26res-avatar{
+
+    width:38px;
+
+    height:38px;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    border-radius:50%;
+
+    background:
+        var(--spj-maroon);
+
+    color:#ffffff;
+
+}
+
+
+#spj26res-submit-root .spj26res-mobile-menu{
+
+    display:none;
+
+}
+
+
+/* =========================================================
+   BODY
+========================================================= */
+
+#spj26res-submit-root .spj26res-body{
+
+    height:
+        calc(
+            100% - 76px
+        );
+
+    min-height:0;
+
+    display:grid;
+
+    grid-template-columns:
+        300px
+        minmax(0,1fr);
+
+    overflow:hidden;
+
+}
+
+
+/* =========================================================
+   SIDEBAR
+========================================================= */
+
+#spj26res-submit-root .spj26res-sidebar{
+
+    height:100%;
+
+    display:flex;
+
+    flex-direction:column;
+
+    justify-content:space-between;
+
+    padding:
+        18px
+        16px
+        14px;
+
+    background:#ffffff;
+
+    border-right:
+        1px solid
+        var(--spj-border);
+
+    overflow:hidden;
+
+}
+
+
+#spj26res-submit-root .spj26res-nav-title{
+
+    margin:
+        4px
+        8px
+        7px;
+
+    color:#6c5a57;
+
+    font-size:10px;
+
+    font-weight:700;
+
+    text-transform:uppercase;
+
+}
+
+
+#spj26res-submit-root .spj26res-nav{
+
+    display:flex;
+
+    flex-direction:column;
+
+    gap:5px;
+
+}
+
+
+#spj26res-submit-root .spj26res-nav-link{
+
+    width:100%;
+
+    min-height:42px;
+
+    display:flex;
+
+    align-items:center;
+
+    padding:
+        9px
+        13px;
+
+    border-radius:6px;
+
+    color:#5b4744;
+
+    font-size:13px;
+
+    font-weight:500;
+
+}
+
+
+#spj26res-submit-root .spj26res-nav-link:hover{
+
+    background:#f8fafc;
+
+}
+
+
+#spj26res-submit-root .spj26res-nav-link.active{
+
+    background:#a61f1f;
+
+    color:#ffffff;
+
+    font-weight:700;
+
+}
+
+
+#spj26res-submit-root .spj26res-nav-left{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:10px;
+
+}
+
+
+#spj26res-submit-root
+.spj26res-nav-link
+.material-symbols-outlined{
+
+    font-size:19px;
+
+}
+
+
+#spj26res-submit-root .spj26res-nav-alert{
+
+    display:inline-flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    width:10px;
+
+    height:10px;
+
+    border-radius:999px;
+
+    background:#6ff0aa;
+
+    box-shadow:
+        0
+        0
+        0
+        0
+        rgba(111,240,170,.72);
+
+    animation:
+        spj26resSubmitPulse
+        1.6s
+        infinite;
+
+    flex:
+        0
+        0
+        auto;
+
+}
+
+
+#spj26res-submit-root .spj26res-nav-alert[hidden]{
+
+    display:none;
+
+}
+
+
+@keyframes spj26resSubmitPulse{
+
+    0%{
+
+        box-shadow:
+            0
+            0
+            0
+            0
+            rgba(111,240,170,.72);
+
+    }
+
+
+    70%{
+
+        box-shadow:
+            0
+            0
+            0
+            10px
+            rgba(111,240,170,0);
+
+    }
+
+
+    100%{
+
+        box-shadow:
+            0
+            0
+            0
+            0
+            rgba(111,240,170,0);
+
+    }
+
+}
+
+
+#spj26res-submit-root .spj26res-nav-count{
+
+    min-width:20px;
+
+    height:20px;
+
+    padding:
+        0
+        6px;
+
+    display:inline-flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    border-radius:999px;
+
+    background:#edf2f7;
+
+    color:
+        var(--spj-maroon);
+
+    font-size:9px;
+
+    font-weight:800;
+
+    line-height:1;
+
+}
+
+
+#spj26res-submit-root .spj26res-nav-count[hidden]{
+
+    display:none;
+
+}
+
+
+#spj26res-submit-root .spj26res-nav-section-gap{
+
+    height:20px;
+
+}
+
+
+#spj26res-submit-root .spj26res-sidebar-info{
+
+    padding:
+        14px
+        15px;
+
+    border-radius:7px;
+
+    background:#f8fafc;
+
+}
+
+
+#spj26res-submit-root .spj26res-sidebar-info-title{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:7px;
+
+    color:
+        var(--spj-maroon);
+
+    font-size:10px;
+
+    font-weight:700;
+
+}
+
+
+#spj26res-submit-root .spj26res-version{
+
+    margin-top:6px;
+
+    color:#594b48;
+
+    font-family:
+        "JetBrains Mono",
+        monospace;
+
+    font-size:10px;
+
+}
+
+
+#spj26res-submit-root .spj26res-department{
+
+    margin-top:5px;
+
+    color:#665855;
+
+    font-size:10px;
+
+    line-height:1.45;
+
+}
+
+
+/* =========================================================
+   RIGHT PANE + STICKY-BOTTOM FOOTER
+========================================================= */
+
+#spj26res-submit-root .spj26res-rightpane{
+
+    width:100%;
+
+    height:100%;
+
+    min-width:0;
+
+    min-height:0;
+
+    display:flex;
+
+    flex-direction:column;
+
+    overflow-y:auto;
+
+    overflow-x:hidden;
+
+    overscroll-behavior:contain;
+
+}
+
+
+/* =========================================================
+   MAIN
+========================================================= */
+
+#spj26res-submit-root .spj26res-main{
+
+    width:100%;
+
+    min-width:0;
+
+    flex:
+        1
+        0
+        auto;
+
+    padding:
+        30px
+        34px
+        34px;
+
+    background:
+        var(--spj-bg);
+
+}
+
+
+#spj26res-submit-root .spj26res-content{
+
+    width:100%;
+
+    max-width:1040px;
+
+    margin:
+        0
+        auto;
+
+}
+
+
+#spj26res-submit-root .spj26res-page-head{
+
+    margin-bottom:20px;
+
+}
+
+
+#spj26res-submit-root .spj26res-page-head h1{
+
+    color:#111827;
+
+    font-family:
+        "Plus Jakarta Sans",
+        sans-serif;
+
+    font-size:24px;
+
+    font-weight:800;
+
+    line-height:1.3;
+
+    letter-spacing:-.02em;
+
+}
+
+
+#spj26res-submit-root .spj26res-page-head p{
+
+    margin-top:5px;
+
+    color:
+        var(--spj-text-muted);
+
+    font-size:12.5px;
+
+    line-height:1.55;
+
+}
+
+
+/* =========================================================
+   STEPPER
+========================================================= */
+
+#spj26res-submit-root .spj26res-stepper-card{
+
+    margin-bottom:18px;
+
+    padding:
+        24px
+        28px
+        22px;
+
+    background:#ffffff;
+
+    border:
+        1px solid
+        var(--spj-border);
+
+    border-radius:14px;
+
+    box-shadow:
+        0
+        2px
+        5px
+        rgba(15,23,42,.03);
+
+    overflow:hidden;
+
+}
+
+
+#spj26res-submit-root .spj26res-stepper{
+
+    position:relative;
+
+    max-width:850px;
+
+    margin:
+        0
+        auto;
+
+}
+
+
+#spj26res-submit-root .spj26res-step-track{
+
+    position:absolute;
+
+    top:20px;
+
+    left:10%;
+
+    right:10%;
+
+    height:2px;
+
+    background:#e2e8f0;
+
+}
+
+
+#spj26res-submit-root .spj26res-step-line-fill{
+
+    position:absolute;
+
+    top:20px;
+
+    left:10%;
+
+    width:0;
+
+    height:2px;
+
+    background:
+        var(--spj-green);
+
+    transition:
+        width .25s ease;
+
+}
+
+
+#spj26res-submit-root .spj26res-step-row{
+
+    position:relative;
+
+    z-index:2;
+
+    display:flex;
+
+    justify-content:space-between;
+
+}
+
+
+#spj26res-submit-root .spj26res-step{
+
+    width:20%;
+
+    display:flex;
+
+    flex-direction:column;
+
+    align-items:center;
+
+    text-align:center;
+
+}
+
+
+#spj26res-submit-root .spj26res-step-circle{
+
+    width:40px;
+
+    height:40px;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    background:#ffffff;
+
+    border:
+        2px solid
+        #cbd5e1;
+
+    border-radius:11px;
+
+    color:#94a3b8;
+
+    box-shadow:
+        0
+        0
+        0
+        4px
+        #ffffff;
+
+}
+
+
+#spj26res-submit-root
+.spj26res-step-circle
+.material-symbols-outlined{
+
+    font-size:19px;
+
+}
+
+
+#spj26res-submit-root .spj26res-step-label{
+
+    margin-top:9px;
+
+    color:#64748b;
+
+    font-size:11px;
+
+    font-weight:600;
+
+    line-height:1.3;
+
+}
+
+
+#spj26res-submit-root
+.spj26res-step.is-complete
+.spj26res-step-circle{
+
+    background:
+        var(--spj-green);
+
+    border-color:
+        var(--spj-green);
+
+    color:#ffffff;
+
+}
+
+
+#spj26res-submit-root
+.spj26res-step.is-active
+.spj26res-step-circle{
+
+    background:
+        var(--spj-maroon-medium);
+
+    border-color:
+        var(--spj-maroon-medium);
+
+    color:#ffffff;
+
+    box-shadow:
+        0
+        0
+        0
+        4px
+        #fbe6e6;
+
+}
+
+
+#spj26res-submit-root
+.spj26res-step.is-active
+.spj26res-step-label{
+
+    color:#111827;
+
+    font-weight:800;
+
+}
+
+
+/* =========================================================
+   FORM CARD
+========================================================= */
+
+#spj26res-submit-root .spj26res-form-card{
+
+    padding:
+        28px
+        30px;
+
+    background:#ffffff;
+
+    border:
+        1px solid
+        var(--spj-border);
+
+    border-radius:14px;
+
+    box-shadow:
+        0
+        2px
+        6px
+        rgba(15,23,42,.035);
+
+}
+
+
+#spj26res-submit-root .spj26res-step-panel{
+
+    display:none;
+
+}
+
+
+#spj26res-submit-root
+.spj26res-step-panel.is-active{
+
+    display:block;
+
+}
+
+
+#spj26res-submit-root .spj26res-section-head{
+
+    margin-bottom:22px;
+
+    padding-bottom:18px;
+
+    border-bottom:
+        1px solid
+        #f1f5f9;
+
+}
+
+
+#spj26res-submit-root .spj26res-section-kicker{
+
+    display:block;
+
+    margin-bottom:5px;
+
+    color:
+        var(--spj-maroon-medium);
+
+    font-size:10px;
+
+    font-weight:800;
+
+    letter-spacing:.07em;
+
+    text-transform:uppercase;
+
+}
+
+
+#spj26res-submit-root .spj26res-section-head h2{
+
+    color:#111827;
+
+    font-family:
+        "Plus Jakarta Sans",
+        sans-serif;
+
+    font-size:19px;
+
+    font-weight:800;
+
+    line-height:1.3;
+
+}
+
+
+#spj26res-submit-root .spj26res-section-head p{
+
+    margin-top:5px;
+
+    color:#64748b;
+
+    font-size:12px;
+
+    line-height:1.55;
+
+}
+
+
+/* =========================================================
+   FIELDS
+========================================================= */
+
+#spj26res-submit-root .spj26res-field{
+
+    margin-bottom:20px;
+
+}
+
+
+#spj26res-submit-root .spj26res-label-row{
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:space-between;
+
+    gap:12px;
+
+    margin-bottom:7px;
+
+}
+
+
+#spj26res-submit-root .spj26res-label{
+
+    display:block;
+
+    margin-bottom:7px;
+
+    color:#334155;
+
+    font-size:11.5px;
+
+    font-weight:700;
+
+}
+
+
+#spj26res-submit-root .spj26res-required{
+
+    color:
+        var(--spj-maroon-medium);
+
+}
+
+
+#spj26res-submit-root .spj26res-field-note{
+
+    color:#94a3b8;
+
+    font-size:10px;
+
+}
+
+
+#spj26res-submit-root .spj26res-input,
+#spj26res-submit-root .spj26res-select,
+#spj26res-submit-root .spj26res-textarea{
+
+    width:100%;
+
+    color:#1e293b;
+
+    background:#ffffff;
+
+    border:
+        1px solid
+        var(--spj-border-strong);
+
+    border-radius:8px;
+
+    outline:none;
+
+    font-size:12.5px;
+
+}
+
+
+#spj26res-submit-root .spj26res-input,
+#spj26res-submit-root .spj26res-select{
+
+    min-height:44px;
+
+    padding:
+        10px
+        12px;
+
+}
+
+
+#spj26res-submit-root .spj26res-textarea{
+
+    min-height:180px;
+
+    padding:13px;
+
+    resize:vertical;
+
+    line-height:1.62;
+
+}
+
+
+#spj26res-submit-root .spj26res-input:focus,
+#spj26res-submit-root .spj26res-select:focus,
+#spj26res-submit-root .spj26res-textarea:focus{
+
+    border-color:
+        var(--spj-maroon-medium);
+
+    box-shadow:
+        0
+        0
+        0
+        3px
+        rgba(139,30,30,.09);
+
+}
+
+
+#spj26res-submit-root .spj26res-help{
+
+    margin-top:6px;
+
+    color:#64748b;
+
+    font-size:10.5px;
+
+    line-height:1.5;
+
+}
+
+
+#spj26res-submit-root .spj26res-counter{
+
+    display:flex;
+
+    justify-content:flex-end;
+
+    margin-top:6px;
+
+    color:#94a3b8;
+
+    font-family:
+        "JetBrains Mono",
+        monospace;
+
+    font-size:10px;
+
+}
+
+
+#spj26res-submit-root .spj26res-grid-3{
+
+    display:grid;
+
+    grid-template-columns:
+        2fr
+        1fr
+        1fr;
+
+    gap:12px;
+
+}
+
+
+/* =========================================================
+   ARTICLE TYPE CARDS
+========================================================= */
+
+#spj26res-submit-root .spj26res-type-grid{
+
+    display:grid;
+
+    grid-template-columns:
+        repeat(
+            2,
+            minmax(0,1fr)
+        );
+
+    gap:16px;
+
+}
+
+
+#spj26res-submit-root .spj26res-type-option{
+
+    position:relative;
+
+    display:block;
+
+    min-width:0;
+
+    cursor:pointer;
+
+}
+
+
+#spj26res-submit-root
+.spj26res-type-option
+input{
+
+    position:absolute;
+
+    width:1px;
+
+    height:1px;
+
+    opacity:0;
+
+    pointer-events:none;
+
+}
+
+
+#spj26res-submit-root .spj26res-type-card{
+
+    position:relative;
+
+    width:100%;
+
+    height:100%;
+
+    min-height:165px;
+
+    display:flex;
+
+    flex-direction:column;
+
+    align-items:flex-start;
+
+    padding:
+        21px
+        20px
+        20px;
+
+    background:#ffffff;
+
+    border:
+        1.5px solid
+        var(--spj-border);
+
+    border-radius:12px;
+
+    transition:
+        border-color .18s ease,
+        background-color .18s ease,
+        box-shadow .18s ease,
+        transform .18s ease;
+
+}
+
+
+#spj26res-submit-root
+.spj26res-type-option:hover
+.spj26res-type-card{
+
+    background:#fffafa;
+
+    border-color:#d6a9ad;
+
+    transform:
+        translateY(-1px);
+
+}
+
+
+#spj26res-submit-root
+.spj26res-type-option
+input:checked
++
+.spj26res-type-card{
+
+    background:#fff7f7;
+
+    border-color:
+        var(--spj-maroon-medium);
+
+    box-shadow:
+        0
+        0
+        0
+        3px
+        rgba(139,30,30,.07);
+
+}
+
+
+/* =========================================================
+   ARTICLE TYPE CHECK
+========================================================= */
+
+#spj26res-submit-root .spj26res-type-check{
+
+    position:absolute;
+
+    top:16px;
+
+    right:16px;
+
+    width:26px;
+
+    height:26px;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    background:#ffffff;
+
+    border:
+        1.5px solid
+        #cbd5e1;
+
+    border-radius:50%;
+
+    color:transparent;
+
+}
+
+
+#spj26res-submit-root
+.spj26res-type-check
+.material-symbols-outlined{
+
+    font-size:16px;
+
+}
+
+
+#spj26res-submit-root
+.spj26res-type-option
+input:checked
++
+.spj26res-type-card
+.spj26res-type-check{
+
+    background:
+        var(--spj-maroon-medium);
+
+    border-color:
+        var(--spj-maroon-medium);
+
+    color:#ffffff;
+
+}
+
+
+/* =========================================================
+   ARTICLE TYPE ICON
+========================================================= */
+
+#spj26res-submit-root .spj26res-type-icon-wrap{
+
+    width:46px;
+
+    height:46px;
+
+    flex:
+        0
+        0
+        46px;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    border-radius:11px;
+
+    background:#f8eeee;
+
+    color:
+        var(--spj-maroon-medium);
+
+}
+
+
+#spj26res-submit-root
+.spj26res-type-icon-wrap
+.material-symbols-outlined{
+
+    font-size:24px;
+
+}
+
+
+#spj26res-submit-root
+.spj26res-type-option
+input:checked
++
+.spj26res-type-card
+.spj26res-type-icon-wrap{
+
+    background:
+        var(--spj-maroon-medium);
+
+    color:#ffffff;
+
+}
+
+
+/* =========================================================
+   ARTICLE TYPE TEXT
+   IMPORTANT:
+   Strong rules prevent Elementor/Astra/Safari override.
+========================================================= */
+
+#spj26res-submit-root
+.spj26res-type-grid
+.spj26res-type-option
+.spj26res-type-card
+.spj26res-type-content{
+
+    width:100%;
+
+    min-width:0;
+
+    margin-top:16px;
+
+    color:#1f2937 !important;
+
+    -webkit-text-fill-color:#1f2937 !important;
+
+}
+
+
+#spj26res-submit-root
+.spj26res-type-grid
+.spj26res-type-option
+.spj26res-type-card
+.spj26res-type-content
+.spj26res-type-name{
+
+    display:block !important;
+
+    padding-right:34px;
+
+    color:#1f2937 !important;
+
+    -webkit-text-fill-color:#1f2937 !important;
+
+    opacity:1 !important;
+
+    visibility:visible !important;
+
+    font-family:
+        "Plus Jakarta Sans",
+        sans-serif !important;
+
+    font-size:13.5px !important;
+
+    font-weight:800 !important;
+
+    line-height:1.4 !important;
+
+}
+
+
+#spj26res-submit-root
+.spj26res-type-grid
+.spj26res-type-option
+.spj26res-type-card
+.spj26res-type-content
+.spj26res-type-desc{
+
+    display:block !important;
+
+    margin-top:7px;
+
+    color:#64748b !important;
+
+    -webkit-text-fill-color:#64748b !important;
+
+    opacity:1 !important;
+
+    font-size:10.8px !important;
+
+    font-weight:400 !important;
+
+    line-height:1.55 !important;
+
+}
+
+
+#spj26res-submit-root
+.spj26res-type-grid
+.spj26res-type-option
+input:checked
++
+.spj26res-type-card
+.spj26res-type-content
+.spj26res-type-name{
+
+    color:#5c0000 !important;
+
+    -webkit-text-fill-color:#5c0000 !important;
+
+}
+
+
+#spj26res-submit-root
+.spj26res-type-grid
+.spj26res-type-option:hover
+.spj26res-type-card
+.spj26res-type-content
+.spj26res-type-name{
+
+    color:#5c0000 !important;
+
+    -webkit-text-fill-color:#5c0000 !important;
+
+}
+
+
+/* =========================================================
+   JOURNAL CARDS
+========================================================= */
+
+#spj26res-submit-root .spj26res-journal-list{
+
+    display:flex;
+
+    flex-direction:column;
+
+    gap:13px;
+
+}
+
+
+#spj26res-submit-root .spj26res-journal-card{
+
+    padding:16px;
+
+    background:#ffffff;
+
+    border:
+        1px solid
+        var(--spj-border);
+
+    border-radius:11px;
+
+}
+
+
+#spj26res-submit-root .spj26res-journal-head{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:8px;
+
+    margin-bottom:14px;
+
+}
+
+
+#spj26res-submit-root .spj26res-journal-number{
+
+    width:22px;
+
+    height:22px;
+
+    flex:
+        0
+        0
+        22px;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    border-radius:50%;
+
+    background:#111827;
+
+    color:#ffffff;
+
+    font-size:10px;
+
+    font-weight:800;
+
+}
+
+
+#spj26res-submit-root .spj26res-journal-title{
+
+    color:#334155;
+
+    font-size:11.5px;
+
+    font-weight:800;
+
+}
+
+
+#spj26res-submit-root .spj26res-journal-link-field{
+
+    margin-top:14px;
+
+    padding-top:14px;
+
+    border-top:
+        1px solid
+        #f1f5f9;
+
+}
+
+
+#spj26res-submit-root .spj26res-url-input-wrap{
+
+    position:relative;
+
+}
+
+
+#spj26res-submit-root
+.spj26res-url-input-wrap
+.material-symbols-outlined{
+
+    position:absolute;
+
+    top:50%;
+
+    left:12px;
+
+    transform:
+        translateY(-50%);
+
+    color:#94a3b8;
+
+    font-size:18px;
+
+    pointer-events:none;
+
+}
+
+
+#spj26res-submit-root
+.spj26res-url-input-wrap
+.spj26res-input{
+
+    padding-left:39px;
+
+}
+
+
+/* =========================================================
+   INFO BOXES
+========================================================= */
+
+#spj26res-submit-root .spj26res-info-box,
+#spj26res-submit-root .spj26res-neutral-box{
+
+    margin-top:18px;
+
+    padding:
+        13px
+        14px;
+
+    display:flex;
+
+    align-items:flex-start;
+
+    gap:10px;
+
+    border-radius:10px;
+
+}
+
+
+#spj26res-submit-root .spj26res-info-box{
+
+    background:#fffbeb;
+
+    border:
+        1px solid
+        #fde68a;
+
+}
+
+
+#spj26res-submit-root .spj26res-neutral-box{
+
+    background:#f8fafc;
+
+    border:
+        1px solid
+        var(--spj-border);
+
+}
+
+
+#spj26res-submit-root .spj26res-info-title{
+
+    color:#92400e;
+
+    font-size:11px;
+
+    font-weight:800;
+
+}
+
+
+#spj26res-submit-root .spj26res-info-text{
+
+    margin-top:3px;
+
+    color:#92400e;
+
+    font-size:10.5px;
+
+    line-height:1.5;
+
+}
+
+
+/* =========================================================
+   ERROR / SUCCESS
+========================================================= */
+
+#spj26res-submit-root .spj26res-error-box{
+
+    display:none;
+
+    margin-bottom:18px;
+
+    padding:
+        11px
+        13px;
+
+    background:
+        var(--spj-danger-bg);
+
+    border:
+        1px solid
+        #fecaca;
+
+    border-radius:8px;
+
+    color:
+        var(--spj-danger);
+
+    font-size:10.5px;
+
+    line-height:1.5;
+
+}
+
+
+#spj26res-submit-root
+.spj26res-error-box.is-visible{
+
+    display:block;
+
+}
+
+
+#spj26res-submit-root .spj26res-success-box{
+
+    display:none;
+
+    margin-bottom:18px;
+
+    padding:
+        13px
+        14px;
+
+    background:#ecfdf5;
+
+    border:
+        1px solid
+        #a7f3d0;
+
+    border-radius:9px;
+
+    color:#047857;
+
+    font-size:10.8px;
+
+    line-height:1.55;
+
+}
+
+
+#spj26res-submit-root
+.spj26res-success-box.is-visible{
+
+    display:block;
+
+}
+
+
+#spj26res-submit-root .spj26res-success-code{
+
+    margin-top:5px;
+
+    font-family:
+        "JetBrains Mono",
+        monospace;
+
+    font-weight:700;
+
+}
+
+
+/* =========================================================
+   ACTIONS
+========================================================= */
+
+#spj26res-submit-root .spj26res-actions{
+
+    margin-top:24px;
+
+    padding-top:20px;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:space-between;
+
+    gap:12px;
+
+    border-top:
+        1px solid
+        #f1f5f9;
+
+}
+
+
+#spj26res-submit-root .spj26res-btn{
+
+    min-height:42px;
+
+    display:inline-flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    gap:7px;
+
+    padding:
+        10px
+        17px;
+
+    border:
+        1px solid
+        transparent;
+
+    border-radius:8px;
+
+    font-size:11.5px;
+
+    font-weight:700;
+
+    cursor:pointer;
+
+}
+
+
+#spj26res-submit-root .spj26res-btn-secondary{
+
+    background:#ffffff;
+
+    border-color:#cbd5e1;
+
+    color:#475569;
+
+}
+
+
+#spj26res-submit-root .spj26res-btn-primary{
+
+    background:
+        var(--spj-maroon-medium);
+
+    color:#ffffff;
+
+}
+
+
+#spj26res-submit-root
+.spj26res-btn-primary:hover{
+
+    background:
+        var(--spj-maroon-dark);
+
+}
+
+
+#spj26res-submit-root .spj26res-btn:disabled{
+
+    opacity:.55;
+
+    cursor:not-allowed;
+
+}
+
+
+/* =========================================================
+   FINAL SUMMARY
+========================================================= */
+
+#spj26res-submit-root .spj26res-summary-list{
+
+    display:flex;
+
+    flex-direction:column;
+
+    gap:13px;
+
+}
+
+
+#spj26res-submit-root .spj26res-summary-card{
+
+    padding:16px;
+
+    background:#ffffff;
+
+    border:
+        1px solid
+        var(--spj-border);
+
+    border-radius:11px;
+
+}
+
+
+#spj26res-submit-root .spj26res-summary-card h3{
+
+    margin-bottom:11px;
+
+    padding-bottom:10px;
+
+    color:#334155;
+
+    border-bottom:
+        1px solid
+        #f1f5f9;
+
+    font-size:11.5px;
+
+    font-weight:800;
+
+}
+
+
+#spj26res-submit-root .spj26res-summary-label{
+
+    display:block;
+
+    color:#94a3b8;
+
+    font-size:9.5px;
+
+    font-weight:700;
+
+    letter-spacing:.04em;
+
+    text-transform:uppercase;
+
+}
+
+
+#spj26res-submit-root .spj26res-summary-value{
+
+    margin-top:4px;
+
+    color:#1e293b;
+
+    font-size:11.5px;
+
+    font-weight:600;
+
+    line-height:1.55;
+
+    overflow-wrap:anywhere;
+
+}
+
+
+#spj26res-submit-root .spj26res-summary-text{
+
+    margin-top:5px;
+
+    padding:
+        10px
+        11px;
+
+    background:#f8fafc;
+
+    border:
+        1px solid
+        var(--spj-border);
+
+    border-radius:8px;
+
+    color:#475569;
+
+    font-size:10.5px;
+
+    line-height:1.58;
+
+    white-space:pre-line;
+
+}
+
+
+#spj26res-submit-root .spj26res-summary-section-gap{
+
+    margin-top:14px;
+
+}
+
+
+#spj26res-submit-root .spj26res-summary-journals{
+
+    display:flex;
+
+    flex-direction:column;
+
+    gap:9px;
+
+}
+
+
+#spj26res-submit-root .spj26res-summary-journal{
+
+    display:flex;
+
+    align-items:flex-start;
+
+    gap:9px;
+
+    padding:
+        11px
+        12px;
+
+    background:#f8fafc;
+
+    border:
+        1px solid
+        var(--spj-border);
+
+    border-radius:9px;
+
+}
+
+
+#spj26res-submit-root .spj26res-summary-badge{
+
+    width:22px;
+
+    height:22px;
+
+    flex:
+        0
+        0
+        22px;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    background:
+        var(--spj-maroon-medium);
+
+    border-radius:50%;
+
+    color:#ffffff;
+
+    font-size:9px;
+
+    font-weight:800;
+
+}
+
+
+#spj26res-submit-root .spj26res-summary-journal-info{
+
+    min-width:0;
+
+    flex:1;
+
+}
+
+
+#spj26res-submit-root .spj26res-summary-journal-name{
+
+    color:#1e293b;
+
+    font-size:11px;
+
+    font-weight:800;
+
+}
+
+
+#spj26res-submit-root .spj26res-summary-journal-meta{
+
+    margin-top:3px;
+
+    color:#64748b;
+
+    font-family:
+        "JetBrains Mono",
+        monospace;
+
+    font-size:9.5px;
+
+}
+
+
+#spj26res-submit-root .spj26res-summary-journal-link{
+
+    display:inline-flex;
+
+    align-items:center;
+
+    gap:4px;
+
+    margin-top:6px;
+
+    color:
+        var(--spj-maroon-medium);
+
+    font-size:10px;
+
+    font-weight:700;
+
+    word-break:break-all;
+
+}
+
+
+#spj26res-submit-root
+.spj26res-summary-journal-link:hover{
+
+    text-decoration:underline;
+
+}
+
+
+/* =========================================================
+   FOOTER
+========================================================= */
+
+#spj26res-submit-root .spj26res-footer{
+
+    width:100%;
+
+    min-height:58px;
+
+    flex:
+        0
+        0
+        auto;
+
+    margin-top:auto;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:space-between;
+
+    gap:20px;
+
+    padding:
+        0
+        28px;
+
+    background:#ffffff;
+
+    border-top:
+        1px solid
+        var(--spj-border);
+
+}
+
+
+#spj26res-submit-root .spj26res-footer-left{
+
+    min-width:0;
+
+    display:flex;
+
+    align-items:center;
+
+    gap:8px;
+
+    color:#6b5b58;
+
+    font-size:10px;
+
+    line-height:1.45;
+
+}
+
+
+#spj26res-submit-root .spj26res-footer-brand{
+
+    color:
+        var(--spj-maroon);
+
+    font-weight:800;
+
+}
+
+
+#spj26res-submit-root .spj26res-footer-right{
+
+    flex:
+        0
+        0
+        auto;
+
+    color:#625451;
+
+    font-family:
+        "JetBrains Mono",
+        monospace;
+
+    font-size:9px;
+
+    text-align:right;
+
+    white-space:nowrap;
+
+}
+
+
+/* =========================================================
+   OVERLAY
+========================================================= */
+
+#spj26res-submit-root .spj26res-overlay{
+
+    display:none;
+
+}
+
+
+/* =========================================================
+   ≤ 1050 PX
+========================================================= */
+
+@media(max-width:1050px){
+
+    #spj26res-submit-root .spj26res-body{
+
+        grid-template-columns:
+            240px
+            minmax(0,1fr);
+
+    }
+
+
+    #spj26res-submit-root .spj26res-brand-divider,
+    #spj26res-submit-root .spj26res-brand-description{
+
+        display:none;
+
+    }
+
+
+    #spj26res-submit-root .spj26res-main{
+
+        padding:
+            26px
+            24px
+            30px;
+
+    }
+
+}
+
+
+/* =========================================================
+   TABLET / MOBILE ≤ 800 PX
+========================================================= */
+
+@media(max-width:800px){
+
+    html.spj26res-page-lock,
+    body.spj26res-page-lock{
+
+        height:auto !important;
+
+        min-height:100% !important;
+
+        overflow-x:hidden !important;
+
+        overflow-y:auto !important;
+
+    }
+
+
+    #spj26res-submit-root{
+
+        height:auto;
+
+        min-height:100vh;
+
+        min-height:100dvh;
+
+        overflow:visible;
+
+    }
+
+
+    #spj26res-submit-root .spj26res-header{
+
+        height:64px;
+
+        min-height:64px;
+
+        padding:
+            8px
+            14px;
+
+    }
+
+
+    #spj26res-submit-root .spj26res-mobile-menu{
+
+        width:38px;
+
+        height:38px;
+
+        flex:
+            0
+            0
+            38px;
+
+        display:flex;
+
+        align-items:center;
+
+        justify-content:center;
+
+        background:#ffffff;
+
+        border:
+            1px solid
+            var(--spj-border);
+
+        border-radius:7px;
+
+        color:
+            var(--spj-maroon);
+
+        cursor:pointer;
+
+    }
+
+
+    #spj26res-submit-root .spj26res-logo{
+
+        width:38px;
+
+        height:38px;
+
+        flex-basis:38px;
+
+    }
+
+
+    #spj26res-submit-root .spj26res-brand-name{
+
+        font-size:11px;
+
+    }
+
+
+    #spj26res-submit-root .spj26res-faculty,
+    #spj26res-submit-root .spj26res-user-text{
+
+        display:none;
+
+    }
+
+
+    #spj26res-submit-root .spj26res-body{
+
+        display:block;
+
+        height:auto;
+
+        min-height:
+            calc(
+                100dvh - 64px
+            );
+
+        overflow:visible;
+
+    }
+
+
+    #spj26res-submit-root .spj26res-rightpane{
+
+        height:auto;
+
+        min-height:
+            calc(
+                100dvh - 64px
+            );
+
+        display:flex;
+
+        flex-direction:column;
+
+        overflow:visible;
+
+    }
+
+
+    #spj26res-submit-root .spj26res-sidebar{
+
+        position:fixed;
+
+        top:0;
+
+        left:0;
+
+        width:270px;
+
+        height:100vh;
+
+        height:100dvh;
+
+        z-index:100;
+
+        overflow-y:auto;
+
+        transform:
+            translateX(-102%);
+
+        transition:
+            transform .22s ease;
+
+        box-shadow:
+            8px
+            0
+            24px
+            rgba(15,23,42,.14);
+
+    }
+
+
+    #spj26res-submit-root
+    .spj26res-sidebar.open{
+
+        transform:
+            translateX(0);
+
+    }
+
+
+    #spj26res-submit-root .spj26res-overlay{
+
+        position:fixed;
+
+        inset:0;
+
+        z-index:90;
+
+        background:
+            rgba(15,23,42,.4);
+
+    }
+
+
+    #spj26res-submit-root
+    .spj26res-overlay.open{
+
+        display:block;
+
+    }
+
+
+    #spj26res-submit-root .spj26res-main{
+
+        flex:
+            1
+            0
+            auto;
+
+        padding:
+            18px
+            14px
+            24px;
+
+    }
+
+
+    #spj26res-submit-root .spj26res-page-head h1{
+
+        font-size:20px;
+
+    }
+
+
+    #spj26res-submit-root .spj26res-stepper-card{
+
+        padding:
+            20px
+            9px
+            18px;
+
+        overflow-x:auto;
+
+    }
+
+
+    #spj26res-submit-root .spj26res-stepper{
+
+        min-width:600px;
+
+    }
+
+
+    #spj26res-submit-root .spj26res-form-card{
+
+        padding:
+            21px
+            17px;
+
+    }
+
+
+    #spj26res-submit-root .spj26res-grid-3{
+
+        grid-template-columns:1fr;
+
+    }
+
+
+    #spj26res-submit-root .spj26res-actions{
+
+        flex-direction:column-reverse;
+
+        align-items:stretch;
+
+    }
+
+
+    #spj26res-submit-root .spj26res-btn{
+
+        width:100%;
+
+    }
+
+
+    #spj26res-submit-root .spj26res-footer{
+
+        min-height:auto;
+
+        padding:
+            14px
+            16px;
+
+        flex-direction:column;
+
+        align-items:flex-start;
+
+        justify-content:center;
+
+        gap:5px;
+
+    }
+
+
+    #spj26res-submit-root .spj26res-footer-left{
+
+        width:100%;
+
+        flex-wrap:wrap;
+
+    }
+
+
+    #spj26res-submit-root .spj26res-footer-right{
+
+        width:100%;
+
+        text-align:left;
+
+        white-space:normal;
+
+    }
+
+}
+
+
+/* =========================================================
+   MOBILE ≤ 600 PX
+========================================================= */
+
+@media(max-width:600px){
+
+    #spj26res-submit-root .spj26res-type-grid{
+
+        grid-template-columns:1fr;
+
+        gap:11px;
+
+    }
+
+
+    #spj26res-submit-root .spj26res-type-card{
+
+        min-height:0;
+
+        padding:
+            17px
+            52px
+            17px
+            17px;
+
+    }
+
+
+    #spj26res-submit-root
+    .spj26res-type-grid
+    .spj26res-type-option
+    .spj26res-type-card
+    .spj26res-type-content
+    .spj26res-type-name{
+
+        color:#1f2937 !important;
+
+        -webkit-text-fill-color:#1f2937 !important;
+
+        font-size:12px !important;
+
+    }
+
+
+    #spj26res-submit-root
+    .spj26res-type-grid
+    .spj26res-type-option
+    input:checked
+    +
+    .spj26res-type-card
+    .spj26res-type-content
+    .spj26res-type-name{
+
+        color:#5c0000 !important;
+
+        -webkit-text-fill-color:#5c0000 !important;
+
+    }
+
+}
+
+
+/* =========================================================
+   SMALL MOBILE ≤ 480 PX
+========================================================= */
+
+@media(max-width:480px){
+
+    #spj26res-submit-root .spj26res-footer{
+
+        padding:
+            13px
+            12px;
+
+    }
+
+
+    #spj26res-submit-root .spj26res-footer-left{
+
+        display:grid;
+
+        grid-template-columns:
+            auto
+            1fr;
+
+        column-gap:6px;
+
+        row-gap:3px;
+
+    }
+
+
+    #spj26res-submit-root
+    .spj26res-footer-left
+    > span:nth-child(2){
+
+        display:none;
+
+    }
+
+
+    #spj26res-submit-root
+    .spj26res-footer-left
+    > span:last-child{
+
+        grid-column:
+            1 / -1;
+
+    }
+
+
+    #spj26res-submit-root .spj26res-footer-right{
+
+        font-size:8px;
+
+    }
+
+}
+
+
+
+/* =========================================================
+   SIDEBAR NOTIFICATION - REFINED
+   Dot indikator ditempelkan ke badge angka agar tidak
+   mengganggu alignment teks menu.
+========================================================= */
+#spj26res-submit-root .spj26res-nav-link > .spj26res-nav-left:first-child {
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+#spj26res-submit-root .spj26res-nav-notification {
+    position: relative;
+    margin-left: auto;
+    min-width: 24px;
+    min-height: 24px;
+    flex: 0 0 auto;
+    display: inline-flex;
+    align-items: center;
+    justify-content: flex-end;
+    padding-left: 10px;
+}
+
+#spj26res-submit-root .spj26res-nav-notification .spj26res-nav-count {
+    min-width: 24px;
+    height: 24px;
+    padding: 0 7px;
+    font-size: 10px;
+    line-height: 1;
+}
+
+#spj26res-submit-root .spj26res-nav-notification .spj26res-nav-alert {
+    position: absolute;
+    top: -2px;
+    right: -2px;
+    width: 8px;
+    height: 8px;
+    z-index: 2;
+    background: #4ade80;
+    border: 2px solid #ffffff;
+    box-shadow: 0 0 0 0 rgba(74, 222, 128, 0.55);
+    animation: spj26resSubmitPulse 1.8s infinite;
+}
+
+#spj26res-submit-root .spj26res-nav-link.active .spj26res-nav-notification .spj26res-nav-alert {
+    border-color: #8f1919;
+}
+
+@media (max-width: 800px) {
+    #spj26res-submit-root .spj26res-nav-notification {
+        padding-left: 8px;
+    }
+}
+
+/* =========================================================
+   SIDEBAR HASIL PEMERIKSAAN - PAGE BUAT PENGAJUAN
+   Paksa area label dan notifikasi menjadi dua kolom terpisah.
+========================================================= */
+#spj26res-submit-root #spj26res-submit-results-nav {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    column-gap: 16px;
+    width: 100%;
+}
+
+#spj26res-submit-root #spj26res-submit-results-nav > .spj26res-nav-left {
+    min-width: 0;
+    width: 100%;
+    flex: none;
+}
+
+#spj26res-submit-root #spj26res-submit-results-nav > .spj26res-nav-left > span:last-child {
+    min-width: 0;
+    white-space: nowrap;
+}
+
+#spj26res-submit-root #spj26res-submit-results-nav > .spj26res-nav-notification {
+    position: relative;
+    justify-self: end;
+    margin-left: 0;
+    padding-left: 0;
+    width: auto;
+    min-width: 28px;
+    min-height: 28px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#spj26res-submit-root #spj26res-submit-results-nav .spj26res-nav-count {
+    min-width: 26px;
+    height: 26px;
+    padding: 0 8px;
+}
+
+#spj26res-submit-root #spj26res-submit-results-nav .spj26res-nav-alert {
+    top: -1px;
+    right: -3px;
+}
+
+@media (max-width: 800px) {
+    #spj26res-submit-root #spj26res-submit-results-nav {
+        column-gap: 12px;
+    }
+}
+
+
+
+/* =========================================================
+   SIDEBAR GLOBAL SYNC v3
+   Canonical sidebar untuk Dashboard, Buat Pengajuan, dan
+   Hasil Pemeriksaan. Menyamakan ukuran, spacing, active state,
+   dan posisi notifikasi Hasil Pemeriksaan.
+========================================================= */
+#spj26res-submit-root .spj26res-nav-link {
+    min-height: 42px;
+    padding: 9px 13px;
+    border-radius: 8px;
+    color: #5b4744;
+    font-size: 13px;
+    font-weight: 500;
+}
+
+#spj26res-submit-root .spj26res-nav-link.active {
+    background: #8f1919;
+    color: #ffffff;
+    font-weight: 700;
+}
+
+#spj26res-submit-root .spj26res-nav-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+}
+
+#spj26res-submit-root .spj26res-nav-link .material-symbols-outlined {
+    font-size: 19px;
+    flex: 0 0 auto;
+}
+
+/* Hasil Pemeriksaan: label kiri, notification kanan. */
+#spj26res-submit-root #spj26res-submit-results-nav {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    column-gap: 16px;
+    width: 100%;
+}
+
+#spj26res-submit-root #spj26res-submit-results-nav > .spj26res-nav-left {
+    width: 100%;
+    min-width: 0;
+    flex: none;
+}
+
+#spj26res-submit-root #spj26res-submit-results-nav > .spj26res-nav-left > span:last-child {
+    min-width: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+#spj26res-submit-root #spj26res-submit-results-nav > .spj26res-nav-notification {
+    position: relative;
+    justify-self: end;
+    width: auto;
+    min-width: 28px;
+    min-height: 28px;
+    margin-left: 0;
+    padding-left: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 auto;
+}
+
+#spj26res-submit-root #spj26res-submit-results-nav .spj26res-nav-count {
+    min-width: 26px;
+    height: 26px;
+    padding: 0 8px;
+    border-radius: 999px;
+    background: #edf2f7;
+    color: #8f1919;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    font-weight: 800;
+    line-height: 1;
+}
+
+#spj26res-submit-root #spj26res-submit-results-nav.active .spj26res-nav-count {
+    background: rgba(255,255,255,0.18);
+    color: #ffffff;
+}
+
+#spj26res-submit-root #spj26res-submit-results-nav .spj26res-nav-alert {
+    position: absolute;
+    top: -1px;
+    right: -3px;
+    width: 8px;
+    height: 8px;
+    z-index: 2;
+    border-radius: 999px;
+    background: #4ade80;
+    border: 2px solid #ffffff;
+    box-shadow: 0 0 0 0 rgba(74, 222, 128, 0.55);
+}
+
+#spj26res-submit-root #spj26res-submit-results-nav.active .spj26res-nav-alert {
+    border-color: #8f1919;
+}
+
+#spj26res-submit-root #spj26res-submit-results-nav .spj26res-nav-count[hidden],
+#spj26res-submit-root #spj26res-submit-results-nav .spj26res-nav-alert[hidden] {
+    display: none !important;
+}
+
+@media (max-width: 800px) {
+    #spj26res-submit-root #spj26res-submit-results-nav {
+        column-gap: 12px;
+    }
+}
+
+
+
+/* =========================================================
+   TRUE FULLPAGE UI SYNC v6B — VIEWPORT SHELL
+   Dashboard / Buat Pengajuan / Hasil Pemeriksaan
+   ========================================================= */
+#spj26res-submit-root {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    margin: 0 !important;
+    padding: 0 !important;
+    --spj-maroon: #800000;
+    --spj-maroon-dark: #5c0000;
+    --spj-maroon-medium: #8f1919;
+    --spj-bg: #f5f7fb;
+    --spj-border: #e2e8f0;
+    width: 100vw;
+    max-width: none;
+    height: 100vh;
+    height: 100dvh;
+    min-height: 0;
+    overflow: hidden;
+    background: var(--spj-bg);
+}
+
+body.spj26res-page-lock #page,
+body.spj26res-page-lock .site,
+body.spj26res-page-lock .site-content,
+body.spj26res-page-lock .elementor,
+body.spj26res-page-lock .elementor-section-wrap,
+body.spj26res-page-lock .elementor-section,
+body.spj26res-page-lock .elementor-container,
+body.spj26res-page-lock .elementor-column,
+body.spj26res-page-lock .elementor-widget-wrap,
+body.spj26res-page-lock .elementor-widget,
+body.spj26res-page-lock .elementor-widget-container {
+    width: 100% !important;
+    max-width: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+#spj26res-submit-root .spj26res-header {
+    height: 76px;
+    min-height: 76px;
+    padding: 0 30px;
+    background: #ffffff;
+    border-bottom: 1px solid var(--spj-border);
+}
+
+#spj26res-submit-root .spj26res-logo {
+    width: 48px;
+    height: 48px;
+    flex: 0 0 48px;
+    border-radius: 8px;
+    background: var(--spj-maroon);
+}
+
+#spj26res-submit-root .material-symbols-outlined {
+    line-height: 1;
+    font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+}
+
+#spj26res-submit-root .spj26res-body {
+    height: calc(100vh - 76px);
+    height: calc(100dvh - 76px);
+    min-height: 0;
+    grid-template-columns: 300px minmax(0, 1fr);
+    overflow: hidden;
+}
+
+#spj26res-submit-root .spj26res-sidebar {
+    height: 100%;
+    min-height: 0;
+    padding: 18px 16px 14px;
+    background: #ffffff;
+    border-right: 1px solid var(--spj-border);
+    overflow: hidden;
+}
+
+#spj26res-submit-root .spj26res-nav-title {
+    margin: 4px 8px 7px;
+    color: #6c5a57;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: .04em;
+}
+
+#spj26res-submit-root .spj26res-nav { gap: 5px; }
+
+#spj26res-submit-root .spj26res-nav-link {
+    width: 100%;
+    min-height: 42px;
+    padding: 9px 13px;
+    border-radius: 8px;
+    color: #5b4744;
+    font-size: 13px;
+    font-weight: 500;
+}
+
+#spj26res-submit-root .spj26res-nav-link:hover {
+    background: #f8fafc;
+    color: #0f172a;
+}
+
+#spj26res-submit-root .spj26res-nav-link.active {
+    background: #8f1919;
+    color: #ffffff;
+    font-weight: 700;
+}
+
+#spj26res-submit-root .spj26res-nav-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+}
+
+#spj26res-submit-root .spj26res-nav-link .material-symbols-outlined {
+    width: 19px;
+    height: 19px;
+    flex: 0 0 19px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 19px;
+}
+
+#spj26res-submit-root .spj26res-sidebar-info {
+    padding: 14px 15px;
+    border-radius: 8px;
+    background: #f8fafc;
+}
+
+#spj26res-submit-root #spj26res-submit-results-nav {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    column-gap: 16px;
+    width: 100%;
+}
+
+#spj26res-submit-root #spj26res-submit-results-nav > .spj26res-nav-left > span:last-child {
+    min-width: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+#spj26res-submit-root #spj26res-submit-results-nav > .spj26res-nav-notification {
+    position: relative;
+    justify-self: end;
+    min-width: 28px;
+    min-height: 28px;
+    margin: 0;
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#spj26res-submit-root #spj26res-submit-results-nav .spj26res-nav-count {
+    min-width: 26px;
+    height: 26px;
+    padding: 0 8px;
+    border-radius: 999px;
+    background: #edf2f7;
+    color: #8f1919;
+    font-size: 10px;
+    font-weight: 800;
+}
+
+#spj26res-submit-root #spj26res-submit-results-nav .spj26res-nav-alert {
+    position: absolute;
+    top: -1px;
+    right: -3px;
+    width: 8px;
+    height: 8px;
+    border: 2px solid #ffffff;
+    background: #4ade80;
+}
+
+#spj26res-submit-root .spj26res-rightpane {
+    width: 100%;
+    height: 100%;
+    min-width: 0;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+#spj26res-submit-root .spj26res-main {
+    width: 100%;
+    min-width: 0;
+    min-height: 0;
+    flex: 1 1 auto;
+    padding: 28px;
+    background: var(--spj-bg);
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+#spj26res-submit-root .spj26res-content {
+    width: 100%;
+    max-width: none;
+    margin: 0;
+}
+
+#spj26res-submit-root .spj26res-footer {
+    width: 100%;
+    min-height: 58px;
+    height: 58px;
+    flex: 0 0 58px;
+    margin: 0;
+    padding: 0 28px;
+    background: #ffffff;
+    border-top: 1px solid var(--spj-border);
+}
+
+@media (max-width: 1050px) {
+    #spj26res-submit-root .spj26res-body {
+        grid-template-columns: 240px minmax(0, 1fr);
+    }
+    #spj26res-submit-root .spj26res-main { padding: 24px; }
+}
+
+@media (max-width: 800px) {
+    #spj26res-submit-root {
+        position: relative;
+        inset: auto;
+        z-index: auto;
+        margin: 0 !important;
+        width: 100%;
+        height: auto;
+        min-height: 100vh;
+        min-height: 100dvh;
+        overflow: visible;
+    }
+
+    body.spj26res-page-lock #page,
+    body.spj26res-page-lock .site,
+    body.spj26res-page-lock .site-content,
+    body.spj26res-page-lock .elementor,
+    body.spj26res-page-lock .elementor-section-wrap,
+    body.spj26res-page-lock .elementor-section,
+    body.spj26res-page-lock .elementor-container,
+    body.spj26res-page-lock .elementor-column,
+    body.spj26res-page-lock .elementor-widget-wrap,
+    body.spj26res-page-lock .elementor-widget,
+    body.spj26res-page-lock .elementor-widget-container {
+        min-height: 0 !important;
+    }
+
+    #spj26res-submit-root .spj26res-header {
+        height: 64px;
+        min-height: 64px;
+        padding: 8px 14px;
+    }
+
+    #spj26res-submit-root .spj26res-logo {
+        width: 38px;
+        height: 38px;
+        flex-basis: 38px;
+        border-radius: 7px;
+    }
+
+    #spj26res-submit-root .spj26res-body {
+        display: block;
+        height: auto;
+        min-height: calc(100dvh - 64px);
+        overflow: visible;
+    }
+
+    #spj26res-submit-root .spj26res-rightpane {
+        height: auto;
+        min-height: calc(100dvh - 64px);
+        overflow: visible;
+    }
+
+    #spj26res-submit-root .spj26res-main {
+        padding: 16px;
+        overflow: visible;
+    }
+
+    #spj26res-submit-root .spj26res-footer {
+        height: auto;
+        min-height: 58px;
+        flex-basis: auto;
+        padding: 12px 16px;
+    }
+}
+
+
+
+/* =========================================================
+   WIZARD ACTIONS — RESPONSIVE LEFT / RIGHT v1
+   - Batal / Kembali selalu di kiri bawah.
+   - Lanjut / Finalisasi / Kirim Pengajuan selalu di kanan bawah.
+   - Tetap dua kolom pada desktop, tablet, dan mobile.
+========================================================= */
+
+#spj26res-submit-root .spj26res-step-panel.is-active{
+    display:flex;
+    flex-direction:column;
+    min-width:0;
+}
+
+#spj26res-submit-root .spj26res-actions{
+    width:100%;
+    margin-top:24px;
+    padding-top:20px;
+
+    display:grid !important;
+    grid-template-columns:
+        minmax(0,1fr)
+        minmax(0,1fr);
+
+    align-items:end;
+    column-gap:16px;
+    row-gap:10px;
+
+    border-top:
+        1px solid
+        #f1f5f9;
+}
+
+#spj26res-submit-root .spj26res-actions > :first-child{
+    justify-self:start;
+}
+
+#spj26res-submit-root .spj26res-actions > :last-child{
+    justify-self:end;
+}
+
+#spj26res-submit-root .spj26res-actions .spj26res-btn{
+    width:auto !important;
+    min-width:132px;
+    max-width:100%;
+    min-height:44px;
+
+    padding:
+        10px
+        18px;
+
+    white-space:nowrap;
+    line-height:1.2;
+}
+
+#spj26res-submit-root
+.spj26res-actions
+.spj26res-btn
+.material-symbols-outlined{
+    flex:
+        0
+        0
+        auto;
+
+    font-size:18px;
+}
+
+/* Tablet */
+@media(max-width:800px){
+
+    #spj26res-submit-root .spj26res-actions{
+        flex-direction:initial !important;
+        align-items:end !important;
+
+        grid-template-columns:
+            minmax(0,1fr)
+            minmax(0,1fr);
+
+        column-gap:12px;
+    }
+
+    #spj26res-submit-root .spj26res-actions .spj26res-btn{
+        width:min(100%,180px) !important;
+        min-width:0;
+    }
+
+}
+
+/* Mobile */
+@media(max-width:600px){
+
+    #spj26res-submit-root .spj26res-actions{
+        margin-top:20px;
+        padding-top:16px;
+        column-gap:10px;
+    }
+
+    #spj26res-submit-root .spj26res-actions > :first-child{
+        justify-self:stretch;
+    }
+
+    #spj26res-submit-root .spj26res-actions > :last-child{
+        justify-self:stretch;
+    }
+
+    #spj26res-submit-root .spj26res-actions .spj26res-btn{
+        width:100% !important;
+        min-width:0;
+        min-height:44px;
+
+        padding:
+            10px
+            12px;
+
+        font-size:11px;
+    }
+
+}
+
+/* Small mobile */
+@media(max-width:380px){
+
+    #spj26res-submit-root .spj26res-actions{
+        column-gap:8px;
+    }
+
+    #spj26res-submit-root .spj26res-actions .spj26res-btn{
+        min-height:42px;
+
+        padding:
+            9px
+            8px;
+
+        gap:5px;
+
+        font-size:10px;
+    }
+
+    #spj26res-submit-root
+    .spj26res-actions
+    .spj26res-btn
+    .material-symbols-outlined{
+        font-size:16px;
+    }
+
+}
+
+</style>
+
+
+<!-- =========================================================
+     PAGE
+========================================================= -->
+
+<div id="spj26res-submit-root">
+
+
+    <div
+        class="spj26res-overlay"
+        id="spj26res-submit-overlay"
+    ></div>
+
+
+    <!-- =====================================================
+         HEADER
+    ====================================================== -->
+
+    <header class="spj26res-header">
+
+
+        <div class="spj26res-header-left">
+
+
+            <button
+                class="spj26res-mobile-menu"
+                id="spj26res-submit-menu-button"
+                type="button"
+                aria-label="Buka menu"
+            >
+
+                <span class="material-symbols-outlined">
+                    menu
+                </span>
+
+            </button>
+
+
+            <div class="spj26res-logo">
+
+                <span class="material-symbols-outlined">
+                    school
+                </span>
+
+            </div>
+
+
+            <div class="spj26res-brand">
+
+
+                <div class="spj26res-brand-row">
+
+
+                    <div class="spj26res-brand-name">
+                        SIPATUJU PPDS
+                    </div>
+
+
+                    <div class="spj26res-brand-divider">
+                        |
+                    </div>
+
+
+                    <div class="spj26res-brand-description">
+                        Sistem Pemeriksaan Kelayakan Jurnal PPDS FK UNHAS
+                    </div>
+
+
+                </div>
+
+
+                <div class="spj26res-faculty">
+                    Fakultas Kedokteran • Akreditasi Unggul
+                </div>
+
+
+            </div>
+
+
+        </div>
+
+
+        <div class="spj26res-header-right">
+
+
+            <div class="spj26res-user">
+
+
+                <div class="spj26res-user-text">
+
+                    <span
+                        class="spj26res-user-name"
+                        id="spj26res-submit-user-name"
+                    >
+                        Residen
+                    </span>
+
+                    <span class="spj26res-user-role">
+                        Residen
+                    </span>
+
+                </div>
+
+
+                <div class="spj26res-avatar">
+
+                    <span class="material-symbols-outlined">
+                        person
+                    </span>
+
+                </div>
+
+
+            </div>
+
+
+        </div>
+
+
+    </header>
+
+
+    <!-- =====================================================
+         BODY
+    ====================================================== -->
+
+    <div class="spj26res-body">
+
+
+        <!-- =================================================
+             SIDEBAR
+        ================================================== -->
+
+        <aside
+            class="spj26res-sidebar"
+            id="spj26res-submit-sidebar"
+        >
+
+
+            <div>
+
+
+                <div class="spj26res-nav-title">
+                    Menu Utama
+                </div>
+
+
+                <nav class="spj26res-nav">
+
+
+                    <a
+                        class="spj26res-nav-link"
+                        href="/residen-sipatuju/"
+                    >
+
+                        <span class="spj26res-nav-left">
+
+                            <span class="material-symbols-outlined">
+                                grid_view
+                            </span>
+
+                            <span>
+                                Dashboard
+                            </span>
+
+                        </span>
+
+                    </a>
+
+
+                    <a
+                        class="spj26res-nav-link active"
+                        href="/residen-sipatuju/pengajuan-baru/"
+                    >
+
+                        <span class="spj26res-nav-left">
+
+                            <span class="material-symbols-outlined">
+                                post_add
+                            </span>
+
+                            <span>
+                                Buat Pengajuan
+                            </span>
+
+                        </span>
+
+                    </a>
+
+
+                    <a
+                        class="spj26res-nav-link"
+                        id="spj26res-submit-results-nav"
+                        href="/residen-sipatuju/hasil/"
+                    >
+
+                        <span class="spj26res-nav-left">
+
+                            <span class="material-symbols-outlined">
+                                fact_check
+                            </span>
+
+                            <span>
+                                Hasil Pemeriksaan
+                            </span>
+
+                        </span>
+
+                        <span class="spj26res-nav-notification">
+<span
+                                class="spj26res-nav-alert"
+                                id="spj26res-submit-results-nav-alert"
+                                hidden
+                                aria-hidden="true"
+                            ></span>
+
+                            <span
+                                class="spj26res-nav-count"
+                                id="spj26res-submit-results-nav-count"
+                                hidden
+                            >0</span>
+
+                        </span>
+
+                    </a>
+                </nav>
+
+
+                <div class="spj26res-nav-section-gap"></div>
+
+
+                <div class="spj26res-nav-title">
+                    Akses &amp; Akun
+                </div>
+
+
+                <nav class="spj26res-nav">
+
+
+                    <a
+                        class="spj26res-nav-link"
+                        href="/residen-sipatuju/profil/"
+                    >
+
+                        <span class="spj26res-nav-left">
+
+                            <span class="material-symbols-outlined">
+                                manage_accounts
+                            </span>
+
+                            <span>
+                                Profil &amp; Password
+                            </span>
+
+                        </span>
+
+                    </a>
+
+
+                    <a
+                        class="spj26res-nav-link"
+                        href="/residen-sipatuju/panduan/"
+                    >
+
+                        <span class="spj26res-nav-left">
+
+                            <span class="material-symbols-outlined">
+                                menu_book
+                            </span>
+
+                            <span>
+                                Panduan Sistem
+                            </span>
+
+                        </span>
+
+                    </a>
+
+
+                    <a
+                        class="spj26res-nav-link"
+                        href="#"
+                        data-spj26-logout
+                    >
+
+                        <span class="spj26res-nav-left">
+
+                            <span class="material-symbols-outlined">
+                                logout
+                            </span>
+
+                            <span>
+                                Logout
+                            </span>
+
+                        </span>
+
+                    </a>
+
+
+                </nav>
+
+
+            </div>
+
+
+            <div class="spj26res-sidebar-info">
+
+
+                <div class="spj26res-sidebar-info-title">
+
+                    <span class="material-symbols-outlined">
+                        verified
+                    </span>
+
+                    <span>
+                        PPDS FK UNHAS
+                    </span>
+
+                </div>
+
+
+                <div class="spj26res-version">
+                    Versi Sistem 2026.1
+                </div>
+
+
+                <div class="spj26res-department">
+                    Program Pendidikan Dokter Spesialis
+                </div>
+
+
+            </div>
+
+
+        </aside>
+
+
+        <!-- =================================================
+             RIGHT PANE
+        ================================================== -->
+
+        <div class="spj26res-rightpane">
+
+
+            <main class="spj26res-main">
+
+
+                <div class="spj26res-content">
+
+
+                    <!-- =====================================
+                         PAGE HEADER
+                    ====================================== -->
+
+                    <div class="spj26res-page-head">
+
+
+                        <h1>
+                            Buat Pengajuan Pemeriksaan Jurnal
+                        </h1>
+
+
+                        <p>
+                            Lengkapi informasi artikel dan tiga jurnal kandidat
+                            yang akan diajukan untuk pemeriksaan.
+                        </p>
+
+
+                    </div>
+
+
+                    <!-- =====================================
+                         STEPPER
+                    ====================================== -->
+
+                    <div class="spj26res-stepper-card">
+
+
+                        <div class="spj26res-stepper">
+
+
+                            <div class="spj26res-step-track"></div>
+
+
+                            <div
+                                class="spj26res-step-line-fill"
+                                id="spj26res-submit-step-line"
+                            ></div>
+
+
+                            <div class="spj26res-step-row">
+
+
+                                <div
+                                    class="spj26res-step is-active"
+                                    data-step-indicator="1"
+                                >
+
+                                    <div class="spj26res-step-circle">
+
+                                        <span class="material-symbols-outlined">
+                                            article
+                                        </span>
+
+                                    </div>
+
+                                    <div class="spj26res-step-label">
+                                        Jenis Artikel
+                                    </div>
+
+                                </div>
+
+
+                                <div
+                                    class="spj26res-step"
+                                    data-step-indicator="2"
+                                >
+
+                                    <div class="spj26res-step-circle">
+
+                                        <span class="material-symbols-outlined">
+                                            subject
+                                        </span>
+
+                                    </div>
+
+                                    <div class="spj26res-step-label">
+                                        Judul &amp; Abstrak
+                                    </div>
+
+                                </div>
+
+
+                                <div
+                                    class="spj26res-step"
+                                    data-step-indicator="3"
+                                >
+
+                                    <div class="spj26res-step-circle">
+
+                                        <span class="material-symbols-outlined">
+                                            school
+                                        </span>
+
+                                    </div>
+
+                                    <div class="spj26res-step-label">
+                                        Pembimbing
+                                    </div>
+
+                                </div>
+
+
+                                <div
+                                    class="spj26res-step"
+                                    data-step-indicator="4"
+                                >
+
+                                    <div class="spj26res-step-circle">
+
+                                        <span class="material-symbols-outlined">
+                                            library_books
+                                        </span>
+
+                                    </div>
+
+                                    <div class="spj26res-step-label">
+                                        3 Jurnal
+                                    </div>
+
+                                </div>
+
+
+                                <div
+                                    class="spj26res-step"
+                                    data-step-indicator="5"
+                                >
+
+                                    <div class="spj26res-step-circle">
+
+                                        <span class="material-symbols-outlined">
+                                            task_alt
+                                        </span>
+
+                                    </div>
+
+                                    <div class="spj26res-step-label">
+                                        Finalisasi
+                                    </div>
+
+                                </div>
+
+
+                            </div>
+
+
+                        </div>
+
+
+                    </div>
+
+
+                    <!-- =====================================
+                         FORM CARD
+                    ====================================== -->
+
+                    <div class="spj26res-form-card">
+
+
+                        <div
+                            class="spj26res-error-box"
+                            id="spj26res-submit-error"
+                            role="alert"
+                        ></div>
+
+
+                        <div
+                            class="spj26res-success-box"
+                            id="spj26res-submit-success"
+                            role="status"
+                            aria-live="polite"
+                        >
+
+                            <div id="spj26res-submit-success-message"></div>
+
+                            <div
+                                class="spj26res-success-code"
+                                id="spj26res-submit-success-code"
+                            ></div>
+
+                        </div>
+
+
+                        <!-- =================================================
+                             STEP 1
+                        ================================================== -->
+
+                        <section
+                            class="spj26res-step-panel is-active"
+                            data-step-panel="1"
+                        >
+
+
+                            <div class="spj26res-section-head">
+
+
+                                <span class="spj26res-section-kicker">
+                                    Tahap 1 dari 5
+                                </span>
+
+
+                                <h2>
+                                    Jenis Artikel
+                                </h2>
+
+
+                                <p>
+                                    Pilih jenis artikel yang akan diajukan.
+                                </p>
+
+
+                            </div>
+
+
+                            <div class="spj26res-type-grid">
+
+
+                                <!-- ORIGINAL ARTICLE -->
+
+                                <label class="spj26res-type-option">
+
+
+                                    <input
+                                        type="radio"
+                                        name="spj26res_article_type"
+                                        value="Research Article"
+                                        data-display-label="Original Article"
+                                    >
+
+
+                                    <span class="spj26res-type-card">
+
+
+                                        <span
+                                            class="spj26res-type-check material-symbols-outlined"
+                                            aria-hidden="true"
+                                        >
+                                            check
+                                        </span>
+
+
+                                        <span
+                                            class="spj26res-type-icon-wrap"
+                                            aria-hidden="true"
+                                        >
+
+                                            <span class="material-symbols-outlined">
+                                                science
+                                            </span>
+
+                                        </span>
+
+
+                                        <span class="spj26res-type-content">
+
+
+                                            <span class="spj26res-type-name">
+                                                Original Article
+                                            </span>
+
+
+                                            <span class="spj26res-type-desc">
+                                                Artikel penelitian asli yang
+                                                melaporkan metode, data, hasil,
+                                                dan analisis dari penelitian
+                                                yang dilakukan.
+                                            </span>
+
+
+                                        </span>
+
+
+                                    </span>
+
+
+                                </label>
+
+
+                                <!-- SYSTEMATIC REVIEW -->
+
+                                <label class="spj26res-type-option">
+
+
+                                    <input
+                                        type="radio"
+                                        name="spj26res_article_type"
+                                        value="Review Article"
+                                        data-display-label="Systematic Review / Meta-Analysis"
+                                    >
+
+
+                                    <span class="spj26res-type-card">
+
+
+                                        <span
+                                            class="spj26res-type-check material-symbols-outlined"
+                                            aria-hidden="true"
+                                        >
+                                            check
+                                        </span>
+
+
+                                        <span
+                                            class="spj26res-type-icon-wrap"
+                                            aria-hidden="true"
+                                        >
+
+                                            <span class="material-symbols-outlined">
+                                                fact_check
+                                            </span>
+
+                                        </span>
+
+
+                                        <span class="spj26res-type-content">
+
+
+                                            <span class="spj26res-type-name">
+                                                Systematic Review / Meta-Analysis
+                                            </span>
+
+
+                                            <span class="spj26res-type-desc">
+                                                Artikel yang melakukan
+                                                penelusuran, seleksi, dan
+                                                sintesis bukti secara sistematis,
+                                                dengan atau tanpa meta-analisis.
+                                            </span>
+
+
+                                        </span>
+
+
+                                    </span>
+
+
+                                </label>
+
+
+                            </div>
+
+
+                            <div class="spj26res-info-box">
+
+
+                                <span class="material-symbols-outlined">
+                                    info
+                                </span>
+
+
+                                <div>
+
+
+                                    <div class="spj26res-info-title">
+                                        Perhatian
+                                    </div>
+
+
+                                    <div class="spj26res-info-text">
+                                        Pilih jenis artikel yang sesuai
+                                        dengan naskah yang akan diajukan.
+                                    </div>
+
+
+                                </div>
+
+
+                            </div>
+
+
+                            <div class="spj26res-actions">
+
+
+                                <a
+                                    class="spj26res-btn spj26res-btn-secondary"
+                                    href="/residen-sipatuju/"
+                                >
+
+                                    <span class="material-symbols-outlined">
+                                        arrow_back
+                                    </span>
+
+                                    <span>
+                                        Batal
+                                    </span>
+
+                                </a>
+
+
+                                <button
+                                    class="spj26res-btn spj26res-btn-primary"
+                                    type="button"
+                                    data-next-step="2"
+                                >
+
+                                    <span>
+                                        Lanjut
+                                    </span>
+
+                                    <span class="material-symbols-outlined">
+                                        arrow_forward
+                                    </span>
+
+                                </button>
+
+
+                            </div>
+
+
+                        </section>
+
+
+                        <!-- =================================================
+                             STEP 2
+                        ================================================== -->
+
+                        <section
+                            class="spj26res-step-panel"
+                            data-step-panel="2"
+                        >
+
+
+                            <div class="spj26res-section-head">
+
+
+                                <span class="spj26res-section-kicker">
+                                    Tahap 2 dari 5
+                                </span>
+
+
+                                <h2>
+                                    Informasi Artikel
+                                </h2>
+
+
+                                <p>
+                                    Lengkapi judul proposal tesis,
+                                    judul artikel, dan abstrak artikel.
+                                </p>
+
+
+                            </div>
+
+
+                            <div class="spj26res-field">
+
+
+                                <label
+                                    class="spj26res-label"
+                                    for="spj26res-submit-thesis-title"
+                                >
+                                    Judul Proposal Tesis
+                                    <span class="spj26res-required">*</span>
+                                </label>
+
+
+                                <input
+                                    class="spj26res-input"
+                                    id="spj26res-submit-thesis-title"
+                                    type="text"
+                                    placeholder="Masukkan judul proposal tesis"
+                                    autocomplete="off"
+                                >
+
+
+                            </div>
+
+
+                            <div class="spj26res-field">
+
+
+                                <label
+                                    class="spj26res-label"
+                                    for="spj26res-submit-title"
+                                >
+                                    Judul Artikel
+                                    <span class="spj26res-required">*</span>
+                                </label>
+
+
+                                <input
+                                    class="spj26res-input"
+                                    id="spj26res-submit-title"
+                                    type="text"
+                                    placeholder="Masukkan judul artikel"
+                                    autocomplete="off"
+                                >
+
+
+                            </div>
+
+
+                            <div class="spj26res-field">
+
+
+                                <div class="spj26res-label-row">
+
+
+                                    <label
+                                        class="spj26res-label"
+                                        for="spj26res-submit-abstract"
+                                        style="margin-bottom:0;"
+                                    >
+                                        Abstrak
+                                        <span class="spj26res-required">*</span>
+                                    </label>
+
+
+                                    <span class="spj26res-field-note">
+                                        Informasi konteks
+                                    </span>
+
+
+                                </div>
+
+
+                                <textarea
+                                    class="spj26res-textarea"
+                                    id="spj26res-submit-abstract"
+                                    placeholder="Tuliskan atau tempel abstrak artikel di sini..."
+                                ></textarea>
+
+
+                                <div
+                                    class="spj26res-counter"
+                                    id="spj26res-submit-word-counter"
+                                >
+                                    0 kata
+                                </div>
+
+
+                            </div>
+
+
+                            <div class="spj26res-actions">
+
+
+                                <button
+                                    class="spj26res-btn spj26res-btn-secondary"
+                                    type="button"
+                                    data-prev-step="1"
+                                >
+
+                                    <span class="material-symbols-outlined">
+                                        arrow_back
+                                    </span>
+
+                                    <span>
+                                        Kembali
+                                    </span>
+
+                                </button>
+
+
+                                <button
+                                    class="spj26res-btn spj26res-btn-primary"
+                                    type="button"
+                                    data-next-step="3"
+                                >
+
+                                    <span>
+                                        Lanjut
+                                    </span>
+
+                                    <span class="material-symbols-outlined">
+                                        arrow_forward
+                                    </span>
+
+                                </button>
+
+
+                            </div>
+
+
+                        </section>
+
+
+                        <!-- =================================================
+                             STEP 3
+                        ================================================== -->
+
+                        <section
+                            class="spj26res-step-panel"
+                            data-step-panel="3"
+                        >
+
+
+                            <div class="spj26res-section-head">
+
+
+                                <span class="spj26res-section-kicker">
+                                    Tahap 3 dari 5
+                                </span>
+
+
+                                <h2>
+                                    Informasi Pembimbing
+                                </h2>
+
+
+                                <p>
+                                    Masukkan dosen pembimbing utama
+                                    untuk artikel yang diajukan.
+                                </p>
+
+
+                            </div>
+
+
+                            <div class="spj26res-field">
+
+
+                                <label
+                                    class="spj26res-label"
+                                    for="spj26res-submit-supervisor"
+                                >
+                                    Dosen Pembimbing Utama
+                                    <span class="spj26res-required">*</span>
+                                </label>
+
+
+                                <input
+                                    class="spj26res-input"
+                                    id="spj26res-submit-supervisor"
+                                    type="text"
+                                    placeholder="Masukkan nama lengkap dosen pembimbing utama"
+                                    autocomplete="off"
+                                >
+
+
+                            </div>
+
+
+                            <div class="spj26res-info-box">
+
+
+                                <span class="material-symbols-outlined">
+                                    info
+                                </span>
+
+
+                                <div>
+
+
+                                    <div class="spj26res-info-title">
+                                        Catatan Persetujuan
+                                    </div>
+
+
+                                    <div class="spj26res-info-text">
+                                        Pastikan artikel telah dikonsultasikan
+                                        dengan dosen pembimbing sebelum jurnal
+                                        kandidat diajukan untuk diperiksa.
+                                    </div>
+
+
+                                </div>
+
+
+                            </div>
+
+
+                            <div class="spj26res-actions">
+
+
+                                <button
+                                    class="spj26res-btn spj26res-btn-secondary"
+                                    type="button"
+                                    data-prev-step="2"
+                                >
+
+                                    <span class="material-symbols-outlined">
+                                        arrow_back
+                                    </span>
+
+                                    <span>
+                                        Kembali
+                                    </span>
+
+                                </button>
+
+
+                                <button
+                                    class="spj26res-btn spj26res-btn-primary"
+                                    type="button"
+                                    data-next-step="4"
+                                >
+
+                                    <span>
+                                        Lanjut
+                                    </span>
+
+                                    <span class="material-symbols-outlined">
+                                        arrow_forward
+                                    </span>
+
+                                </button>
+
+
+                            </div>
+
+
+                        </section>
+
+
+                        <!-- =================================================
+                             STEP 4
+                        ================================================== -->
+
+                        <section
+                            class="spj26res-step-panel"
+                            data-step-panel="4"
+                        >
+
+
+                            <div class="spj26res-section-head">
+
+
+                                <span class="spj26res-section-kicker">
+                                    Tahap 4 dari 5
+                                </span>
+
+
+                                <h2>
+                                    Tiga Jurnal Kandidat
+                                </h2>
+
+
+                                <p>
+                                    Masukkan tepat tiga jurnal kandidat
+                                    beserta informasi dan link jurnal resmi.
+                                </p>
+
+
+                            </div>
+
+
+                            <div class="spj26res-journal-list">
+
+
+                                <!-- ============================
+                                     JOURNAL 1
+                                ============================= -->
+
+                                <div class="spj26res-journal-card">
+
+
+                                    <div class="spj26res-journal-head">
+
+                                        <span class="spj26res-journal-number">
+                                            1
+                                        </span>
+
+                                        <span class="spj26res-journal-title">
+                                            Jurnal Kandidat 1
+                                        </span>
+
+                                    </div>
+
+
+                                    <div class="spj26res-grid-3">
+
+
+                                        <div>
+
+                                            <label class="spj26res-label">
+                                                Nama Jurnal
+                                                <span class="spj26res-required">*</span>
+                                            </label>
+
+                                            <input
+                                                class="spj26res-input"
+                                                id="spj26res-submit-j1-name"
+                                                type="text"
+                                                placeholder="Masukkan nama jurnal"
+                                            >
+
+                                        </div>
+
+
+                                        <div>
+
+                                            <label class="spj26res-label">
+                                                ISSN
+                                                <span class="spj26res-required">*</span>
+                                            </label>
+
+                                            <input
+                                                class="spj26res-input"
+                                                id="spj26res-submit-j1-issn"
+                                                type="text"
+                                                placeholder="e.g. 1234-5678"
+                                            >
+
+                                        </div>
+
+
+                                        <div>
+
+                                            <label class="spj26res-label">
+                                                Kuartil Jurnal
+                                                <span class="spj26res-required">*</span>
+                                            </label>
+
+                                            <select
+                                                class="spj26res-select"
+                                                id="spj26res-submit-j1-index"
+                                            >
+
+                                                <option value="">
+                                                    Pilih kuartil
+                                                </option>
+
+                                                <option value="Q1">Q1</option>
+                                                <option value="Q2">Q2</option>
+                                                <option value="Q3">Q3</option>
+                                                <option value="Q4">Q4</option>
+
+                                            </select>
+
+                                        </div>
+
+
+                                    </div>
+
+
+                                    <div class="spj26res-journal-link-field">
+
+
+                                        <label class="spj26res-label">
+                                            Link Jurnal
+                                            <span class="spj26res-required">*</span>
+                                        </label>
+
+
+                                        <div class="spj26res-url-input-wrap">
+
+
+                                            <span class="material-symbols-outlined">
+                                                link
+                                            </span>
+
+
+                                            <input
+                                                class="spj26res-input"
+                                                id="spj26res-submit-j1-link"
+                                                type="url"
+                                                inputmode="url"
+                                                placeholder="https://example-journal.com"
+                                            >
+
+
+                                        </div>
+
+
+                                    </div>
+
+
+                                </div>
+
+
+                                <!-- ============================
+                                     JOURNAL 2
+                                ============================= -->
+
+                                <div class="spj26res-journal-card">
+
+
+                                    <div class="spj26res-journal-head">
+
+                                        <span class="spj26res-journal-number">
+                                            2
+                                        </span>
+
+                                        <span class="spj26res-journal-title">
+                                            Jurnal Kandidat 2
+                                        </span>
+
+                                    </div>
+
+
+                                    <div class="spj26res-grid-3">
+
+
+                                        <div>
+
+                                            <label class="spj26res-label">
+                                                Nama Jurnal
+                                                <span class="spj26res-required">*</span>
+                                            </label>
+
+                                            <input
+                                                class="spj26res-input"
+                                                id="spj26res-submit-j2-name"
+                                                type="text"
+                                                placeholder="Masukkan nama jurnal"
+                                            >
+
+                                        </div>
+
+
+                                        <div>
+
+                                            <label class="spj26res-label">
+                                                ISSN
+                                                <span class="spj26res-required">*</span>
+                                            </label>
+
+                                            <input
+                                                class="spj26res-input"
+                                                id="spj26res-submit-j2-issn"
+                                                type="text"
+                                                placeholder="e.g. 1234-5678"
+                                            >
+
+                                        </div>
+
+
+                                        <div>
+
+                                            <label class="spj26res-label">
+                                                Kuartil Jurnal
+                                                <span class="spj26res-required">*</span>
+                                            </label>
+
+                                            <select
+                                                class="spj26res-select"
+                                                id="spj26res-submit-j2-index"
+                                            >
+
+                                                <option value="">
+                                                    Pilih kuartil
+                                                </option>
+
+                                                <option value="Q1">Q1</option>
+                                                <option value="Q2">Q2</option>
+                                                <option value="Q3">Q3</option>
+                                                <option value="Q4">Q4</option>
+
+                                            </select>
+
+                                        </div>
+
+
+                                    </div>
+
+
+                                    <div class="spj26res-journal-link-field">
+
+
+                                        <label class="spj26res-label">
+                                            Link Jurnal
+                                            <span class="spj26res-required">*</span>
+                                        </label>
+
+
+                                        <div class="spj26res-url-input-wrap">
+
+
+                                            <span class="material-symbols-outlined">
+                                                link
+                                            </span>
+
+
+                                            <input
+                                                class="spj26res-input"
+                                                id="spj26res-submit-j2-link"
+                                                type="url"
+                                                inputmode="url"
+                                                placeholder="https://example-journal.com"
+                                            >
+
+
+                                        </div>
+
+
+                                    </div>
+
+
+                                </div>
+
+
+                                <!-- ============================
+                                     JOURNAL 3
+                                ============================= -->
+
+                                <div class="spj26res-journal-card">
+
+
+                                    <div class="spj26res-journal-head">
+
+                                        <span class="spj26res-journal-number">
+                                            3
+                                        </span>
+
+                                        <span class="spj26res-journal-title">
+                                            Jurnal Kandidat 3
+                                        </span>
+
+                                    </div>
+
+
+                                    <div class="spj26res-grid-3">
+
+
+                                        <div>
+
+                                            <label class="spj26res-label">
+                                                Nama Jurnal
+                                                <span class="spj26res-required">*</span>
+                                            </label>
+
+                                            <input
+                                                class="spj26res-input"
+                                                id="spj26res-submit-j3-name"
+                                                type="text"
+                                                placeholder="Masukkan nama jurnal"
+                                            >
+
+                                        </div>
+
+
+                                        <div>
+
+                                            <label class="spj26res-label">
+                                                ISSN
+                                                <span class="spj26res-required">*</span>
+                                            </label>
+
+                                            <input
+                                                class="spj26res-input"
+                                                id="spj26res-submit-j3-issn"
+                                                type="text"
+                                                placeholder="e.g. 1234-5678"
+                                            >
+
+                                        </div>
+
+
+                                        <div>
+
+                                            <label class="spj26res-label">
+                                                Kuartil Jurnal
+                                                <span class="spj26res-required">*</span>
+                                            </label>
+
+                                            <select
+                                                class="spj26res-select"
+                                                id="spj26res-submit-j3-index"
+                                            >
+
+                                                <option value="">
+                                                    Pilih kuartil
+                                                </option>
+
+                                                <option value="Q1">Q1</option>
+                                                <option value="Q2">Q2</option>
+                                                <option value="Q3">Q3</option>
+                                                <option value="Q4">Q4</option>
+
+                                            </select>
+
+                                        </div>
+
+
+                                    </div>
+
+
+                                    <div class="spj26res-journal-link-field">
+
+
+                                        <label class="spj26res-label">
+                                            Link Jurnal
+                                            <span class="spj26res-required">*</span>
+                                        </label>
+
+
+                                        <div class="spj26res-url-input-wrap">
+
+
+                                            <span class="material-symbols-outlined">
+                                                link
+                                            </span>
+
+
+                                            <input
+                                                class="spj26res-input"
+                                                id="spj26res-submit-j3-link"
+                                                type="url"
+                                                inputmode="url"
+                                                placeholder="https://example-journal.com"
+                                            >
+
+
+                                        </div>
+
+
+                                    </div>
+
+
+                                </div>
+
+
+                            </div>
+
+
+                            <div class="spj26res-neutral-box">
+
+
+                                <span class="material-symbols-outlined">
+                                    info
+                                </span>
+
+
+                                <div>
+
+
+                                    <div
+                                        class="spj26res-info-title"
+                                        style="color:#475569;"
+                                    >
+                                        Informasi jurnal
+                                    </div>
+
+
+                                    <div
+                                        class="spj26res-info-text"
+                                        style="color:#64748b;"
+                                    >
+                                        Pastikan nama jurnal, ISSN, kuartil,
+                                        dan link jurnal sesuai informasi resmi
+                                        jurnal atau publisher.
+                                    </div>
+
+
+                                </div>
+
+
+                            </div>
+
+
+                            <div class="spj26res-actions">
+
+
+                                <button
+                                    class="spj26res-btn spj26res-btn-secondary"
+                                    type="button"
+                                    data-prev-step="3"
+                                >
+
+                                    <span class="material-symbols-outlined">
+                                        arrow_back
+                                    </span>
+
+                                    <span>
+                                        Kembali
+                                    </span>
+
+                                </button>
+
+
+                                <button
+                                    class="spj26res-btn spj26res-btn-primary"
+                                    type="button"
+                                    data-next-step="5"
+                                >
+
+                                    <span>
+                                        Finalisasi
+                                    </span>
+
+                                    <span class="material-symbols-outlined">
+                                        arrow_forward
+                                    </span>
+
+                                </button>
+
+
+                            </div>
+
+
+                        </section>
+
+
+                        <!-- =================================================
+                             STEP 5
+                        ================================================== -->
+
+                        <section
+                            class="spj26res-step-panel"
+                            data-step-panel="5"
+                        >
+
+
+                            <div class="spj26res-section-head">
+
+
+                                <span class="spj26res-section-kicker">
+                                    Tahap 5 dari 5
+                                </span>
+
+
+                                <h2>
+                                    Finalisasi Pengajuan
+                                </h2>
+
+
+                                <p>
+                                    Periksa kembali seluruh informasi
+                                    sebelum pengajuan dikirim.
+                                </p>
+
+
+                            </div>
+
+
+                            <div class="spj26res-summary-list">
+
+
+                                <!-- ARTICLE TYPE -->
+
+                                <div class="spj26res-summary-card">
+
+
+                                    <h3>
+                                        Jenis Artikel
+                                    </h3>
+
+
+                                    <span class="spj26res-summary-label">
+                                        Jenis
+                                    </span>
+
+
+                                    <div
+                                        class="spj26res-summary-value"
+                                        id="spj26res-submit-summary-type"
+                                    >
+                                        -
+                                    </div>
+
+
+                                </div>
+
+
+                                <!-- ARTICLE -->
+
+                                <div class="spj26res-summary-card">
+
+
+                                    <h3>
+                                        Informasi Artikel
+                                    </h3>
+
+
+                                    <span class="spj26res-summary-label">
+                                        Judul Proposal Tesis
+                                    </span>
+
+
+                                    <div
+                                        class="spj26res-summary-value"
+                                        id="spj26res-submit-summary-thesis-title"
+                                    >
+                                        -
+                                    </div>
+
+
+                                    <span
+                                        class="spj26res-summary-label spj26res-summary-section-gap"
+                                    >
+                                        Judul Artikel
+                                    </span>
+
+
+                                    <div
+                                        class="spj26res-summary-value"
+                                        id="spj26res-submit-summary-title"
+                                    >
+                                        -
+                                    </div>
+
+
+                                    <span
+                                        class="spj26res-summary-label spj26res-summary-section-gap"
+                                    >
+                                        Abstrak
+                                    </span>
+
+
+                                    <div
+                                        class="spj26res-summary-text"
+                                        id="spj26res-submit-summary-abstract"
+                                    >
+                                        -
+                                    </div>
+
+
+                                </div>
+
+
+                                <!-- SUPERVISOR -->
+
+                                <div class="spj26res-summary-card">
+
+
+                                    <h3>
+                                        Pembimbing Utama
+                                    </h3>
+
+
+                                    <span class="spj26res-summary-label">
+                                        Dosen Pembimbing
+                                    </span>
+
+
+                                    <div
+                                        class="spj26res-summary-value"
+                                        id="spj26res-submit-summary-supervisor"
+                                    >
+                                        -
+                                    </div>
+
+
+                                </div>
+
+
+                                <!-- JOURNALS -->
+
+                                <div class="spj26res-summary-card">
+
+
+                                    <h3>
+                                        Tiga Jurnal Kandidat
+                                    </h3>
+
+
+                                    <div
+                                        class="spj26res-summary-journals"
+                                        id="spj26res-submit-summary-journals"
+                                    ></div>
+
+
+                                </div>
+
+
+                            </div>
+
+
+                            <div class="spj26res-actions">
+
+
+                                <button
+                                    class="spj26res-btn spj26res-btn-secondary"
+                                    type="button"
+                                    data-prev-step="4"
+                                >
+
+                                    <span class="material-symbols-outlined">
+                                        arrow_back
+                                    </span>
+
+                                    <span>
+                                        Kembali
+                                    </span>
+
+                                </button>
+
+
+                                <button
+                                    class="spj26res-btn spj26res-btn-primary"
+                                    id="spj26res-submit-final"
+                                    type="button"
+                                >
+
+                                    <span>
+                                        Kirim Pengajuan
+                                    </span>
+
+                                    <span class="material-symbols-outlined">
+                                        check
+                                    </span>
+
+                                </button>
+
+
+                            </div>
+
+
+                        </section>
+
+
+                    </div>
+
+
+                </div>
+
+
+            </main>
+
+
+            <!-- =================================================
+                 FOOTER
+            ================================================== -->
+
+            <footer class="spj26res-footer">
+
+
+                <div class="spj26res-footer-left">
+
+
+                    <span class="spj26res-footer-brand">
+                        SIPATUJU PPDS
+                    </span>
+
+
+                    <span>
+                        •
+                    </span>
+
+
+                    <span>
+                        Fakultas Kedokteran Universitas Hasanuddin
+                    </span>
+
+
+                </div>
+
+
+                <div class="spj26res-footer-right">
+                    PPDS FK UNHAS - Versi Sistem 2026.1
+                </div>
+
+
+            </footer>
+
+
+        </div>
+
+
+    </div>
+
+
+</div>
+
+
+<script>
+
+(function(){
+
+    "use strict";
+
+
+    /* =====================================================
+       ROOT
+    ===================================================== */
+
+    const root =
+        document.getElementById(
+            "spj26res-submit-root"
+        );
+
+
+    if(!root){
+        return;
+    }
+
+    /* TRUE FULLPAGE v6B: bypass Elementor/theme wrapper spacing. */
+    const isElementorEditor =
+        document.body.classList.contains('elementor-editor-active') ||
+        /(?:^|[?&])elementor-preview=/.test(window.location.search);
+
+    if (!isElementorEditor && root.parentElement !== document.body) {
+        document.body.appendChild(root);
+    }
+
+
+    document.documentElement
+        .classList
+        .add(
+            "spj26res-page-lock"
+        );
+
+
+    document.body
+        .classList
+        .add(
+            "spj26res-page-lock"
+        );
+
+
+    /* =====================================================
+       MOBILE SIDEBAR
+    ===================================================== */
+
+    const menuButton =
+        root.querySelector(
+            "#spj26res-submit-menu-button"
+        );
+
+
+    const sidebar =
+        root.querySelector(
+            "#spj26res-submit-sidebar"
+        );
+
+
+    const overlay =
+        root.querySelector(
+            "#spj26res-submit-overlay"
+        );
+
+
+    function openSidebar(){
+
+        if(sidebar){
+            sidebar.classList.add("open");
+        }
+
+
+        if(overlay){
+            overlay.classList.add("open");
+        }
+
+    }
+
+
+    function closeSidebar(){
+
+        if(sidebar){
+            sidebar.classList.remove("open");
+        }
+
+
+        if(overlay){
+            overlay.classList.remove("open");
+        }
+
+    }
+
+
+    if(menuButton){
+
+        menuButton.addEventListener(
+            "click",
+            openSidebar
+        );
+
+    }
+
+
+    if(overlay){
+
+        overlay.addEventListener(
+            "click",
+            closeSidebar
+        );
+
+    }
+
+
+    /* =====================================================
+       BACKEND CONFIG
+    ===================================================== */
+
+    function getSubmissionConfig(){
+
+        return (
+            window.spj26SubmissionConfig
+            ||
+            window.spj26ResidentPortalConfig
+            ||
+            null
+        );
+
+    }
+
+
+    function getResultsConfig(){
+
+        return (
+            window.spj26ResidentResultsConfig
+            ||
+            null
+        );
+
+    }
+
+
+    const logoutLinks =
+        root.querySelectorAll(
+            '[data-spj26-logout]'
+        );
+
+
+    const resultsNavAlert =
+        root.querySelector(
+            '#spj26res-submit-results-nav-alert'
+        );
+
+
+    const resultsNavCount =
+        root.querySelector(
+            '#spj26res-submit-results-nav-count'
+        );
+
+
+    let resultsNotificationRequestInFlight =
+        false;
+
+
+    let resultsNotificationTimer =
+        null;
+
+
+    function applyNavigationConfig(){
+
+        const submissionConfig =
+            getSubmissionConfig();
+
+
+        const resultsConfig =
+            getResultsConfig();
+
+
+        const logoutUrl =
+            (
+                submissionConfig
+                &&
+                submissionConfig.logoutUrl
+            )
+            ||
+            (
+                resultsConfig
+                &&
+                resultsConfig.logoutUrl
+            )
+            ||
+            '';
+
+
+        if(logoutUrl){
+
+            logoutLinks.forEach(
+                function(link){
+
+                    link.href =
+                        logoutUrl;
+
+                }
+            );
+
+        }
+
+    }
+
+
+
+    function getResultsNotificationStorageKey() {
+        const config = window.spj26ResidentResultsConfig || {};
+        const identity = String(config.nim || config.name || 'resident')
+            .trim()
+            .replace(/[^a-zA-Z0-9_-]/g, '_');
+
+        return 'spj26res_results_seen_v2_' + identity;
+    }
+
+    function buildResultsNotificationSnapshot(items) {
+        const snapshot = {};
+        const list = Array.isArray(items) ? items : [];
+
+        list.forEach(function (item) {
+            if (!item) return;
+
+            const key = String(item.id || item.code || '').trim();
+            if (!key) return;
+
+            const journals = Array.isArray(item.journals)
+                ? item.journals.map(function (journal) {
+                    return {
+                        order: journal && journal.order ? String(journal.order) : '',
+                        decision: journal && journal.decision ? String(journal.decision) : '',
+                        comment: journal && journal.comment ? String(journal.comment) : '',
+                        updated_at: journal && journal.updated_at ? String(journal.updated_at) : ''
+                    };
+                })
+                : [];
+
+            snapshot[key] = JSON.stringify({
+                status: item.status ? String(item.status) : '',
+                status_label: item.status_label ? String(item.status_label) : '',
+                updated_at: item.updated_at ? String(item.updated_at) : '',
+                completed_at: item.completed_at ? String(item.completed_at) : '',
+                journals: journals
+            });
+        });
+
+        return snapshot;
+    }
+
+    function readSeenResultsNotificationSnapshot() {
+        try {
+            const raw = window.localStorage.getItem(
+                getResultsNotificationStorageKey()
+            );
+
+            if (!raw) return null;
+
+            const parsed = JSON.parse(raw);
+            return parsed && typeof parsed === 'object' ? parsed : null;
+        } catch (error) {
+            console.warn('SIPATUJU Residen - snapshot notifikasi tidak dapat dibaca:', error);
+            return null;
+        }
+    }
+
+    function writeSeenResultsNotificationSnapshot(items) {
+        try {
+            window.localStorage.setItem(
+                getResultsNotificationStorageKey(),
+                JSON.stringify(buildResultsNotificationSnapshot(items))
+            );
+        } catch (error) {
+            console.warn('SIPATUJU Residen - snapshot notifikasi tidak dapat disimpan:', error);
+        }
+    }
+
+    function getUnreadResultsUpdateCount(items) {
+        const currentSnapshot = buildResultsNotificationSnapshot(items);
+        const seenSnapshot = readSeenResultsNotificationSnapshot();
+
+        /*
+         * Pertama kali fitur dipakai: jadikan kondisi saat ini sebagai baseline,
+         * sehingga data lama tidak langsung dianggap sebagai notifikasi baru.
+         */
+        if (!seenSnapshot) {
+            writeSeenResultsNotificationSnapshot(items);
+            return 0;
+        }
+
+        let unreadCount = 0;
+
+        Object.keys(currentSnapshot).forEach(function (key) {
+            /*
+             * Record baru tidak dihitung sebagai perubahan status.
+             * Notifikasi hanya untuk pengajuan yang sebelumnya sudah dikenal,
+             * lalu mengalami perubahan status/detail pemeriksaan.
+             */
+            if (!Object.prototype.hasOwnProperty.call(seenSnapshot, key)) {
+                return;
+            }
+
+            if (seenSnapshot[key] !== currentSnapshot[key]) {
+                unreadCount += 1;
+            }
+        });
+
+        return unreadCount;
+    }
+
+    function renderResultsUpdateNotification(count) {
+        const unreadCount = Math.max(0, Number(count) || 0);
+        const hasUnread = unreadCount > 0;
+
+        if (resultsNavAlert) {
+            resultsNavAlert.hidden = !hasUnread;
+        }
+
+        if (resultsNavCount) {
+            resultsNavCount.hidden = !hasUnread;
+            resultsNavCount.textContent = hasUnread ? String(unreadCount) : '0';
+        }
+    }
+
+    async function loadResultsNotification(){
+        if(resultsNotificationRequestInFlight) return;
+
+        const config = getResultsConfig();
+        if(!config || !config.ajaxUrl || !config.nonce) return;
+
+        resultsNotificationRequestInFlight = true;
+
+        try{
+            const body = new URLSearchParams();
+            body.append('action', 'spj26_resident_results_data');
+            body.append('nonce', config.nonce);
+
+            const response = await fetch(config.ajaxUrl, {
+                method:'POST',
+                credentials:'same-origin',
+                headers:{
+                    'Content-Type':'application/x-www-form-urlencoded; charset=UTF-8'
+                },
+                body:body.toString()
+            });
+
+            const result = await response.json();
+            if(!response.ok || !result || result.success !== true) return;
+
+            const items = result.data && Array.isArray(result.data.submissions)
+                ? result.data.submissions
+                : [];
+
+            renderResultsUpdateNotification(
+                getUnreadResultsUpdateCount(items)
+            );
+        }
+        catch(error){
+            console.error('SIPATUJU Residen - notifikasi hasil:', error);
+        }
+        finally{
+            resultsNotificationRequestInFlight = false;
+        }
+    }
+
+    function startResultsNotificationRefresh(){
+        if(resultsNotificationTimer){
+            window.clearInterval(resultsNotificationTimer);
+        }
+
+        resultsNotificationTimer = window.setInterval(
+            loadResultsNotification,
+            30000
+        );
+    }
+
+    /* =====================================================
+       RESIDENT NAME
+    ===================================================== */
+
+    const residentNameElement =
+        root.querySelector(
+            "#spj26res-submit-user-name"
+        );
+
+
+    function applyResidentIdentity(){
+
+        const config =
+            getSubmissionConfig();
+
+
+        if(
+            config
+            &&
+            config.name
+            &&
+            residentNameElement
+        ){
+
+            residentNameElement.textContent =
+                String(
+                    config.name
+                );
+
+        }
+
+    }
+
+
+    /* =====================================================
+       WIZARD
+    ===================================================== */
+
+    let currentStep = 1;
+
+
+    const totalSteps = 5;
+
+
+    const errorBox =
+        root.querySelector(
+            "#spj26res-submit-error"
+        );
+
+
+    const stepLine =
+        root.querySelector(
+            "#spj26res-submit-step-line"
+        );
+
+
+    function clearError(){
+
+        if(!errorBox){
+            return;
+        }
+
+
+        errorBox.textContent =
+            "";
+
+
+        errorBox.classList.remove(
+            "is-visible"
+        );
+
+    }
+
+
+    function showError(message){
+
+        if(!errorBox){
+            return;
+        }
+
+
+        errorBox.textContent =
+            String(
+                message
+                ||
+                "Terjadi kesalahan."
+            );
+
+
+        errorBox.classList.add(
+            "is-visible"
+        );
+
+
+        errorBox.scrollIntoView({
+            behavior:"smooth",
+            block:"center"
+        });
+
+    }
+
+
+    function updateStepper(){
+
+        const icons = {
+
+            1:"article",
+            2:"subject",
+            3:"school",
+            4:"library_books",
+            5:"task_alt"
+
+        };
+
+
+        root
+            .querySelectorAll(
+                "[data-step-indicator]"
+            )
+            .forEach(
+                function(item){
+
+
+                    const step =
+                        Number(
+                            item.getAttribute(
+                                "data-step-indicator"
+                            )
+                        );
+
+
+                    const icon =
+                        item.querySelector(
+                            ".material-symbols-outlined"
+                        );
+
+
+                    item.classList.remove(
+                        "is-active",
+                        "is-complete"
+                    );
+
+
+                    if(step < currentStep){
+
+                        item.classList.add(
+                            "is-complete"
+                        );
+
+
+                        if(icon){
+                            icon.textContent = "check";
+                        }
+
+                    }
+                    else if(step === currentStep){
+
+                        item.classList.add(
+                            "is-active"
+                        );
+
+
+                        if(icon){
+                            icon.textContent =
+                                icons[step];
+                        }
+
+                    }
+                    else{
+
+                        if(icon){
+                            icon.textContent =
+                                icons[step];
+                        }
+
+                    }
+
+
+                }
+            );
+
+
+        root
+            .querySelectorAll(
+                "[data-step-panel]"
+            )
+            .forEach(
+                function(panel){
+
+
+                    const step =
+                        Number(
+                            panel.getAttribute(
+                                "data-step-panel"
+                            )
+                        );
+
+
+                    panel.classList.toggle(
+                        "is-active",
+                        step === currentStep
+                    );
+
+
+                }
+            );
+
+
+        if(stepLine){
+
+            const width =
+                (
+                    (
+                        currentStep - 1
+                    )
+                    /
+                    (
+                        totalSteps - 1
+                    )
+                )
+                *
+                80;
+
+
+            stepLine.style.width =
+                width + "%";
+
+        }
+
+
+        clearError();
+
+
+        const rightPane =
+            root.querySelector(
+                ".spj26res-rightpane"
+            );
+
+
+        if(
+            window.innerWidth > 800
+            &&
+            rightPane
+        ){
+
+            rightPane.scrollTo({
+                top:0,
+                behavior:"smooth"
+            });
+
+        }
+        else{
+
+            window.scrollTo({
+                top:0,
+                behavior:"smooth"
+            });
+
+        }
+
+    }
+
+
+    /* =====================================================
+       FIELD VALUE
+    ===================================================== */
+
+    function valueOf(selector){
+
+        const element =
+            root.querySelector(
+                selector
+            );
+
+
+        if(!element){
+            return "";
+        }
+
+
+        return String(
+            element.value
+            ||
+            ""
+        ).trim();
+
+    }
+
+
+    /* =====================================================
+       ARTICLE TYPE
+    ===================================================== */
+
+    function getSelectedArticleType(){
+
+        return root.querySelector(
+            'input[name="spj26res_article_type"]:checked'
+        );
+
+    }
+
+
+    function getSelectedArticleDisplay(){
+
+        const selected =
+            getSelectedArticleType();
+
+
+        if(!selected){
+            return "";
+        }
+
+
+        return String(
+            selected.dataset.displayLabel
+            ||
+            selected.value
+            ||
+            ""
+        );
+
+    }
+
+
+    /* =====================================================
+       URL VALIDATION
+    ===================================================== */
+
+    function isValidHttpUrl(value){
+
+        try{
+
+            const url =
+                new URL(
+                    value
+                );
+
+
+            return (
+                url.protocol === "https:"
+                ||
+                url.protocol === "http:"
+            );
+
+        }
+        catch(error){
+
+            return false;
+
+        }
+
+    }
+
+
+    /* =====================================================
+       DUPLICATE JOURNAL
+    ===================================================== */
+
+    function normalizeJournalName(value){
+
+        return String(
+            value
+            ||
+            ""
+        )
+        .trim()
+        .toLowerCase()
+        .replace(
+            /\s+/g,
+            " "
+        )
+        .replace(
+            /[.,;:()[\]{}'"`]/g,
+            ""
+        )
+        .trim();
+
+    }
+
+
+    function normalizeIssn(value){
+
+        return String(
+            value
+            ||
+            ""
+        )
+        .toUpperCase()
+        .replace(
+            /[^0-9X]/g,
+            ""
+        );
+
+    }
+
+
+    /* =====================================================
+       RESTRICTED JOURNAL CHECK
+
+       Logic:
+       - Nama jurnal cocok ATAU ISSN cocok => DITOLAK
+       - Nama jurnal tidak cocok DAN ISSN tidak cocok => BOLEH
+
+       Source of truth tetap backend SIPATUJU.
+       Frontend tidak mengunduh seluruh daftar restricted.
+    ===================================================== */
+
+    function collectJournalRestrictionPayload(){
+
+        const journals = [];
+
+        for(
+            let i = 1;
+            i <= 3;
+            i++
+        ){
+
+            journals.push({
+                order:i,
+                journal_name:
+                    valueOf(
+                        "#spj26res-submit-j"
+                        +
+                        i
+                        +
+                        "-name"
+                    ),
+                issn:
+                    valueOf(
+                        "#spj26res-submit-j"
+                        +
+                        i
+                        +
+                        "-issn"
+                    )
+            });
+
+        }
+
+        return journals;
+
+    }
+
+
+    async function checkRestrictedJournals(){
+
+        const config =
+            getSubmissionConfig();
+
+        if(
+            !config
+            ||
+            !config.ajaxUrl
+            ||
+            !config.nonce
+        ){
+
+            throw new Error(
+                "Konfigurasi pemeriksaan jurnal belum tersedia."
+            );
+
+        }
+
+
+        const body =
+            new URLSearchParams();
+
+        body.append(
+            "action",
+            "spj26_check_restricted_journals"
+        );
+
+        body.append(
+            "nonce",
+            config.nonce
+        );
+
+        body.append(
+            "journals",
+            JSON.stringify(
+                collectJournalRestrictionPayload()
+            )
+        );
+
+
+        const response =
+            await fetch(
+                config.ajaxUrl,
+                {
+                    method:"POST",
+                    credentials:"same-origin",
+                    headers:{
+                        "Content-Type":
+                            "application/x-www-form-urlencoded; charset=UTF-8"
+                    },
+                    body:
+                        body.toString()
+                }
+            );
+
+
+        let result = null;
+
+        try{
+            result =
+                await response.json();
+        }
+        catch(error){
+            throw new Error(
+                "Respons pemeriksaan jurnal dari server tidak valid."
+            );
+        }
+
+
+        if(
+            !response.ok
+            ||
+            !result
+            ||
+            result.success !== true
+        ){
+
+            throw new Error(
+                result
+                &&
+                result.data
+                &&
+                result.data.message
+                ?
+                result.data.message
+                :
+                "Pemeriksaan daftar Predator / Discontinued gagal dilakukan."
+            );
+
+        }
+
+
+        return result.data || {};
+
+    }
+
+
+    function restrictedJournalMessage(matches){
+
+        const list =
+            Array.isArray(matches)
+            ? matches
+            : [];
+
+        if(list.length === 0){
+            return "";
+        }
+
+
+        return list
+            .map(function(match){
+
+                const order =
+                    Number(match.order) || 0;
+
+                const nameMatch =
+                    match.name_match === true;
+
+                const issnMatch =
+                    match.issn_match === true;
+
+                let reason =
+                    "terdapat dalam daftar Jurnal Predator / Discontinued SIPATUJU";
+
+                if(nameMatch && issnMatch){
+                    reason =
+                        "nama jurnal dan ISSN terdapat dalam daftar Jurnal Predator / Discontinued SIPATUJU";
+                }
+                else if(nameMatch){
+                    reason =
+                        "nama jurnal terdapat dalam daftar Jurnal Predator / Discontinued SIPATUJU";
+                }
+                else if(issnMatch){
+                    reason =
+                        "ISSN terdapat dalam daftar Jurnal Predator / Discontinued SIPATUJU";
+                }
+
+
+                return (
+                    "Jurnal Kandidat "
+                    +
+                    order
+                    +
+                    " tidak dapat diajukan karena "
+                    +
+                    reason
+                    +
+                    "."
+                );
+
+            })
+            .join(" ")
+            +
+            " Silakan ganti jurnal tersebut sebelum melanjutkan.";
+
+    }
+
+
+    async function validateRestrictedJournals(){
+
+        const data =
+            await checkRestrictedJournals();
+
+        const matches =
+            Array.isArray(data.matches)
+            ? data.matches
+            : [];
+
+        const allowed =
+            data.allowed === true
+            &&
+            matches.length === 0;
+
+        if(!allowed){
+
+            showError(
+                restrictedJournalMessage(matches)
+                ||
+                "Satu atau lebih jurnal kandidat terdapat dalam daftar Jurnal Predator / Discontinued SIPATUJU."
+            );
+
+            return false;
+
+        }
+
+        return true;
+
+    }
+
+
+    function findDuplicateJournals(){
+
+        const journals = [];
+
+
+        for(
+            let i = 1;
+            i <= 3;
+            i++
+        ){
+
+            journals.push({
+
+                number:
+                    i,
+
+                name:
+                    normalizeJournalName(
+                        valueOf(
+                            "#spj26res-submit-j"
+                            +
+                            i
+                            +
+                            "-name"
+                        )
+                    ),
+
+                issn:
+                    normalizeIssn(
+                        valueOf(
+                            "#spj26res-submit-j"
+                            +
+                            i
+                            +
+                            "-issn"
+                        )
+                    )
+
+            });
+
+        }
+
+
+        for(
+            let i = 0;
+            i < journals.length;
+            i++
+        ){
+
+            for(
+                let j = i + 1;
+                j < journals.length;
+                j++
+            ){
+
+                const sameName =
+                    journals[i].name !== ""
+                    &&
+                    journals[i].name
+                    ===
+                    journals[j].name;
+
+
+                const sameIssn =
+                    journals[i].issn !== ""
+                    &&
+                    journals[i].issn
+                    ===
+                    journals[j].issn;
+
+
+                if(
+                    sameName
+                    ||
+                    sameIssn
+                ){
+
+                    return {
+
+                        first:
+                            journals[i].number,
+
+                        second:
+                            journals[j].number,
+
+                        reason:
+                            sameName
+                            &&
+                            sameIssn
+                            ?
+                            "nama jurnal dan ISSN sama"
+                            :
+                            (
+                                sameName
+                                ?
+                                "nama jurnal sama"
+                                :
+                                "ISSN sama"
+                            )
+
+                    };
+
+                }
+
+            }
+
+        }
+
+
+        return null;
+
+    }
+
+
+    /* =====================================================
+       VALIDATION
+    ===================================================== */
+
+    function validateStep(step){
+
+        clearError();
+
+
+        /* =============================================
+           STEP 1
+        ============================================== */
+
+        if(step === 1){
+
+            if(
+                !getSelectedArticleType()
+            ){
+
+                showError(
+                    "Pilih jenis artikel terlebih dahulu."
+                );
+
+
+                return false;
+
+            }
+
+        }
+
+
+        /* =============================================
+           STEP 2
+        ============================================== */
+
+        if(step === 2){
+
+            const thesisTitle =
+                valueOf(
+                    "#spj26res-submit-thesis-title"
+                );
+
+
+            const articleTitle =
+                valueOf(
+                    "#spj26res-submit-title"
+                );
+
+
+            const abstract =
+                valueOf(
+                    "#spj26res-submit-abstract"
+                );
+
+
+            if(!thesisTitle){
+
+                showError(
+                    "Judul Proposal Tesis wajib diisi."
+                );
+
+
+                return false;
+
+            }
+
+
+            if(!articleTitle){
+
+                showError(
+                    "Judul Artikel wajib diisi."
+                );
+
+
+                return false;
+
+            }
+
+
+            if(!abstract){
+
+                showError(
+                    "Abstrak artikel wajib diisi."
+                );
+
+
+                return false;
+
+            }
+
+        }
+
+
+        /* =============================================
+           STEP 3
+        ============================================== */
+
+        if(step === 3){
+
+            const supervisor =
+                valueOf(
+                    "#spj26res-submit-supervisor"
+                );
+
+
+            if(!supervisor){
+
+                showError(
+                    "Dosen Pembimbing Utama wajib diisi."
+                );
+
+
+                return false;
+
+            }
+
+        }
+
+
+        /* =============================================
+           STEP 4
+        ============================================== */
+
+        if(step === 4){
+
+            for(
+                let i = 1;
+                i <= 3;
+                i++
+            ){
+
+                const name =
+                    valueOf(
+                        "#spj26res-submit-j"
+                        +
+                        i
+                        +
+                        "-name"
+                    );
+
+
+                const issn =
+                    valueOf(
+                        "#spj26res-submit-j"
+                        +
+                        i
+                        +
+                        "-issn"
+                    );
+
+
+                const quartile =
+                    valueOf(
+                        "#spj26res-submit-j"
+                        +
+                        i
+                        +
+                        "-index"
+                    );
+
+
+                const link =
+                    valueOf(
+                        "#spj26res-submit-j"
+                        +
+                        i
+                        +
+                        "-link"
+                    );
+
+
+                if(
+                    !name
+                    ||
+                    !issn
+                    ||
+                    !quartile
+                    ||
+                    !link
+                ){
+
+                    showError(
+                        "Lengkapi Nama Jurnal, ISSN, Kuartil Jurnal, dan Link Jurnal pada ketiga jurnal kandidat."
+                    );
+
+
+                    return false;
+
+                }
+
+
+                if(
+                    !isValidHttpUrl(
+                        link
+                    )
+                ){
+
+                    showError(
+                        "Link Jurnal Kandidat "
+                        +
+                        i
+                        +
+                        " tidak valid. Gunakan alamat lengkap yang diawali https:// atau http://."
+                    );
+
+
+                    return false;
+
+                }
+
+            }
+
+
+            const duplicate =
+                findDuplicateJournals();
+
+
+            if(duplicate){
+
+                showError(
+                    "Jurnal Kandidat "
+                    +
+                    duplicate.first
+                    +
+                    " dan Jurnal Kandidat "
+                    +
+                    duplicate.second
+                    +
+                    " terdeteksi sama karena "
+                    +
+                    duplicate.reason
+                    +
+                    ". Gunakan tiga jurnal yang berbeda."
+                );
+
+
+                return false;
+
+            }
+
+        }
+
+
+        return true;
+
+    }
+
+
+    /* =====================================================
+       FINALIZATION SUMMARY
+    ===================================================== */
+
+    function setText(selector,value){
+
+        const element =
+            root.querySelector(
+                selector
+            );
+
+
+        if(element){
+
+            element.textContent =
+                value
+                ||
+                "-";
+
+        }
+
+    }
+
+
+    function buildSummary(){
+
+        setText(
+            "#spj26res-submit-summary-type",
+            getSelectedArticleDisplay()
+        );
+
+
+        setText(
+            "#spj26res-submit-summary-thesis-title",
+            valueOf(
+                "#spj26res-submit-thesis-title"
+            )
+        );
+
+
+        setText(
+            "#spj26res-submit-summary-title",
+            valueOf(
+                "#spj26res-submit-title"
+            )
+        );
+
+
+        setText(
+            "#spj26res-submit-summary-abstract",
+            valueOf(
+                "#spj26res-submit-abstract"
+            )
+        );
+
+
+        setText(
+            "#spj26res-submit-summary-supervisor",
+            valueOf(
+                "#spj26res-submit-supervisor"
+            )
+        );
+
+
+        const journalsBox =
+            root.querySelector(
+                "#spj26res-submit-summary-journals"
+            );
+
+
+        if(!journalsBox){
+            return;
+        }
+
+
+        journalsBox.innerHTML =
+            "";
+
+
+        for(
+            let i = 1;
+            i <= 3;
+            i++
+        ){
+
+            const name =
+                valueOf(
+                    "#spj26res-submit-j"
+                    +
+                    i
+                    +
+                    "-name"
+                );
+
+
+            const issn =
+                valueOf(
+                    "#spj26res-submit-j"
+                    +
+                    i
+                    +
+                    "-issn"
+                );
+
+
+            const quartile =
+                valueOf(
+                    "#spj26res-submit-j"
+                    +
+                    i
+                    +
+                    "-index"
+                );
+
+
+            const link =
+                valueOf(
+                    "#spj26res-submit-j"
+                    +
+                    i
+                    +
+                    "-link"
+                );
+
+
+            const row =
+                document.createElement(
+                    "div"
+                );
+
+
+            row.className =
+                "spj26res-summary-journal";
+
+
+            const badge =
+                document.createElement(
+                    "span"
+                );
+
+
+            badge.className =
+                "spj26res-summary-badge";
+
+
+            badge.textContent =
+                String(i);
+
+
+            const info =
+                document.createElement(
+                    "div"
+                );
+
+
+            info.className =
+                "spj26res-summary-journal-info";
+
+
+            const nameElement =
+                document.createElement(
+                    "div"
+                );
+
+
+            nameElement.className =
+                "spj26res-summary-journal-name";
+
+
+            nameElement.textContent =
+                name;
+
+
+            const meta =
+                document.createElement(
+                    "div"
+                );
+
+
+            meta.className =
+                "spj26res-summary-journal-meta";
+
+
+            meta.textContent =
+                "ISSN: "
+                +
+                issn
+                +
+                " • Kuartil: "
+                +
+                quartile;
+
+
+            const anchor =
+                document.createElement(
+                    "a"
+                );
+
+
+            anchor.className =
+                "spj26res-summary-journal-link";
+
+
+            anchor.href =
+                link;
+
+
+            anchor.target =
+                "_blank";
+
+
+            anchor.rel =
+                "noopener noreferrer";
+
+
+            const icon =
+                document.createElement(
+                    "span"
+                );
+
+
+            icon.className =
+                "material-symbols-outlined";
+
+
+            icon.textContent =
+                "open_in_new";
+
+
+            const linkText =
+                document.createElement(
+                    "span"
+                );
+
+
+            linkText.textContent =
+                link;
+
+
+            anchor.appendChild(
+                icon
+            );
+
+
+            anchor.appendChild(
+                linkText
+            );
+
+
+            info.appendChild(
+                nameElement
+            );
+
+
+            info.appendChild(
+                meta
+            );
+
+
+            info.appendChild(
+                anchor
+            );
+
+
+            row.appendChild(
+                badge
+            );
+
+
+            row.appendChild(
+                info
+            );
+
+
+            journalsBox.appendChild(
+                row
+            );
+
+        }
+
+    }
+
+
+    /* =====================================================
+       NEXT BUTTONS
+
+       STEP 4 -> STEP 5 menjalankan restricted-journal precheck
+       sebelum user dapat masuk ke Finalisasi.
+    ===================================================== */
+
+    root
+        .querySelectorAll(
+            "[data-next-step]"
+        )
+        .forEach(
+            function(button){
+
+
+                button.addEventListener(
+                    "click",
+                    async function(){
+
+
+                        if(
+                            !validateStep(
+                                currentStep
+                            )
+                        ){
+
+                            return;
+
+                        }
+
+
+                        const next =
+                            Number(
+                                button.getAttribute(
+                                    "data-next-step"
+                                )
+                            );
+
+
+                        if(
+                            currentStep === 4
+                            &&
+                            next === 5
+                        ){
+
+                            const originalHtml =
+                                button.innerHTML;
+
+                            button.disabled =
+                                true;
+
+                            button.innerHTML =
+                                '<span>Memeriksa...</span>'
+                                +
+                                '<span class="material-symbols-outlined">hourglass_top</span>';
+
+                            try{
+
+                                const allowed =
+                                    await validateRestrictedJournals();
+
+                                if(!allowed){
+                                    return;
+                                }
+
+                            }
+                            catch(error){
+
+                                showError(
+                                    error
+                                    &&
+                                    error.message
+                                    ?
+                                    error.message
+                                    :
+                                    "Pemeriksaan daftar Predator / Discontinued gagal dilakukan."
+                                );
+
+                                return;
+
+                            }
+                            finally{
+
+                                button.disabled =
+                                    false;
+
+                                button.innerHTML =
+                                    originalHtml;
+
+                            }
+
+                        }
+
+
+                        if(next === 5){
+
+                            buildSummary();
+
+                        }
+
+
+                        currentStep =
+                            next;
+
+
+                        updateStepper();
+
+
+                    }
+                );
+
+
+            }
+        );
+
+
+    /* =====================================================
+       PREVIOUS BUTTONS
+    ===================================================== */
+
+    root
+        .querySelectorAll(
+            "[data-prev-step]"
+        )
+        .forEach(
+            function(button){
+
+
+                button.addEventListener(
+                    "click",
+                    function(){
+
+
+                        currentStep =
+                            Number(
+                                button.getAttribute(
+                                    "data-prev-step"
+                                )
+                            );
+
+
+                        updateStepper();
+
+
+                    }
+                );
+
+
+            }
+        );
+
+
+    /* =====================================================
+       ABSTRACT WORD COUNTER
+    ===================================================== */
+
+    const abstractTextarea =
+        root.querySelector(
+            "#spj26res-submit-abstract"
+        );
+
+
+    const wordCounter =
+        root.querySelector(
+            "#spj26res-submit-word-counter"
+        );
+
+
+    function updateWordCounter(){
+
+        if(
+            !abstractTextarea
+            ||
+            !wordCounter
+        ){
+
+            return;
+
+        }
+
+
+        const text =
+            abstractTextarea.value.trim();
+
+
+        const count =
+            text === ""
+            ?
+            0
+            :
+            text
+                .split(/\s+/)
+                .filter(Boolean)
+                .length;
+
+
+        wordCounter.textContent =
+            count
+            +
+            " kata";
+
+    }
+
+
+    if(abstractTextarea){
+
+        abstractTextarea.addEventListener(
+            "input",
+            updateWordCounter
+        );
+
+
+        updateWordCounter();
+
+    }
+
+
+    /* =====================================================
+       SUCCESS
+    ===================================================== */
+
+    const successBox =
+        root.querySelector(
+            "#spj26res-submit-success"
+        );
+
+
+    const successMessage =
+        root.querySelector(
+            "#spj26res-submit-success-message"
+        );
+
+
+    const successCode =
+        root.querySelector(
+            "#spj26res-submit-success-code"
+        );
+
+
+    function clearSuccess(){
+
+        if(successBox){
+
+            successBox.classList.remove(
+                "is-visible"
+            );
+
+        }
+
+
+        if(successMessage){
+
+            successMessage.textContent =
+                "";
+
+        }
+
+
+        if(successCode){
+
+            successCode.textContent =
+                "";
+
+        }
+
+    }
+
+
+    function showSuccess(
+        message,
+        code,
+        status
+    ){
+
+        clearError();
+
+
+        if(successMessage){
+
+            successMessage.textContent =
+                message
+                ||
+                "Pengajuan berhasil dikirim.";
+
+        }
+
+
+        if(successCode){
+
+            successCode.textContent =
+                "Kode Pengajuan: "
+                +
+                (
+                    code
+                    ||
+                    "-"
+                )
+                +
+                (
+                    status
+                    ?
+                    " • "
+                    +
+                    status
+                    :
+                    ""
+                );
+
+        }
+
+
+        if(successBox){
+
+            successBox.classList.add(
+                "is-visible"
+            );
+
+
+            successBox.scrollIntoView({
+                behavior:"smooth",
+                block:"center"
+            });
+
+        }
+
+    }
+
+
+    /* =====================================================
+       BACKEND SUBMISSION
+
+       UI:
+       Original Article
+       Systematic Review / Meta-Analysis
+
+       BACKEND:
+       Research Article
+       Review Article
+    ===================================================== */
+
+    async function submitToBackend(){
+
+        const config =
+            getSubmissionConfig();
+
+
+        if(
+            !config
+            ||
+            !config.ajaxUrl
+            ||
+            !config.nonce
+            ||
+            !config.submissionToken
+        ){
+
+            throw new Error(
+                "Konfigurasi Submission System belum tersedia."
+            );
+
+        }
+
+
+        const articleType =
+            getSelectedArticleType();
+
+
+        if(!articleType){
+
+            throw new Error(
+                "Jenis artikel belum dipilih."
+            );
+
+        }
+
+
+        const body =
+            new URLSearchParams();
+
+
+        body.append(
+            "action",
+            "spj26_create_submission"
+        );
+
+
+        body.append(
+            "nonce",
+            config.nonce
+        );
+
+
+        body.append(
+            "request_token",
+            config.submissionToken
+        );
+
+
+        /*
+         * Backend compatible value.
+         */
+
+        body.append(
+            "article_type",
+            articleType.value
+        );
+
+
+        /*
+         * Human-friendly label.
+         * Older backend may ignore it safely.
+         */
+
+        body.append(
+            "article_type_display",
+            articleType.dataset.displayLabel
+            ||
+            ""
+        );
+
+
+        body.append(
+            "thesis_proposal_title",
+            valueOf(
+                "#spj26res-submit-thesis-title"
+            )
+        );
+
+
+        body.append(
+            "article_title",
+            valueOf(
+                "#spj26res-submit-title"
+            )
+        );
+
+
+        body.append(
+            "article_abstract",
+            valueOf(
+                "#spj26res-submit-abstract"
+            )
+        );
+
+
+        body.append(
+            "supervisor_name",
+            valueOf(
+                "#spj26res-submit-supervisor"
+            )
+        );
+
+
+        for(
+            let i = 1;
+            i <= 3;
+            i++
+        ){
+
+            body.append(
+                "journal_"
+                +
+                i
+                +
+                "_name",
+                valueOf(
+                    "#spj26res-submit-j"
+                    +
+                    i
+                    +
+                    "-name"
+                )
+            );
+
+
+            body.append(
+                "journal_"
+                +
+                i
+                +
+                "_issn",
+                valueOf(
+                    "#spj26res-submit-j"
+                    +
+                    i
+                    +
+                    "-issn"
+                )
+            );
+
+
+            body.append(
+                "journal_"
+                +
+                i
+                +
+                "_quartile",
+                valueOf(
+                    "#spj26res-submit-j"
+                    +
+                    i
+                    +
+                    "-index"
+                )
+            );
+
+
+            body.append(
+                "journal_"
+                +
+                i
+                +
+                "_link",
+                valueOf(
+                    "#spj26res-submit-j"
+                    +
+                    i
+                    +
+                    "-link"
+                )
+            );
+
+        }
+
+
+        const response =
+            await fetch(
+                config.ajaxUrl,
+                {
+
+                    method:
+                        "POST",
+
+                    credentials:
+                        "same-origin",
+
+                    headers:{
+                        "Content-Type":
+                            "application/x-www-form-urlencoded; charset=UTF-8"
+                    },
+
+                    body:
+                        body.toString()
+
+                }
+            );
+
+
+        let result;
+
+
+        try{
+
+            result =
+                await response.json();
+
+        }
+        catch(error){
+
+            throw new Error(
+                "Respons server tidak valid."
+            );
+
+        }
+
+
+        if(
+            !response.ok
+            ||
+            !result
+            ||
+            result.success !== true
+        ){
+
+            const message =
+                result
+                &&
+                result.data
+                &&
+                result.data.message
+                ?
+                result.data.message
+                :
+                "Pengajuan gagal dikirim.";
+
+
+            throw new Error(
+                message
+            );
+
+        }
+
+
+        return result.data
+        ||
+        {};
+
+    }
+
+
+    /* =====================================================
+       FINAL SUBMIT
+    ===================================================== */
+
+    const finalButton =
+        root.querySelector(
+            "#spj26res-submit-final"
+        );
+
+
+    if(finalButton){
+
+        finalButton.addEventListener(
+            "click",
+            async function(){
+
+
+                clearError();
+
+                clearSuccess();
+
+
+                /*
+                 * Revalidate all previous steps.
+                 */
+
+                for(
+                    let step = 1;
+                    step <= 4;
+                    step++
+                ){
+
+                    if(
+                        !validateStep(
+                            step
+                        )
+                    ){
+
+                        currentStep =
+                            step;
+
+
+                        updateStepper();
+
+
+                        return;
+
+                    }
+
+                }
+
+
+                /*
+                 * Re-check restricted list immediately before final submit.
+                 * Ini menutup race condition jika daftar restricted berubah
+                 * setelah user meninggalkan Step 4.
+                 */
+
+                try{
+
+                    const restrictionData =
+                        await checkRestrictedJournals();
+
+                    const restrictionMatches =
+                        Array.isArray(
+                            restrictionData.matches
+                        )
+                        ?
+                        restrictionData.matches
+                        :
+                        [];
+
+                    if(
+                        restrictionData.allowed !== true
+                        ||
+                        restrictionMatches.length > 0
+                    ){
+
+                        currentStep = 4;
+
+                        updateStepper();
+
+                        showError(
+                            restrictedJournalMessage(
+                                restrictionMatches
+                            )
+                            ||
+                            "Satu atau lebih jurnal kandidat terdapat dalam daftar Jurnal Predator / Discontinued SIPATUJU."
+                        );
+
+                        return;
+
+                    }
+
+                }
+                catch(error){
+
+                    currentStep = 4;
+
+                    updateStepper();
+
+                    showError(
+                        error
+                        &&
+                        error.message
+                        ?
+                        error.message
+                        :
+                        "Pemeriksaan daftar Predator / Discontinued gagal dilakukan."
+                    );
+
+                    return;
+
+                }
+
+
+                buildSummary();
+
+
+                const originalHtml =
+                    finalButton.innerHTML;
+
+
+                finalButton.disabled =
+                    true;
+
+
+                finalButton.innerHTML =
+                    '<span>Mengirim...</span>'
+                    +
+                    '<span class="material-symbols-outlined">hourglass_top</span>';
+
+
+                try{
+
+
+                    const data =
+                        await submitToBackend();
+
+
+                    showSuccess(
+
+                        data.message
+                        ||
+                        "Pengajuan berhasil dikirim.",
+
+                        data.code
+                        ||
+                        "",
+
+                        data.status_label
+                        ||
+                        "Menunggu Pemeriksaan"
+
+                    );
+
+
+                    finalButton.innerHTML =
+                        '<span>Pengajuan Terkirim</span>'
+                        +
+                        '<span class="material-symbols-outlined">check_circle</span>';
+
+
+                    finalButton.disabled =
+                        true;
+
+
+                    root
+                        .querySelectorAll(
+                            "input, textarea, select"
+                        )
+                        .forEach(
+                            function(field){
+
+                                field.disabled =
+                                    true;
+
+                            }
+                        );
+
+
+                    const resultsUrl =
+                        (
+                            window.spj26ResidentResultsConfig
+                            &&
+                            window.spj26ResidentResultsConfig.resultsUrl
+                        )
+                        ||
+                        "/residen-sipatuju/hasil/";
+
+
+                    const submittedCode =
+                        data.code
+                        ||
+                        "";
+
+
+                    window.setTimeout(
+                        function(){
+
+                            const target =
+                                new URL(
+                                    resultsUrl,
+                                    window.location.origin
+                                );
+
+
+                            if(submittedCode){
+
+                                target.searchParams.set(
+                                    "submitted",
+                                    submittedCode
+                                );
+
+                            }
+
+
+                            window.location.assign(
+                                target.toString()
+                            );
+
+                        },
+                        1200
+                    );
+
+
+                }
+                catch(error){
+
+
+                    finalButton.disabled =
+                        false;
+
+
+                    finalButton.innerHTML =
+                        originalHtml;
+
+
+                    showError(
+                        error
+                        &&
+                        error.message
+                        ?
+                        error.message
+                        :
+                        "Pengajuan gagal dikirim."
+                    );
+
+
+                }
+
+
+            }
+        );
+
+    }
+    /* =====================================================
+       INITIALIZATION
+    ===================================================== */
+
+    function initialize(){
+
+        applyResidentIdentity();
+
+        applyNavigationConfig();
+
+        loadResultsNotification();
+
+        startResultsNotificationRefresh();
+
+        updateStepper();
+
+    }
+
+
+    if(
+        document.readyState === "loading"
+    ){
+
+        document.addEventListener(
+            "DOMContentLoaded",
+            initialize,
+            {
+                once:true
+            }
+        );
+
+    }
+    else{
+
+        initialize();
+
+    }
+
+
+})();
+
+</script>

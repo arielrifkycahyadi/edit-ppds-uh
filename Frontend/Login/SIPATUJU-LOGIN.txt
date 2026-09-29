@@ -1,0 +1,3392 @@
+<!-- =========================================================
+     SIPATUJU PPDS FK UNHAS
+     PAGE      : LOGIN
+     SLUG      : /sipatuju-login
+     ROLE      : Residen / Reviewer / Admin
+     FORMAT    : Elementor HTML Widget
+     NAMESPACE : spj26auth
+     VIEWPORT  : Fully responsive — desktop locked, mobile/tablet adaptive scroll
+     PASSWORD  : Native browser reveal icon hidden; custom icon only
+     AUTH      : WordPress AJAX authentication via 000 — 01 snippet
+========================================================== -->
+
+<style>
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap');
+
+
+/* =========================================================
+   ROOT
+========================================================= */
+
+#spj26auth-root {
+
+    --spj26auth-maroon: #800000;
+    --spj26auth-maroon-dark: #5c0000;
+    --spj26auth-maroon-mid: #8b1e1e;
+
+    --spj26auth-primary: #6a020a;
+
+    --spj26auth-bg: #f8fafc;
+    --spj26auth-card: #ffffff;
+    --spj26auth-soft: #f1f5f9;
+
+    --spj26auth-text: #0f172a;
+    --spj26auth-muted: #64748b;
+
+    --spj26auth-line: #e2e8f0;
+
+    --spj26auth-error: #b91c1c;
+    --spj26auth-error-bg: #fef2f2;
+
+    width: 100%;
+
+    height: 100vh;
+    height: 100dvh;
+
+    min-height: 0;
+
+    margin: 0;
+    padding: 0;
+
+    background:
+        var(--spj26auth-bg);
+
+    color:
+        var(--spj26auth-text);
+
+    font-family:
+        "Inter",
+        Arial,
+        sans-serif;
+
+    box-sizing:
+        border-box;
+
+    overflow:
+        hidden;
+
+}
+
+
+#spj26auth-root *,
+#spj26auth-root *::before,
+#spj26auth-root *::after {
+
+    box-sizing:
+        border-box;
+
+}
+
+
+#spj26auth-root h1,
+#spj26auth-root h2,
+#spj26auth-root h3,
+#spj26auth-root p {
+
+    margin: 0;
+
+}
+
+
+#spj26auth-root a {
+
+    color:
+        inherit;
+
+    text-decoration:
+        none;
+
+}
+
+
+#spj26auth-root button,
+#spj26auth-root input {
+
+    font:
+        inherit;
+
+}
+
+
+/* =========================================================
+   LOGIN PAGE VIEWPORT LOCK
+========================================================= */
+
+html.spj26auth-page-lock,
+body.spj26auth-page-lock {
+
+    width:
+        100% !important;
+
+    height:
+        100% !important;
+
+    min-height:
+        100% !important;
+
+    margin:
+        0 !important;
+
+    padding:
+        0 !important;
+
+    overflow:
+        hidden !important;
+
+}
+
+
+body.spj26auth-page-lock #page,
+body.spj26auth-page-lock .site,
+body.spj26auth-page-lock .site-content,
+body.spj26auth-page-lock .elementor,
+body.spj26auth-page-lock .elementor-section-wrap,
+body.spj26auth-page-lock .elementor-element,
+body.spj26auth-page-lock .elementor-widget,
+body.spj26auth-page-lock .elementor-widget-container {
+
+    max-height:
+        none;
+
+}
+
+
+/* =========================================================
+   MAIN LAYOUT
+========================================================= */
+
+#spj26auth-root .spj26auth-shell {
+
+    width:
+        100%;
+
+    height:
+        100%;
+
+    min-height:
+        0;
+
+    overflow:
+        hidden;
+
+    display:
+        grid;
+
+    grid-template-columns:
+        minmax(0, 1.08fr)
+        minmax(440px, 0.92fr);
+
+}
+
+
+/* =========================================================
+   LEFT BRAND PANEL
+========================================================= */
+
+#spj26auth-root .spj26auth-brand-panel {
+
+    position:
+        relative;
+
+    height:
+        100%;
+
+    min-height:
+        0;
+
+    overflow:
+        hidden;
+
+    padding:
+        42px
+        50px;
+
+    background:
+        linear-gradient(
+            135deg,
+            var(--spj26auth-maroon-dark) 0%,
+            var(--spj26auth-maroon-mid) 50%,
+            var(--spj26auth-primary) 100%
+        );
+
+    color:
+        #ffffff;
+
+    display:
+        flex;
+
+    flex-direction:
+        column;
+
+    justify-content:
+        space-between;
+
+}
+
+
+#spj26auth-root .spj26auth-brand-panel::before {
+
+    content:
+        "";
+
+    position:
+        absolute;
+
+    width:
+        440px;
+
+    height:
+        440px;
+
+    right:
+        -160px;
+
+    top:
+        -120px;
+
+    border-radius:
+        50%;
+
+    background:
+        rgba(
+            255,
+            255,
+            255,
+            0.055
+        );
+
+}
+
+
+#spj26auth-root .spj26auth-brand-panel::after {
+
+    content:
+        "";
+
+    position:
+        absolute;
+
+    width:
+        330px;
+
+    height:
+        330px;
+
+    left:
+        -120px;
+
+    bottom:
+        -145px;
+
+    border-radius:
+        50%;
+
+    background:
+        rgba(
+            255,
+            255,
+            255,
+            0.035
+        );
+
+}
+
+
+#spj26auth-root .spj26auth-brand-top,
+#spj26auth-root .spj26auth-brand-center,
+#spj26auth-root .spj26auth-brand-bottom {
+
+    position:
+        relative;
+
+    z-index:
+        2;
+
+}
+
+
+/* =========================================================
+   LOGO / BRAND LOCKUP
+========================================================= */
+
+#spj26auth-root .spj26auth-brand-lockup {
+
+    display:
+        flex;
+
+    align-items:
+        center;
+
+    gap:
+        14px;
+
+}
+
+
+#spj26auth-root .spj26auth-logo {
+
+    width:
+        50px;
+
+    height:
+        50px;
+
+    flex:
+        0 0 50px;
+
+    border-radius:
+        10px;
+
+    background:
+        #ffffff;
+
+    color:
+        var(--spj26auth-maroon);
+
+    display:
+        flex;
+
+    align-items:
+        center;
+
+    justify-content:
+        center;
+
+    box-shadow:
+        0
+        10px
+        24px
+        rgba(
+            0,
+            0,
+            0,
+            0.14
+        );
+
+}
+
+
+#spj26auth-root
+.spj26auth-logo
+.material-symbols-outlined {
+
+    font-size:
+        27px;
+
+}
+
+
+#spj26auth-root .spj26auth-brand-name {
+
+    font-family:
+        "Plus Jakarta Sans",
+        sans-serif;
+
+    font-size:
+        16px;
+
+    line-height:
+        1.25;
+
+    font-weight:
+        800;
+
+    letter-spacing:
+        -0.02em;
+
+}
+
+
+#spj26auth-root .spj26auth-brand-unit {
+
+    margin-top:
+        4px;
+
+    color:
+        rgba(
+            255,
+            255,
+            255,
+            0.72
+        );
+
+    font-size:
+        10px;
+
+    line-height:
+        1.4;
+
+    letter-spacing:
+        0.08em;
+
+    text-transform:
+        uppercase;
+
+}
+
+
+/* =========================================================
+   CENTER BRAND TEXT
+========================================================= */
+
+#spj26auth-root .spj26auth-brand-center {
+
+    width:
+        100%;
+
+    max-width:
+        720px;
+
+    padding:
+        40px
+        0;
+
+}
+
+
+/* PORTAL BADGE */
+
+#spj26auth-root .spj26auth-brand-kicker {
+
+    display:
+        inline-flex;
+
+    align-items:
+        center;
+
+    gap:
+        7px;
+
+    padding:
+        6px
+        10px;
+
+    border-radius:
+        999px;
+
+    background:
+        rgba(
+            55,
+            0,
+            0,
+            0.32
+        );
+
+    border:
+        1px solid
+        rgba(
+            255,
+            255,
+            255,
+            0.08
+        );
+
+    font-size:
+        9.5px;
+
+    font-weight:
+        800;
+
+    text-transform:
+        uppercase;
+
+    letter-spacing:
+        0.07em;
+
+}
+
+
+#spj26auth-root .spj26auth-kicker-dot {
+
+    width:
+        7px;
+
+    height:
+        7px;
+
+    border-radius:
+        50%;
+
+    background:
+        #86efac;
+
+}
+
+
+/* =========================================================
+   MAIN SYSTEM TITLE
+
+   "Sistem Pemeriksaan Kelayakan Jurnal"
+   selalu 1 baris.
+========================================================= */
+
+#spj26auth-root
+.spj26auth-brand-center
+.spj26auth-system-title {
+
+    display:
+        block;
+
+    width:
+        100%;
+
+    margin-top:
+        16px;
+
+    color:
+        #ffffff !important;
+
+    -webkit-text-fill-color:
+        #ffffff !important;
+
+    font-family:
+        "Plus Jakarta Sans",
+        sans-serif;
+
+    font-size:
+        clamp(
+            27px,
+            2.35vw,
+            38px
+        );
+
+    line-height:
+        1.12;
+
+    font-weight:
+        800;
+
+    letter-spacing:
+        -0.035em;
+
+    white-space:
+        nowrap;
+
+}
+
+
+/* =========================================================
+   SYSTEM SUBTITLE
+   PPDS FK UNHAS
+========================================================= */
+
+#spj26auth-root
+.spj26auth-brand-subtitle {
+
+    display:
+        block;
+
+    margin-top:
+        8px;
+
+    color:
+        rgba(
+            255,
+            255,
+            255,
+            0.90
+        ) !important;
+
+    -webkit-text-fill-color:
+        rgba(
+            255,
+            255,
+            255,
+            0.90
+        ) !important;
+
+    font-family:
+        "Plus Jakarta Sans",
+        sans-serif;
+
+    font-size:
+        16px;
+
+    line-height:
+        1.3;
+
+    font-weight:
+        700;
+
+    letter-spacing:
+        0.04em;
+
+    text-transform:
+        uppercase;
+
+}
+
+
+/* DESCRIPTION */
+
+#spj26auth-root .spj26auth-brand-center p {
+
+    max-width:
+        560px;
+
+    margin-top:
+        18px;
+
+    color:
+        rgba(
+            255,
+            255,
+            255,
+            0.84
+        );
+
+    font-size:
+        14px;
+
+    line-height:
+        1.72;
+
+}
+
+
+/* =========================================================
+   ROLES
+========================================================= */
+
+#spj26auth-root .spj26auth-role-row {
+
+    margin-top:
+        22px;
+
+    display:
+        flex;
+
+    flex-wrap:
+        wrap;
+
+    gap:
+        8px;
+
+}
+
+
+#spj26auth-root .spj26auth-role-chip {
+
+    display:
+        inline-flex;
+
+    align-items:
+        center;
+
+    gap:
+        6px;
+
+    padding:
+        7px
+        10px;
+
+    border-radius:
+        7px;
+
+    background:
+        rgba(
+            62,
+            0,
+            0,
+            0.34
+        );
+
+    border:
+        1px solid
+        rgba(
+            255,
+            255,
+            255,
+            0.09
+        );
+
+    color:
+        #ffffff;
+
+    font-size:
+        10.5px;
+
+    font-weight:
+        600;
+
+}
+
+
+#spj26auth-root
+.spj26auth-role-chip
+.material-symbols-outlined {
+
+    font-size:
+        16px;
+
+}
+
+
+/* =========================================================
+   BRAND BOTTOM
+========================================================= */
+
+#spj26auth-root .spj26auth-brand-bottom {
+
+    display:
+        flex;
+
+    align-items:
+        center;
+
+    justify-content:
+        space-between;
+
+    gap:
+        14px;
+
+    color:
+        rgba(
+            255,
+            255,
+            255,
+            0.66
+        );
+
+    font-size:
+        9.5px;
+
+}
+
+
+#spj26auth-root .spj26auth-brand-bottom strong {
+
+    color:
+        #ffffff;
+
+    font-weight:
+        700;
+
+}
+
+
+/* =========================================================
+   RIGHT LOGIN PANEL
+========================================================= */
+
+#spj26auth-root .spj26auth-login-panel {
+
+    height:
+        100%;
+
+    min-height:
+        0;
+
+    overflow:
+        hidden;
+
+    background:
+        var(--spj26auth-card);
+
+    display:
+        flex;
+
+    align-items:
+        center;
+
+    justify-content:
+        center;
+
+    padding:
+        42px;
+
+}
+
+
+#spj26auth-root .spj26auth-login-wrap {
+
+    width:
+        100%;
+
+    max-width:
+        430px;
+
+}
+
+
+/* =========================================================
+   LOGIN HEADER
+========================================================= */
+
+#spj26auth-root .spj26auth-login-head {
+
+    margin-bottom:
+        26px;
+
+}
+
+
+#spj26auth-root .spj26auth-login-label {
+
+    display:
+        inline-flex;
+
+    align-items:
+        center;
+
+    gap:
+        7px;
+
+    color:
+        var(--spj26auth-primary);
+
+    font-size:
+        9.5px;
+
+    font-weight:
+        800;
+
+    text-transform:
+        uppercase;
+
+    letter-spacing:
+        0.07em;
+
+}
+
+
+#spj26auth-root
+.spj26auth-login-label
+.material-symbols-outlined {
+
+    font-size:
+        16px;
+
+}
+
+
+#spj26auth-root .spj26auth-login-head h2 {
+
+    margin-top:
+        8px;
+
+    font-family:
+        "Plus Jakarta Sans",
+        sans-serif;
+
+    font-size:
+        28px;
+
+    line-height:
+        1.2;
+
+    font-weight:
+        800;
+
+    letter-spacing:
+        -0.025em;
+
+}
+
+
+#spj26auth-root .spj26auth-login-head p {
+
+    margin-top:
+        8px;
+
+    color:
+        var(--spj26auth-muted);
+
+    font-size:
+        12.5px;
+
+    line-height:
+        1.6;
+
+}
+
+
+/* =========================================================
+   ALERT
+========================================================= */
+
+#spj26auth-root .spj26auth-alert {
+
+    display:
+        none;
+
+    margin-bottom:
+        16px;
+
+    padding:
+        11px
+        12px;
+
+    border-radius:
+        8px;
+
+    font-size:
+        11px;
+
+    line-height:
+        1.45;
+
+}
+
+
+#spj26auth-root .spj26auth-alert.is-error {
+
+    display:
+        block;
+
+    color:
+        var(--spj26auth-error);
+
+    background:
+        var(--spj26auth-error-bg);
+
+    border:
+        1px solid
+        #fecaca;
+
+}
+
+
+/* =========================================================
+   FORM
+========================================================= */
+
+#spj26auth-root .spj26auth-form {
+
+    display:
+        flex;
+
+    flex-direction:
+        column;
+
+    gap:
+        17px;
+
+}
+
+
+#spj26auth-root .spj26auth-field {
+
+    display:
+        flex;
+
+    flex-direction:
+        column;
+
+    gap:
+        7px;
+
+}
+
+
+#spj26auth-root .spj26auth-field label {
+
+    color:
+        #334155;
+
+    font-size:
+        11px;
+
+    font-weight:
+        700;
+
+}
+
+
+#spj26auth-root .spj26auth-input-wrap {
+
+    position:
+        relative;
+
+}
+
+
+#spj26auth-root .spj26auth-input-icon {
+
+    position:
+        absolute;
+
+    left:
+        13px;
+
+    top:
+        50%;
+
+    transform:
+        translateY(-50%);
+
+    color:
+        #94a3b8;
+
+    pointer-events:
+        none;
+
+}
+
+
+#spj26auth-root
+.spj26auth-input-icon
+.material-symbols-outlined {
+
+    font-size:
+        19px;
+
+}
+
+
+#spj26auth-root .spj26auth-input {
+
+    width:
+        100%;
+
+    min-height:
+        48px;
+
+    border:
+        1px solid
+        #cbd5e1;
+
+    border-radius:
+        8px;
+
+    background:
+        #ffffff;
+
+    color:
+        var(--spj26auth-text);
+
+    padding:
+        11px
+        44px
+        11px
+        42px;
+
+    font-size:
+        12.5px;
+
+    outline:
+        none;
+
+    transition:
+        border-color 0.18s ease,
+        box-shadow 0.18s ease;
+
+}
+
+
+#spj26auth-root .spj26auth-input::placeholder {
+
+    color:
+        #94a3b8;
+
+}
+
+
+#spj26auth-root .spj26auth-input:focus {
+
+    border-color:
+        var(--spj26auth-primary);
+
+    box-shadow:
+        0
+        0
+        0
+        3px
+        rgba(
+            106,
+            2,
+            10,
+            0.09
+        );
+
+}
+
+
+/* =========================================================
+   HIDE NATIVE PASSWORD REVEAL
+========================================================= */
+
+#spj26auth-root
+input[type="password"]::-ms-reveal,
+#spj26auth-root
+input[type="password"]::-ms-clear {
+
+    display:
+        none;
+
+}
+
+
+#spj26auth-root input[type="password"] {
+
+    appearance:
+        none;
+
+    -webkit-appearance:
+        none;
+
+}
+
+
+/* =========================================================
+   PASSWORD TOGGLE
+========================================================= */
+
+#spj26auth-root .spj26auth-password-toggle {
+
+    position:
+        absolute;
+
+    right:
+        10px;
+
+    top:
+        50%;
+
+    transform:
+        translateY(-50%);
+
+    width:
+        32px;
+
+    height:
+        32px;
+
+    border:
+        0;
+
+    border-radius:
+        6px;
+
+    background:
+        transparent;
+
+    color:
+        #64748b;
+
+    display:
+        flex;
+
+    align-items:
+        center;
+
+    justify-content:
+        center;
+
+    cursor:
+        pointer;
+
+}
+
+
+#spj26auth-root .spj26auth-password-toggle:hover {
+
+    background:
+        var(--spj26auth-soft);
+
+    color:
+        var(--spj26auth-primary);
+
+}
+
+
+#spj26auth-root
+.spj26auth-password-toggle
+.material-symbols-outlined {
+
+    font-size:
+        18px;
+
+}
+
+
+/* =========================================================
+   OPTIONS
+========================================================= */
+
+#spj26auth-root .spj26auth-options {
+
+    display:
+        flex;
+
+    align-items:
+        center;
+
+    justify-content:
+        space-between;
+
+    gap:
+        12px;
+
+}
+
+
+#spj26auth-root .spj26auth-remember {
+
+    display:
+        flex;
+
+    align-items:
+        center;
+
+    gap:
+        7px;
+
+    color:
+        #475569;
+
+    font-size:
+        10.5px;
+
+    cursor:
+        pointer;
+
+}
+
+
+#spj26auth-root .spj26auth-remember input {
+
+    width:
+        14px;
+
+    height:
+        14px;
+
+    accent-color:
+        var(--spj26auth-primary);
+
+}
+
+
+#spj26auth-root .spj26auth-forgot {
+
+    color:
+        var(--spj26auth-primary);
+
+    font-size:
+        10.5px;
+
+    font-weight:
+        700;
+
+}
+
+
+#spj26auth-root .spj26auth-forgot:hover {
+
+    text-decoration:
+        underline;
+
+}
+
+
+/* =========================================================
+   SUBMIT
+========================================================= */
+
+#spj26auth-root .spj26auth-submit {
+
+    width:
+        100%;
+
+    min-height:
+        49px;
+
+    margin-top:
+        2px;
+
+    border:
+        0;
+
+    border-radius:
+        8px;
+
+    background:
+        var(--spj26auth-primary);
+
+    color:
+        #ffffff;
+
+    display:
+        flex;
+
+    align-items:
+        center;
+
+    justify-content:
+        center;
+
+    gap:
+        8px;
+
+    font-family:
+        "Plus Jakarta Sans",
+        sans-serif;
+
+    font-size:
+        12.5px;
+
+    font-weight:
+        800;
+
+    cursor:
+        pointer;
+
+    box-shadow:
+        0
+        8px
+        18px
+        rgba(
+            106,
+            2,
+            10,
+            0.16
+        );
+
+    transition:
+        background 0.18s ease,
+        transform 0.18s ease,
+        box-shadow 0.18s ease;
+
+}
+
+
+#spj26auth-root .spj26auth-submit:hover {
+
+    background:
+        var(--spj26auth-maroon-dark);
+
+    transform:
+        translateY(-1px);
+
+    box-shadow:
+        0
+        10px
+        22px
+        rgba(
+            106,
+            2,
+            10,
+            0.19
+        );
+
+}
+
+
+#spj26auth-root
+.spj26auth-submit
+.material-symbols-outlined {
+
+    font-size:
+        18px;
+
+}
+
+
+/* =========================================================
+   INFO NOTE
+========================================================= */
+
+#spj26auth-root .spj26auth-login-note {
+
+    margin-top:
+        19px;
+
+    padding-top:
+        17px;
+
+    border-top:
+        1px solid
+        var(--spj26auth-line);
+
+    display:
+        flex;
+
+    align-items:
+        flex-start;
+
+    gap:
+        8px;
+
+    color:
+        var(--spj26auth-muted);
+
+    font-size:
+        10.5px;
+
+    line-height:
+        1.5;
+
+}
+
+
+#spj26auth-root
+.spj26auth-login-note
+.material-symbols-outlined {
+
+    margin-top:
+        1px;
+
+    color:
+        var(--spj26auth-primary);
+
+    font-size:
+        17px;
+
+    flex:
+        0
+        0
+        auto;
+
+}
+
+
+#spj26auth-root .spj26auth-login-footer {
+
+    margin-top:
+        26px;
+
+    color:
+        #94a3b8;
+
+    font-size:
+        9.5px;
+
+    text-align:
+        center;
+
+}
+
+
+/* =========================================================
+   RESPONSIVE ≤ 1100 PX
+========================================================= */
+
+@media (max-width: 1100px) {
+
+    #spj26auth-root
+    .spj26auth-system-title {
+
+        font-size:
+            30px;
+
+    }
+
+}
+
+
+/* =========================================================
+   RESPONSIVE ≤ 980 PX
+========================================================= */
+
+@media (max-width: 980px) {
+
+    #spj26auth-root .spj26auth-shell {
+
+        grid-template-columns:
+            minmax(0, 0.95fr)
+            minmax(400px, 1.05fr);
+
+    }
+
+
+    #spj26auth-root
+    .spj26auth-brand-panel {
+
+        padding:
+            34px;
+
+    }
+
+
+    #spj26auth-root
+    .spj26auth-system-title {
+
+        font-size:
+            26px;
+
+    }
+
+
+    #spj26auth-root
+    .spj26auth-brand-subtitle {
+
+        font-size:
+            14px;
+
+    }
+
+}
+
+
+/* =========================================================
+   RESPONSIVE ≤ 820 PX
+========================================================= */
+
+@media (max-width: 820px) {
+
+    #spj26auth-root
+    .spj26auth-system-title {
+
+        font-size:
+            23px;
+
+    }
+
+}
+
+
+/* =========================================================
+   MOBILE ≤ 760 PX
+========================================================= */
+
+@media (max-width: 760px) {
+
+    html.spj26auth-page-lock,
+    body.spj26auth-page-lock {
+
+        height:
+            auto !important;
+
+        min-height:
+            100% !important;
+
+        overflow-x:
+            hidden !important;
+
+        overflow-y:
+            auto !important;
+
+    }
+
+
+    #spj26auth-root {
+
+        height:
+            auto;
+
+        min-height:
+            100vh;
+
+        min-height:
+            100dvh;
+
+        overflow:
+            visible;
+
+    }
+
+
+    #spj26auth-root .spj26auth-shell {
+
+        height:
+            auto;
+
+        min-height:
+            100vh;
+
+        min-height:
+            100dvh;
+
+        overflow:
+            visible;
+
+        display:
+            block;
+
+    }
+
+
+    #spj26auth-root
+    .spj26auth-brand-panel {
+
+        height:
+            auto;
+
+        min-height:
+            auto;
+
+        padding:
+            24px
+            20px;
+
+    }
+
+
+    #spj26auth-root
+    .spj26auth-brand-center {
+
+        max-width:
+            none;
+
+        padding:
+            32px
+            0
+            12px;
+
+    }
+
+
+    /*
+     * Fluid typography:
+     * - 320px viewport = ±16px
+     * - 360px viewport = ±18px
+     * - 480px+ = maksimal 25px
+     *
+     * Tujuannya tetap 1 baris.
+     */
+
+    #spj26auth-root
+    .spj26auth-system-title {
+
+        width:
+            100%;
+
+        font-size:
+            clamp(
+                16px,
+                5vw,
+                25px
+            );
+
+        line-height:
+            1.15;
+
+        letter-spacing:
+            -0.035em;
+
+        white-space:
+            nowrap;
+
+    }
+
+
+    #spj26auth-root
+    .spj26auth-brand-subtitle {
+
+        margin-top:
+            7px;
+
+        font-size:
+            clamp(
+                11px,
+                3.6vw,
+                14px
+            );
+
+    }
+
+
+    #spj26auth-root
+    .spj26auth-brand-center p {
+
+        max-width:
+            600px;
+
+        margin-top:
+            15px;
+
+        font-size:
+            12px;
+
+    }
+
+
+    #spj26auth-root
+    .spj26auth-role-row {
+
+        margin-top:
+            16px;
+
+    }
+
+
+    #spj26auth-root
+    .spj26auth-brand-bottom {
+
+        display:
+            none;
+
+    }
+
+
+    #spj26auth-root
+    .spj26auth-login-panel {
+
+        height:
+            auto;
+
+        min-height:
+            auto;
+
+        overflow:
+            visible;
+
+        padding:
+            30px
+            20px
+            38px;
+
+    }
+
+}
+
+
+/* =========================================================
+   SMALL MOBILE ≤ 380 PX
+========================================================= */
+
+@media (max-width: 380px) {
+
+    #spj26auth-root
+    .spj26auth-brand-panel {
+
+        padding:
+            22px
+            16px;
+
+    }
+
+
+    #spj26auth-root
+    .spj26auth-brand-lockup {
+
+        gap:
+            11px;
+
+    }
+
+
+    #spj26auth-root
+    .spj26auth-logo {
+
+        width:
+            44px;
+
+        height:
+            44px;
+
+        flex-basis:
+            44px;
+
+    }
+
+
+    #spj26auth-root
+    .spj26auth-brand-name {
+
+        font-size:
+            13px;
+
+    }
+
+
+    #spj26auth-root
+    .spj26auth-system-title {
+
+        font-size:
+            clamp(
+                15px,
+                4.8vw,
+                18px
+            );
+
+    }
+
+
+    #spj26auth-root
+    .spj26auth-brand-subtitle {
+
+        font-size:
+            11px;
+
+    }
+
+}
+
+
+
+/* =========================================================
+   SIPATUJU LOGIN — FULLY RESPONSIVE v2
+   Desktop / Laptop / Tablet / Mobile / Short viewport
+========================================================= */
+
+/* True viewport shell: bypass spacing dari theme/Elementor. */
+#spj26auth-root{
+    position:fixed;
+    inset:0;
+    z-index:9999;
+    width:100vw;
+    max-width:none;
+    height:100vh;
+    height:100dvh;
+    min-height:0;
+    margin:0 !important;
+    padding:0 !important;
+}
+
+body.spj26auth-page-lock #page,
+body.spj26auth-page-lock .site,
+body.spj26auth-page-lock .site-content,
+body.spj26auth-page-lock .elementor,
+body.spj26auth-page-lock .elementor-section-wrap,
+body.spj26auth-page-lock .elementor-section,
+body.spj26auth-page-lock .elementor-container,
+body.spj26auth-page-lock .elementor-column,
+body.spj26auth-page-lock .elementor-widget-wrap,
+body.spj26auth-page-lock .elementor-widget,
+body.spj26auth-page-lock .elementor-widget-container{
+    width:100% !important;
+    max-width:none !important;
+    margin:0 !important;
+    padding:0 !important;
+}
+
+/* Base desktop/laptop. */
+#spj26auth-root .spj26auth-shell{
+    grid-template-columns:
+        minmax(0,1.08fr)
+        minmax(380px,.92fr);
+}
+
+#spj26auth-root .spj26auth-brand-panel{
+    padding:
+        clamp(28px,3.2vw,48px)
+        clamp(28px,3.6vw,56px);
+}
+
+#spj26auth-root .spj26auth-login-panel{
+    padding:
+        clamp(26px,3vw,46px);
+    overflow-y:auto;
+    overflow-x:hidden;
+    overscroll-behavior:contain;
+}
+
+#spj26auth-root .spj26auth-login-wrap{
+    width:min(100%,430px);
+    margin:auto;
+}
+
+#spj26auth-root .spj26auth-system-title{
+    font-size:
+        clamp(24px,2.35vw,38px);
+    white-space:normal;
+    text-wrap:balance;
+}
+
+#spj26auth-root .spj26auth-brand-center p{
+    font-size:
+        clamp(12px,1vw,14px);
+}
+
+#spj26auth-root .spj26auth-input,
+#spj26auth-root .spj26auth-submit{
+    min-height:48px;
+}
+
+/* Large tablet / compact laptop. */
+@media(max-width:1100px){
+
+    #spj26auth-root .spj26auth-shell{
+        grid-template-columns:
+            minmax(0,.95fr)
+            minmax(360px,1.05fr);
+    }
+
+    #spj26auth-root .spj26auth-brand-panel{
+        padding:
+            30px
+            32px;
+    }
+
+    #spj26auth-root .spj26auth-login-panel{
+        padding:
+            30px;
+    }
+
+    #spj26auth-root .spj26auth-system-title{
+        font-size:
+            clamp(22px,2.6vw,30px);
+    }
+
+}
+
+/* Tablet landscape / smaller laptop. */
+@media(max-width:900px) and (min-width:761px){
+
+    #spj26auth-root .spj26auth-shell{
+        grid-template-columns:
+            minmax(0,.82fr)
+            minmax(350px,1.18fr);
+    }
+
+    #spj26auth-root .spj26auth-brand-panel{
+        padding:
+            26px
+            24px;
+    }
+
+    #spj26auth-root .spj26auth-login-panel{
+        padding:
+            26px
+            24px;
+    }
+
+    #spj26auth-root .spj26auth-logo{
+        width:46px;
+        height:46px;
+        flex-basis:46px;
+    }
+
+    #spj26auth-root .spj26auth-brand-name{
+        font-size:14px;
+    }
+
+    #spj26auth-root .spj26auth-system-title{
+        font-size:
+            clamp(20px,2.7vw,25px);
+    }
+
+    #spj26auth-root .spj26auth-brand-subtitle{
+        font-size:13px;
+    }
+
+    #spj26auth-root .spj26auth-role-chip{
+        padding:6px 8px;
+        font-size:10px;
+    }
+
+    #spj26auth-root .spj26auth-login-head h2{
+        font-size:25px;
+    }
+
+}
+
+/* Short desktop/laptop: compact vertical spacing, no clipped form. */
+@media(min-width:761px) and (max-height:760px){
+
+    #spj26auth-root .spj26auth-brand-panel{
+        padding-top:24px;
+        padding-bottom:24px;
+    }
+
+    #spj26auth-root .spj26auth-brand-center{
+        padding:
+            20px
+            0;
+    }
+
+    #spj26auth-root .spj26auth-brand-kicker{
+        padding:
+            5px
+            9px;
+    }
+
+    #spj26auth-root .spj26auth-system-title{
+        margin-top:12px;
+        font-size:
+            clamp(21px,2.2vw,30px);
+    }
+
+    #spj26auth-root .spj26auth-brand-subtitle{
+        margin-top:6px;
+        font-size:13px;
+    }
+
+    #spj26auth-root .spj26auth-brand-center p{
+        margin-top:12px;
+        line-height:1.55;
+    }
+
+    #spj26auth-root .spj26auth-role-row{
+        margin-top:14px;
+    }
+
+    #spj26auth-root .spj26auth-login-panel{
+        align-items:flex-start;
+        padding-top:22px;
+        padding-bottom:22px;
+    }
+
+    #spj26auth-root .spj26auth-login-head{
+        margin-bottom:18px;
+    }
+
+    #spj26auth-root .spj26auth-login-head h2{
+        font-size:24px;
+    }
+
+    #spj26auth-root .spj26auth-form{
+        gap:13px;
+    }
+
+    #spj26auth-root .spj26auth-login-note{
+        margin-top:14px;
+        padding-top:14px;
+    }
+
+    #spj26auth-root .spj26auth-login-footer{
+        margin-top:16px;
+    }
+
+}
+
+/* Mobile / tablet portrait. */
+@media(max-width:760px){
+
+    html.spj26auth-page-lock,
+    body.spj26auth-page-lock{
+        height:auto !important;
+        min-height:100% !important;
+        overflow-x:hidden !important;
+        overflow-y:auto !important;
+    }
+
+    #spj26auth-root{
+        position:relative;
+        inset:auto;
+        z-index:auto;
+        width:100%;
+        height:auto;
+        min-height:100vh;
+        min-height:100dvh;
+        overflow:visible;
+    }
+
+    #spj26auth-root .spj26auth-shell{
+        display:flex;
+        flex-direction:column;
+        width:100%;
+        min-height:100vh;
+        min-height:100dvh;
+        height:auto;
+        overflow:visible;
+    }
+
+    #spj26auth-root .spj26auth-brand-panel{
+        flex:0 0 auto;
+        min-height:0;
+        height:auto;
+        padding:
+            22px
+            clamp(16px,5vw,28px)
+            24px;
+    }
+
+    #spj26auth-root .spj26auth-brand-panel::before{
+        width:300px;
+        height:300px;
+        right:-125px;
+        top:-110px;
+    }
+
+    #spj26auth-root .spj26auth-brand-panel::after{
+        width:220px;
+        height:220px;
+        left:-100px;
+        bottom:-120px;
+    }
+
+    #spj26auth-root .spj26auth-brand-lockup{
+        gap:11px;
+    }
+
+    #spj26auth-root .spj26auth-logo{
+        width:44px;
+        height:44px;
+        flex-basis:44px;
+        border-radius:9px;
+    }
+
+    #spj26auth-root .spj26auth-logo .material-symbols-outlined{
+        font-size:24px;
+    }
+
+    #spj26auth-root .spj26auth-brand-name{
+        font-size:
+            clamp(12px,3.6vw,15px);
+    }
+
+    #spj26auth-root .spj26auth-brand-center{
+        max-width:none;
+        padding:
+            24px
+            0
+            2px;
+    }
+
+    #spj26auth-root .spj26auth-brand-kicker{
+        padding:
+            5px
+            9px;
+        font-size:9px;
+    }
+
+    #spj26auth-root .spj26auth-system-title{
+        margin-top:12px;
+        font-size:
+            clamp(21px,6vw,29px);
+        line-height:1.15;
+        white-space:normal;
+        text-wrap:balance;
+    }
+
+    #spj26auth-root .spj26auth-brand-subtitle{
+        margin-top:7px;
+        font-size:
+            clamp(12px,3.7vw,14px);
+    }
+
+    #spj26auth-root .spj26auth-brand-center p{
+        max-width:620px;
+        margin-top:12px;
+        font-size:12px;
+        line-height:1.55;
+    }
+
+    #spj26auth-root .spj26auth-role-row{
+        margin-top:14px;
+        gap:7px;
+    }
+
+    #spj26auth-root .spj26auth-role-chip{
+        padding:
+            6px
+            9px;
+        font-size:10px;
+    }
+
+    #spj26auth-root .spj26auth-brand-bottom{
+        display:none;
+    }
+
+    #spj26auth-root .spj26auth-login-panel{
+        flex:1 0 auto;
+        height:auto;
+        min-height:0;
+        overflow:visible;
+        align-items:flex-start;
+        padding:
+            28px
+            clamp(16px,5vw,28px)
+            34px;
+    }
+
+    #spj26auth-root .spj26auth-login-wrap{
+        width:100%;
+        max-width:520px;
+        margin:
+            0
+            auto;
+    }
+
+    #spj26auth-root .spj26auth-login-head{
+        margin-bottom:20px;
+    }
+
+    #spj26auth-root .spj26auth-login-head h2{
+        font-size:
+            clamp(23px,6vw,28px);
+    }
+
+    #spj26auth-root .spj26auth-login-head p{
+        font-size:12px;
+    }
+
+    #spj26auth-root .spj26auth-form{
+        gap:15px;
+    }
+
+    #spj26auth-root .spj26auth-input{
+        min-height:48px;
+        font-size:16px;
+        /* 16px mencegah auto-zoom iOS pada input. */
+    }
+
+    #spj26auth-root .spj26auth-submit{
+        min-height:48px;
+        font-size:12.5px;
+    }
+
+    #spj26auth-root .spj26auth-login-note{
+        margin-top:17px;
+        padding-top:15px;
+    }
+
+    #spj26auth-root .spj26auth-login-footer{
+        margin-top:20px;
+    }
+
+}
+
+/* Narrow mobile. */
+@media(max-width:480px){
+
+    #spj26auth-root .spj26auth-brand-panel{
+        padding:
+            18px
+            16px
+            20px;
+    }
+
+    #spj26auth-root .spj26auth-brand-center{
+        padding:
+            20px
+            0
+            0;
+    }
+
+    #spj26auth-root .spj26auth-system-title{
+        font-size:
+            clamp(20px,6.4vw,25px);
+    }
+
+    #spj26auth-root .spj26auth-brand-center p{
+        font-size:11.5px;
+    }
+
+    #spj26auth-root .spj26auth-role-row{
+        display:grid;
+        grid-template-columns:
+            repeat(3,minmax(0,1fr));
+        width:100%;
+    }
+
+    #spj26auth-root .spj26auth-role-chip{
+        min-width:0;
+        justify-content:center;
+        padding:
+            7px
+            5px;
+        text-align:center;
+    }
+
+    #spj26auth-root .spj26auth-role-chip .material-symbols-outlined{
+        font-size:15px;
+    }
+
+    #spj26auth-root .spj26auth-login-panel{
+        padding:
+            24px
+            16px
+            30px;
+    }
+
+    #spj26auth-root .spj26auth-options{
+        align-items:flex-start;
+        gap:10px;
+    }
+
+    #spj26auth-root .spj26auth-remember,
+    #spj26auth-root .spj26auth-forgot{
+        font-size:10px;
+    }
+
+}
+
+/* Very small mobile. */
+@media(max-width:360px){
+
+    #spj26auth-root .spj26auth-brand-name{
+        font-size:11.5px;
+    }
+
+    #spj26auth-root .spj26auth-system-title{
+        font-size:
+            clamp(18px,6.2vw,22px);
+    }
+
+    #spj26auth-root .spj26auth-brand-center p{
+        font-size:11px;
+    }
+
+    #spj26auth-root .spj26auth-role-chip{
+        gap:4px;
+        font-size:9px;
+    }
+
+    #spj26auth-root .spj26auth-options{
+        flex-direction:column;
+        align-items:stretch;
+    }
+
+    #spj26auth-root .spj26auth-forgot{
+        align-self:flex-start;
+    }
+
+}
+
+/* Landscape mobile: keep content compact and scrollable. */
+@media(max-width:760px) and (orientation:landscape){
+
+    #spj26auth-root .spj26auth-brand-panel{
+        padding:
+            16px
+            20px;
+    }
+
+    #spj26auth-root .spj26auth-brand-center{
+        padding:
+            14px
+            0
+            0;
+    }
+
+    #spj26auth-root .spj26auth-brand-center p{
+        display:none;
+    }
+
+    #spj26auth-root .spj26auth-role-row{
+        margin-top:10px;
+    }
+
+    #spj26auth-root .spj26auth-login-panel{
+        padding:
+            20px;
+    }
+
+}
+
+/* Better touch behavior. */
+@media(hover:none) and (pointer:coarse){
+
+    #spj26auth-root .spj26auth-submit,
+    #spj26auth-root .spj26auth-password-toggle,
+    #spj26auth-root .spj26auth-remember,
+    #spj26auth-root .spj26auth-forgot{
+        touch-action:manipulation;
+    }
+
+}
+
+</style>
+
+
+<div id="spj26auth-root">
+
+
+    <div class="spj26auth-shell">
+
+
+        <!-- =================================================
+             LEFT PANEL
+        ================================================== -->
+
+        <section class="spj26auth-brand-panel">
+
+
+            <!-- BRAND TOP -->
+
+            <div class="spj26auth-brand-top">
+
+
+                <div class="spj26auth-brand-lockup">
+
+
+                    <div class="spj26auth-logo">
+
+                        <span class="material-symbols-outlined">
+                            school
+                        </span>
+
+                    </div>
+
+
+                    <div>
+
+
+                        <div class="spj26auth-brand-name">
+
+                            SIPATUJU PPDS<br>
+                            UNIVERSITAS HASANUDDIN
+
+                        </div>
+
+
+                    </div>
+
+
+                </div>
+
+
+            </div>
+
+
+            <!-- =================================================
+                 BRAND CENTER
+            ================================================== -->
+
+            <div class="spj26auth-brand-center">
+
+
+                <div class="spj26auth-brand-kicker">
+
+
+                    <span class="spj26auth-kicker-dot"></span>
+
+
+                    <span>
+                        Portal SIPATUJU
+                    </span>
+
+
+                </div>
+
+
+                <!-- =============================================
+                     SYSTEM NAME
+                     SATU BARIS
+                ============================================== -->
+
+                <h1 class="spj26auth-system-title">
+
+                    Sistem Pemeriksaan Kelayakan Jurnal
+
+                </h1>
+
+
+                <!-- =============================================
+                     SYSTEM SUBTITLE
+                ============================================== -->
+
+                <div class="spj26auth-brand-subtitle">
+
+                    PPDS FK UNHAS
+
+                </div>
+
+
+                <p>
+
+                    Sistem terintegrasi untuk pengajuan dan
+                    pemeriksaan jurnal tujuan publikasi sebelum
+                    artikel disubmit ke jurnal yang dipilih.
+
+                </p>
+
+
+                <div class="spj26auth-role-row">
+
+
+                    <div class="spj26auth-role-chip">
+
+
+                        <span class="material-symbols-outlined">
+                            stethoscope
+                        </span>
+
+
+                        <span>
+                            Mahasiswa
+                        </span>
+
+
+                    </div>
+
+
+                    <div class="spj26auth-role-chip">
+
+
+                        <span class="material-symbols-outlined">
+                            fact_check
+                        </span>
+
+
+                        <span>
+                            Reviewer
+                        </span>
+
+
+                    </div>
+
+
+                    <div class="spj26auth-role-chip">
+
+
+                        <span class="material-symbols-outlined">
+                            admin_panel_settings
+                        </span>
+
+
+                        <span>
+                            Admin
+                        </span>
+
+
+                    </div>
+
+
+                </div>
+
+
+            </div>
+
+
+            <!-- BRAND BOTTOM -->
+
+            <div class="spj26auth-brand-bottom">
+
+
+                <span>
+
+
+                    <strong>
+                        SIPATUJU PPDS
+                    </strong>
+
+
+                    • FK UNHAS
+
+
+                </span>
+
+
+                <span>
+                    Versi Sistem 2026.1
+                </span>
+
+
+            </div>
+
+
+        </section>
+
+
+        <!-- =================================================
+             RIGHT LOGIN PANEL
+        ================================================== -->
+
+        <section class="spj26auth-login-panel">
+
+
+            <div class="spj26auth-login-wrap">
+
+
+                <!-- LOGIN HEADER -->
+
+                <div class="spj26auth-login-head">
+
+
+                    <div class="spj26auth-login-label">
+
+
+                        <span class="material-symbols-outlined">
+                            lock
+                        </span>
+
+
+                        <span>
+                            Akses Sistem
+                        </span>
+
+
+                    </div>
+
+
+                    <h2>
+                        Masuk ke SIPATUJU
+                    </h2>
+
+
+                    <p>
+
+                        Gunakan akun yang telah terdaftar.
+                        Sistem akan mengarahkan Anda ke dashboard
+                        sesuai dengan peran akun.
+
+                    </p>
+
+
+                </div>
+
+
+                <!-- =================================================
+                     ALERT
+                ================================================== -->
+
+                <div
+                    class="spj26auth-alert"
+                    id="spj26auth-alert"
+                    role="alert"
+                ></div>
+
+
+                <!-- =================================================
+                     LOGIN FORM
+                ================================================== -->
+
+                <form
+                    class="spj26auth-form"
+                    id="spj26auth-login-form"
+                    autocomplete="on"
+                >
+
+
+                    <!-- USERNAME / NIM -->
+
+                    <div class="spj26auth-field">
+
+
+                        <label
+                            for="spj26auth-login-id"
+                        >
+                            Username atau NIM
+                        </label>
+
+
+                        <div class="spj26auth-input-wrap">
+
+
+                            <span
+                                class="material-symbols-outlined spj26auth-input-icon"
+                            >
+                                person
+                            </span>
+
+
+                            <input
+                                class="spj26auth-input"
+                                id="spj26auth-login-id"
+                                name="spj26auth_login_id"
+                                type="text"
+                                autocomplete="username"
+                                placeholder="Masukkan username atau NIM"
+                                required
+                            >
+
+
+                        </div>
+
+
+                    </div>
+
+
+                    <!-- PASSWORD -->
+
+                    <div class="spj26auth-field">
+
+
+                        <label
+                            for="spj26auth-password"
+                        >
+                            Password
+                        </label>
+
+
+                        <div class="spj26auth-input-wrap">
+
+
+                            <span
+                                class="material-symbols-outlined spj26auth-input-icon"
+                            >
+                                lock
+                            </span>
+
+
+                            <input
+                                class="spj26auth-input"
+                                id="spj26auth-password"
+                                name="spj26auth_password"
+                                type="password"
+                                autocomplete="current-password"
+                                placeholder="Masukkan password"
+                                required
+                            >
+
+
+                            <button
+                                class="spj26auth-password-toggle"
+                                id="spj26auth-password-toggle"
+                                type="button"
+                                aria-label="Tampilkan password"
+                                aria-pressed="false"
+                            >
+
+
+                                <span class="material-symbols-outlined">
+                                    visibility
+                                </span>
+
+
+                            </button>
+
+
+                        </div>
+
+
+                    </div>
+
+
+                    <!-- =================================================
+                         LOGIN OPTIONS
+                    ================================================== -->
+
+                    <div class="spj26auth-options">
+
+
+                        <label class="spj26auth-remember">
+
+
+                            <input
+                                id="spj26auth-remember"
+                                name="spj26auth_remember"
+                                type="checkbox"
+                            >
+
+
+                            <span>
+                                Ingat saya
+                            </span>
+
+
+                        </label>
+
+
+                        <a
+                            class="spj26auth-forgot"
+                            href="/sipatuju-lupa-password"
+                        >
+
+                            Lupa password?
+
+                        </a>
+
+
+                    </div>
+
+
+                    <!-- =================================================
+                         SUBMIT
+                    ================================================== -->
+
+                    <button
+                        class="spj26auth-submit"
+                        id="spj26auth-submit"
+                        type="submit"
+                    >
+
+
+                        <span>
+                            Masuk
+                        </span>
+
+
+                        <span class="material-symbols-outlined">
+                            login
+                        </span>
+
+
+                    </button>
+
+
+                </form>
+
+
+                <!-- =================================================
+                     INFORMATION
+                ================================================== -->
+
+                <div class="spj26auth-login-note">
+
+
+                    <span class="material-symbols-outlined">
+                        info
+                    </span>
+
+
+                    <span>
+
+                        Akun pengguna dibuat dan dikelola oleh
+                        administrator SIPATUJU. Hubungi admin jika
+                        Anda belum memiliki akun atau tidak dapat
+                        mengakses sistem.
+
+                    </span>
+
+
+                </div>
+
+
+                <div class="spj26auth-login-footer">
+
+                    Fakultas Kedokteran Universitas Hasanuddin
+
+                </div>
+
+
+            </div>
+
+
+        </section>
+
+
+    </div>
+
+
+</div>
+
+
+<script>
+
+(function () {
+
+
+    /* =====================================================
+       PAGE LOCK
+    ===================================================== */
+
+    document
+        .documentElement
+        .classList
+        .add(
+            'spj26auth-page-lock'
+        );
+
+
+    document
+        .body
+        .classList
+        .add(
+            'spj26auth-page-lock'
+        );
+
+
+    const root =
+        document.getElementById(
+            'spj26auth-root'
+        );
+
+
+    if (!root) {
+        return;
+    }
+
+
+    /* TRUE FULLPAGE RESPONSIVE:
+       lepaskan root dari wrapper Elementor/tema pada frontend live. */
+    const isElementorEditor =
+        document.body.classList.contains('elementor-editor-active')
+        ||
+        /(?:^|[?&])elementor-preview=/.test(window.location.search);
+
+    if (
+        !isElementorEditor
+        &&
+        root.parentElement !== document.body
+    ) {
+        document.body.appendChild(root);
+    }
+
+
+    /* =====================================================
+       ELEMENT REFERENCES
+    ===================================================== */
+
+    const form =
+        root.querySelector(
+            '#spj26auth-login-form'
+        );
+
+
+    const loginInput =
+        root.querySelector(
+            '#spj26auth-login-id'
+        );
+
+
+    const passwordInput =
+        root.querySelector(
+            '#spj26auth-password'
+        );
+
+
+    const toggleButton =
+        root.querySelector(
+            '#spj26auth-password-toggle'
+        );
+
+
+    const alertBox =
+        root.querySelector(
+            '#spj26auth-alert'
+        );
+
+
+    const submitButton =
+        root.querySelector(
+            '#spj26auth-submit'
+        );
+
+
+    const submitLabel =
+        submitButton
+        ?
+        submitButton.querySelector(
+            'span:first-child'
+        )
+        :
+        null;
+
+
+    /* =====================================================
+       SHOW / HIDE PASSWORD
+    ===================================================== */
+
+    if (
+        toggleButton
+        &&
+        passwordInput
+    ) {
+
+
+        toggleButton.addEventListener(
+            'click',
+            function () {
+
+
+                const isHidden =
+                    passwordInput.type
+                    ===
+                    'password';
+
+
+                passwordInput.type =
+                    isHidden
+                    ?
+                    'text'
+                    :
+                    'password';
+
+
+                toggleButton.setAttribute(
+                    'aria-pressed',
+                    isHidden
+                    ?
+                    'true'
+                    :
+                    'false'
+                );
+
+
+                toggleButton.setAttribute(
+                    'aria-label',
+                    isHidden
+                    ?
+                    'Sembunyikan password'
+                    :
+                    'Tampilkan password'
+                );
+
+
+                const icon =
+                    toggleButton.querySelector(
+                        '.material-symbols-outlined'
+                    );
+
+
+                if (icon) {
+
+
+                    icon.textContent =
+                        isHidden
+                        ?
+                        'visibility_off'
+                        :
+                        'visibility';
+
+
+                }
+
+
+            }
+        );
+
+
+    }
+
+
+    /* =====================================================
+       ALERT FUNCTIONS
+    ===================================================== */
+
+    function showError(message) {
+
+
+        if (!alertBox) {
+            return;
+        }
+
+
+        alertBox.textContent =
+            message;
+
+
+        alertBox.className =
+            'spj26auth-alert is-error';
+
+
+    }
+
+
+    function clearError() {
+
+
+        if (!alertBox) {
+            return;
+        }
+
+
+        alertBox.textContent =
+            '';
+
+
+        alertBox.className =
+            'spj26auth-alert';
+
+
+    }
+
+
+    /* =====================================================
+       SUBMIT STATE
+    ===================================================== */
+
+    function setSubmitting(
+        isSubmitting
+    ) {
+
+
+        if (!submitButton) {
+            return;
+        }
+
+
+        submitButton.disabled =
+            isSubmitting;
+
+
+        submitButton.style.opacity =
+            isSubmitting
+            ?
+            '0.72'
+            :
+            '';
+
+
+        submitButton.style.cursor =
+            isSubmitting
+            ?
+            'wait'
+            :
+            'pointer';
+
+
+        if (submitLabel) {
+
+
+            submitLabel.textContent =
+                isSubmitting
+                ?
+                'Memproses...'
+                :
+                'Masuk';
+
+
+        }
+
+
+    }
+
+
+    /* =====================================================
+       LOGIN FORM
+       REAL WORDPRESS AUTHENTICATION
+    ===================================================== */
+
+    if (form) {
+
+
+        form.addEventListener(
+            'submit',
+            async function (event) {
+
+
+                event.preventDefault();
+
+
+                clearError();
+
+
+                const loginValue =
+                    loginInput
+                    ?
+                    loginInput.value.trim()
+                    :
+                    '';
+
+
+                const passwordValue =
+                    passwordInput
+                    ?
+                    passwordInput.value
+                    :
+                    '';
+
+
+                const rememberInput =
+                    root.querySelector(
+                        '#spj26auth-remember'
+                    );
+
+
+                /* =========================================
+                   BASIC VALIDATION
+                ========================================== */
+
+                if (
+                    !loginValue
+                    ||
+                    !passwordValue
+                ) {
+
+
+                    showError(
+                        'Username/NIM dan password wajib diisi.'
+                    );
+
+
+                    return;
+
+
+                }
+
+
+                /* =========================================
+                   CONFIG CHECK
+                ========================================== */
+
+                if (
+                    !window.spj26AuthConfig
+                    ||
+                    !window.spj26AuthConfig.ajaxUrl
+                    ||
+                    !window.spj26AuthConfig.nonce
+                ) {
+
+
+                    showError(
+                        'Konfigurasi autentikasi SIPATUJU belum tersedia. Pastikan snippet 000 — 01 aktif.'
+                    );
+
+
+                    return;
+
+
+                }
+
+
+                /* =========================================
+                   REQUEST BODY
+                ========================================== */
+
+                const requestBody =
+                    new URLSearchParams();
+
+
+                requestBody.append(
+                    'action',
+                    'spj26_login_ajax'
+                );
+
+
+                requestBody.append(
+                    'nonce',
+                    window.spj26AuthConfig.nonce
+                );
+
+
+                requestBody.append(
+                    'login_id',
+                    loginValue
+                );
+
+
+                requestBody.append(
+                    'password',
+                    passwordValue
+                );
+
+
+                requestBody.append(
+                    'remember',
+                    rememberInput
+                    &&
+                    rememberInput.checked
+                    ?
+                    '1'
+                    :
+                    '0'
+                );
+
+
+                setSubmitting(
+                    true
+                );
+
+
+                /* =========================================
+                   AJAX LOGIN
+                ========================================== */
+
+                try {
+
+
+                    const response =
+                        await fetch(
+                            window.spj26AuthConfig.ajaxUrl,
+                            {
+
+                                method:
+                                    'POST',
+
+                                credentials:
+                                    'same-origin',
+
+                                headers: {
+
+                                    'Content-Type':
+                                        'application/x-www-form-urlencoded; charset=UTF-8'
+
+                                },
+
+                                body:
+                                    requestBody.toString()
+
+                            }
+                        );
+
+
+                    let result =
+                        null;
+
+
+                    try {
+
+
+                        result =
+                            await response.json();
+
+
+                    }
+                    catch (jsonError) {
+
+
+                        throw new Error(
+                            'Respons server tidak valid.'
+                        );
+
+
+                    }
+
+
+                    /* =====================================
+                       LOGIN FAILURE
+                    ====================================== */
+
+                    if (
+                        !result
+                        ||
+                        result.success
+                        !==
+                        true
+                    ) {
+
+
+                        const message =
+                            result
+                            &&
+                            result.data
+                            &&
+                            result.data.message
+                            ?
+                            result.data.message
+                            :
+                            'Login gagal. Silakan periksa akun Anda.';
+
+
+                        showError(
+                            message
+                        );
+
+
+                        return;
+
+
+                    }
+
+
+                    /* =====================================
+                       REDIRECT
+                    ====================================== */
+
+                    const redirectUrl =
+                        result.data
+                        &&
+                        result.data.redirect
+                        ?
+                        result.data.redirect
+                        :
+                        '';
+
+
+                    if (!redirectUrl) {
+
+
+                        showError(
+                            'Login berhasil, tetapi tujuan dashboard tidak ditemukan.'
+                        );
+
+
+                        return;
+
+
+                    }
+
+
+                    window.location.href =
+                        redirectUrl;
+
+
+                }
+                catch (error) {
+
+
+                    showError(
+                        'Tidak dapat menghubungi sistem autentikasi. Silakan coba kembali.'
+                    );
+
+
+                }
+                finally {
+
+
+                    setSubmitting(
+                        false
+                    );
+
+
+                }
+
+
+            }
+        );
+
+
+    }
+
+
+})();
+
+</script>

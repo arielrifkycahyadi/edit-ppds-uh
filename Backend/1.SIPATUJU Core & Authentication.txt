@@ -1,0 +1,955 @@
+/**
+ * SIPATUJU PPDS FK UNHAS
+ * 000 — 01 - SIPATUJU Core & Authentication — CANONICAL 2026.4
+ *
+ * Fungsi:
+ * - Membuat role SIPATUJU
+ * - Login nyata menggunakan WordPress authentication
+ * - AJAX login dari page /sipatuju-login/
+ * - Redirect berdasarkan role
+ * - Proteksi halaman Admin / Reviewer / Residen termasuk alias live Reviewer
+ * - Mencatat login terakhir
+ * - Memblokir akun SIPATUJU yang dinonaktifkan
+ * - Mencegah Reviewer/Residen masuk wp-admin
+ * - Logout nyata WordPress dari seluruh page SIPATUJU
+ * - Logout langsung kembali ke /sipatuju-login/ tanpa halaman konfirmasi
+ *
+ * Namespace PHP: spj26_
+ *
+ * PENTING:
+ * - Paste ke Code Snippets TANPA tag <?php
+ * - Location: Run everywhere
+ * - Priority: 10
+ */
+
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
+
+/* =========================================================
+ * 1. KONFIGURASI URL SIPATUJU
+ * ========================================================= */
+
+function spj26_login_url() {
+	return home_url( '/sipatuju-login/' );
+}
+
+function spj26_admin_url() {
+	return home_url( '/admin-sipatuju/' );
+}
+
+function spj26_reviewer_url() {
+	return home_url( '/reviewer-sipatuju/' );
+}
+
+function spj26_residen_url() {
+	return home_url( '/residen-sipatuju/' );
+}
+
+
+/* =========================================================
+ * 2. ROLE SIPATUJU
+ * ========================================================= */
+
+function spj26_register_roles() {
+
+	$roles = array(
+
+		'sipatuju_admin' => array(
+			'label' => 'SIPATUJU Admin',
+			'caps'  => array(
+				'read'                     => true,
+				'spj26_access_admin'       => true,
+				'spj26_manage_users'       => true,
+				'spj26_manage_submissions' => true,
+				'spj26_assign_reviewers'   => true,
+				'spj26_view_activity'      => true,
+			),
+		),
+
+		'sipatuju_reviewer' => array(
+			'label' => 'SIPATUJU Reviewer',
+			'caps'  => array(
+				'read'                     => true,
+				'spj26_access_reviewer'    => true,
+				'spj26_review_submissions' => true,
+			),
+		),
+
+		'sipatuju_residen' => array(
+			'label' => 'SIPATUJU Residen',
+			'caps'  => array(
+				'read'                      => true,
+				'spj26_access_residen'      => true,
+				'spj26_create_submission'   => true,
+				'spj26_view_own_submission' => true,
+			),
+		),
+
+	);
+
+	foreach ( $roles as $role_slug => $role_data ) {
+
+		$role = get_role( $role_slug );
+
+		if ( ! $role ) {
+
+			add_role(
+				$role_slug,
+				$role_data['label'],
+				array(
+					'read' => true,
+				)
+			);
+
+			$role = get_role( $role_slug );
+		}
+
+		if ( $role ) {
+
+			foreach ( $role_data['caps'] as $capability => $enabled ) {
+
+				if ( $enabled ) {
+					$role->add_cap( $capability );
+				}
+
+			}
+
+		}
+
+	}
+
+}
+
+add_action( 'init', 'spj26_register_roles' );
+
+
+/* =========================================================
+ * 3. HELPER ROLE
+ * ========================================================= */
+
+function spj26_user_has_role( $role, $user = null ) {
+
+	if ( ! $user ) {
+		$user = wp_get_current_user();
+	}
+
+	if ( ! $user || ! $user->exists() ) {
+		return false;
+	}
+
+	return in_array(
+		$role,
+		(array) $user->roles,
+		true
+	);
+}
+
+
+/**
+ * WordPress Administrator diperlakukan sebagai super admin
+ * SIPATUJU selama tahap pengembangan/pengelolaan.
+ */
+function spj26_is_system_admin( $user = null ) {
+
+	if ( ! $user ) {
+		$user = wp_get_current_user();
+	}
+
+	if ( ! $user || ! $user->exists() ) {
+		return false;
+	}
+
+	return (
+		spj26_user_has_role( 'sipatuju_admin', $user )
+		||
+		user_can( $user, 'manage_options' )
+	);
+}
+
+
+/* =========================================================
+ * 4. DASHBOARD BERDASARKAN ROLE
+ * ========================================================= */
+
+function spj26_get_dashboard_url( $user = null ) {
+
+	if ( ! $user ) {
+		$user = wp_get_current_user();
+	}
+
+	if ( ! $user || ! $user->exists() ) {
+		return spj26_login_url();
+	}
+
+	if ( spj26_is_system_admin( $user ) ) {
+		return spj26_admin_url();
+	}
+
+	if ( spj26_user_has_role( 'sipatuju_reviewer', $user ) ) {
+		return spj26_reviewer_url();
+	}
+
+	if ( spj26_user_has_role( 'sipatuju_residen', $user ) ) {
+		return spj26_residen_url();
+	}
+
+	return spj26_login_url();
+}
+
+
+/* =========================================================
+ * 5. STATUS AKUN SIPATUJU
+ * ========================================================= */
+
+/**
+ * WordPress Administrator selalu dianggap aktif agar pengelola situs
+ * tidak terkunci dari SIPATUJU.
+ *
+ * Untuk akun SIPATUJU:
+ * - spj26_account_active = 1  => aktif
+ * - spj26_account_active = 0  => nonaktif
+ * - meta belum ada            => aktif (kompatibilitas akun lama)
+ */
+function spj26_is_account_active( $user = null ) {
+
+	if ( ! $user ) {
+		$user = wp_get_current_user();
+	}
+
+	if ( ! $user || ! $user->exists() ) {
+		return false;
+	}
+
+	if ( user_can( $user, 'manage_options' ) ) {
+		return true;
+	}
+
+	$value = get_user_meta(
+		$user->ID,
+		'spj26_account_active',
+		true
+	);
+
+	if ( $value === '' ) {
+		return true;
+	}
+
+	return (string) $value === '1';
+}
+
+
+/* =========================================================
+ * 6. CEK USER SIPATUJU YANG BOLEH LOGIN
+ * ========================================================= */
+
+function spj26_is_allowed_user( $user ) {
+
+	if ( ! $user || ! $user->exists() ) {
+		return false;
+	}
+
+	$has_sipatuju_access = (
+		spj26_is_system_admin( $user )
+		||
+		spj26_user_has_role( 'sipatuju_reviewer', $user )
+		||
+		spj26_user_has_role( 'sipatuju_residen', $user )
+	);
+
+	if ( ! $has_sipatuju_access ) {
+		return false;
+	}
+
+	return spj26_is_account_active( $user );
+}
+
+
+/* =========================================================
+ * 7. AJAX LOGIN SIPATUJU
+ * ========================================================= */
+
+add_action(
+	'wp_ajax_nopriv_spj26_login_ajax',
+	'spj26_ajax_login'
+);
+
+add_action(
+	'wp_ajax_spj26_login_ajax',
+	'spj26_ajax_login'
+);
+
+
+function spj26_ajax_login() {
+
+	check_ajax_referer(
+		'spj26_login_ajax_action',
+		'nonce'
+	);
+
+	$login_id = isset( $_POST['login_id'] )
+		? sanitize_user(
+			wp_unslash(
+				$_POST['login_id']
+			),
+			true
+		)
+		: '';
+
+	$password = isset( $_POST['password'] )
+		? (string) wp_unslash(
+			$_POST['password']
+		)
+		: '';
+
+	$remember = ! empty(
+		$_POST['remember']
+	);
+
+	if (
+		$login_id === ''
+		||
+		$password === ''
+	) {
+
+		wp_send_json_error(
+			array(
+				'message' => 'Username/NIM dan password wajib diisi.',
+			),
+			400
+		);
+	}
+
+	$credentials = array(
+		'user_login'    => $login_id,
+		'user_password' => $password,
+		'remember'      => $remember,
+	);
+
+	$user = wp_signon(
+		$credentials,
+		is_ssl()
+	);
+
+	if ( is_wp_error( $user ) ) {
+
+		wp_send_json_error(
+			array(
+				'message' => 'Username/NIM atau password tidak sesuai.',
+			),
+			401
+		);
+	}
+
+	if ( ! spj26_is_account_active( $user ) ) {
+
+		wp_logout();
+
+		wp_send_json_error(
+			array(
+				'message' => 'Akun SIPATUJU Anda sedang dinonaktifkan. Hubungi administrator.',
+			),
+			403
+		);
+	}
+
+	if ( ! spj26_is_allowed_user( $user ) ) {
+
+		wp_logout();
+
+		wp_send_json_error(
+			array(
+				'message' => 'Akun ini tidak memiliki akses ke SIPATUJU.',
+			),
+			403
+		);
+	}
+
+	update_user_meta(
+		$user->ID,
+		'spj26_last_login',
+		current_time( 'mysql' )
+	);
+
+	wp_send_json_success(
+		array(
+			'redirect' => spj26_get_dashboard_url( $user ),
+		)
+	);
+}
+
+
+/* =========================================================
+ * 8. KIRIM KONFIGURASI AUTH KE PAGE LOGIN
+ * ========================================================= */
+
+function spj26_print_login_config() {
+
+	if ( ! is_page( 'sipatuju-login' ) ) {
+		return;
+	}
+
+	$config = array(
+		'ajaxUrl' => admin_url( 'admin-ajax.php' ),
+		'nonce'   => wp_create_nonce(
+			'spj26_login_ajax_action'
+		),
+	);
+
+	echo '<script>';
+	echo 'window.spj26AuthConfig = ';
+	echo wp_json_encode( $config );
+	echo ';</script>';
+}
+
+add_action(
+	'wp_footer',
+	'spj26_print_login_config',
+	99
+);
+
+
+/* =========================================================
+ * 9. CATAT LOGIN TERAKHIR
+ * ========================================================= */
+
+function spj26_record_last_login(
+	$user_login,
+	$user
+) {
+
+	if (
+		! $user
+		||
+		! $user->exists()
+		||
+		! spj26_is_allowed_user( $user )
+	) {
+		return;
+	}
+
+	update_user_meta(
+		$user->ID,
+		'spj26_last_login',
+		current_time( 'mysql' )
+	);
+
+}
+
+add_action(
+	'wp_login',
+	'spj26_record_last_login',
+	10,
+	2
+);
+
+
+/* =========================================================
+ * 10. REQUEST PATH
+ * ========================================================= */
+
+function spj26_get_request_path() {
+
+	$request_uri = isset( $_SERVER['REQUEST_URI'] )
+		? wp_unslash(
+			$_SERVER['REQUEST_URI']
+		)
+		: '/';
+
+	$path = wp_parse_url(
+		$request_uri,
+		PHP_URL_PATH
+	);
+
+	return '/' . trim(
+		(string) $path,
+		'/'
+	) . '/';
+}
+
+
+function spj26_path_starts_with(
+	$path,
+	$prefix
+) {
+
+	$path =
+		'/' .
+		trim( $path, '/' ) .
+		'/';
+
+	$prefix =
+		'/' .
+		trim( $prefix, '/' ) .
+		'/';
+
+	return strpos(
+		$path,
+		$prefix
+	) === 0;
+}
+
+
+/**
+ * Central route classifiers.
+ *
+ * Semua snippet backend lain memakai helper ini agar aturan URL tidak
+ * tersebar dan tidak terjadi perbedaan antara Core, Submission, dan
+ * konfigurasi frontend.
+ */
+function spj26_is_admin_frontend_path(
+	$path = null
+) {
+
+	if ( $path === null ) {
+		$path = spj26_get_request_path();
+	}
+
+	return spj26_path_starts_with(
+		$path,
+		'/admin-sipatuju/'
+	);
+}
+
+
+function spj26_is_reviewer_frontend_path(
+	$path = null
+) {
+
+	if ( $path === null ) {
+		$path = spj26_get_request_path();
+	}
+
+	return (
+		spj26_path_starts_with(
+			$path,
+			'/reviewer-sipatuju/'
+		)
+		||
+		$path === '/riwayat-pemeriksaan/'
+	);
+}
+
+
+function spj26_is_residen_frontend_path(
+	$path = null
+) {
+
+	if ( $path === null ) {
+		$path = spj26_get_request_path();
+	}
+
+	return spj26_path_starts_with(
+		$path,
+		'/residen-sipatuju/'
+	);
+}
+
+
+/* =========================================================
+ * 11. PROTEKSI HALAMAN SIPATUJU
+ * ========================================================= */
+
+function spj26_protect_frontend_pages() {
+
+	/*
+	 * Jangan mengganggu Elementor editor/preview.
+	 */
+	if ( isset( $_GET['elementor-preview'] ) ) {
+		return;
+	}
+
+	$path =
+		spj26_get_request_path();
+
+	$is_admin_area =
+		spj26_is_admin_frontend_path(
+			$path
+		);
+
+	$is_reviewer_area =
+		spj26_is_reviewer_frontend_path(
+			$path
+		);
+
+	$is_residen_area =
+		spj26_is_residen_frontend_path(
+			$path
+		);
+
+	if (
+		! $is_admin_area
+		&&
+		! $is_reviewer_area
+		&&
+		! $is_residen_area
+	) {
+		return;
+	}
+
+	if ( ! is_user_logged_in() ) {
+
+		wp_safe_redirect(
+			spj26_login_url()
+		);
+
+		exit;
+	}
+
+	$user =
+		wp_get_current_user();
+
+	/*
+	 * Jika akun SIPATUJU telah dinonaktifkan setelah user login,
+	 * putuskan sesi dan kembalikan ke page login.
+	 */
+	if (
+		! user_can( $user, 'manage_options' )
+		&&
+		! spj26_is_account_active( $user )
+	) {
+
+		wp_logout();
+
+		wp_safe_redirect(
+			add_query_arg(
+				'spj26_login_error',
+				'inactive',
+				spj26_login_url()
+			)
+		);
+
+		exit;
+	}
+
+	/*
+	 * WordPress Administrator boleh mengakses seluruh area.
+	 */
+	if (
+		user_can(
+			$user,
+			'manage_options'
+		)
+	) {
+		return;
+	}
+
+	if (
+		$is_admin_area
+		&&
+		! spj26_user_has_role(
+			'sipatuju_admin',
+			$user
+		)
+	) {
+
+		wp_safe_redirect(
+			spj26_get_dashboard_url( $user )
+		);
+
+		exit;
+	}
+
+	if (
+		$is_reviewer_area
+		&&
+		! spj26_user_has_role(
+			'sipatuju_reviewer',
+			$user
+		)
+	) {
+
+		wp_safe_redirect(
+			spj26_get_dashboard_url( $user )
+		);
+
+		exit;
+	}
+
+	if (
+		$is_residen_area
+		&&
+		! spj26_user_has_role(
+			'sipatuju_residen',
+			$user
+		)
+	) {
+
+		wp_safe_redirect(
+			spj26_get_dashboard_url( $user )
+		);
+
+		exit;
+	}
+
+}
+
+add_action(
+	'template_redirect',
+	'spj26_protect_frontend_pages',
+	1
+);
+
+
+/* =========================================================
+ * 12. USER SUDAH LOGIN LALU MEMBUKA PAGE LOGIN
+ * ========================================================= */
+
+function spj26_redirect_logged_in_user_from_login() {
+
+	if ( isset( $_GET['elementor-preview'] ) ) {
+		return;
+	}
+
+	if ( ! is_page( 'sipatuju-login' ) ) {
+		return;
+	}
+
+	if ( ! is_user_logged_in() ) {
+		return;
+	}
+
+	$user =
+		wp_get_current_user();
+
+	if ( spj26_is_allowed_user( $user ) ) {
+
+		wp_safe_redirect(
+			spj26_get_dashboard_url( $user )
+		);
+
+		exit;
+	}
+
+}
+
+add_action(
+	'template_redirect',
+	'spj26_redirect_logged_in_user_from_login',
+	5
+);
+
+
+/* =========================================================
+ * 13. BLOK WP-ADMIN UNTUK REVIEWER / RESIDEN
+ * ========================================================= */
+
+function spj26_block_wp_admin_for_frontend_users() {
+
+	if ( wp_doing_ajax() ) {
+		return;
+	}
+
+	if ( ! is_user_logged_in() ) {
+		return;
+	}
+
+	$user =
+		wp_get_current_user();
+
+	if (
+		user_can(
+			$user,
+			'manage_options'
+		)
+	) {
+		return;
+	}
+
+	if (
+		spj26_user_has_role(
+			'sipatuju_reviewer',
+			$user
+		)
+		||
+		spj26_user_has_role(
+			'sipatuju_residen',
+			$user
+		)
+	) {
+
+		wp_safe_redirect(
+			spj26_get_dashboard_url( $user )
+		);
+
+		exit;
+	}
+
+}
+
+add_action(
+	'admin_init',
+	'spj26_block_wp_admin_for_frontend_users'
+);
+
+
+/* =========================================================
+ * 14. HIDE WORDPRESS ADMIN BAR UNTUK USER SIPATUJU
+ * ========================================================= */
+
+function spj26_hide_admin_bar(
+	$show
+) {
+
+	if ( ! is_user_logged_in() ) {
+		return $show;
+	}
+
+	$user =
+		wp_get_current_user();
+
+	if (
+		spj26_user_has_role(
+			'sipatuju_admin',
+			$user
+		)
+		||
+		spj26_user_has_role(
+			'sipatuju_reviewer',
+			$user
+		)
+		||
+		spj26_user_has_role(
+			'sipatuju_residen',
+			$user
+		)
+	) {
+		return false;
+	}
+
+	return $show;
+}
+
+add_filter(
+	'show_admin_bar',
+	'spj26_hide_admin_bar'
+);
+
+
+/* =========================================================
+ * 15. GLOBAL FRONTEND LOGOUT
+ * ========================================================= */
+
+/**
+ * Menyediakan URL logout WordPress yang memiliki nonce valid,
+ * lalu memasangkannya ke semua tombol Logout SIPATUJU.
+ *
+ * Dengan ini page Dashboard Admin, Manajemen Residen,
+ * Manajemen Reviewer, dan page SIPATUJU berikutnya tidak
+ * membutuhkan snippet backend khusus hanya untuk logout.
+ */
+function spj26_print_global_logout_config() {
+
+	if ( ! is_user_logged_in() ) {
+		return;
+	}
+
+	$user =
+		wp_get_current_user();
+
+	$is_sipatuju_user = (
+		spj26_is_system_admin( $user )
+		||
+		spj26_user_has_role(
+			'sipatuju_reviewer',
+			$user
+		)
+		||
+		spj26_user_has_role(
+			'sipatuju_residen',
+			$user
+		)
+	);
+
+	if ( ! $is_sipatuju_user ) {
+		return;
+	}
+
+	/*
+	 * wp_logout_url() mengembalikan URL yang HTML-escaped
+	 * (mis. &amp;). Karena URL ini dikirim ke JavaScript melalui JSON,
+	 * entity HTML harus dikembalikan menjadi karakter "&" biasa.
+	 * Jika tidak, WordPress membaca nonce secara salah dan menampilkan
+	 * halaman konfirmasi logout.
+	 */
+	$logout_url = html_entity_decode(
+		wp_logout_url(
+			spj26_login_url()
+		),
+		ENT_QUOTES,
+		'UTF-8'
+	);
+
+	$config = array(
+		'logoutUrl' => $logout_url,
+	);
+
+	echo '<script>';
+	echo 'window.spj26CoreConfig = ';
+	echo wp_json_encode( $config );
+	echo ';';
+
+	echo <<<'JS'
+(function(){
+
+    function applySpj26LogoutUrl(){
+
+        if(
+            !window.spj26CoreConfig ||
+            !window.spj26CoreConfig.logoutUrl
+        ){
+            return;
+        }
+
+        const selectors = [
+            '#spj26adm-logout',
+            '#spj26adm-residen-logout',
+            '#spj26adm-reviewer-logout',
+            '#spj26res-logout',
+            '#spj26rev-logout',
+            '[data-spj26-logout]'
+        ];
+
+        document
+            .querySelectorAll(
+                selectors.join(',')
+            )
+            .forEach(function(link){
+
+                link.setAttribute(
+                    'href',
+                    window.spj26CoreConfig.logoutUrl
+                );
+
+            });
+
+    }
+
+    if(
+        document.readyState === 'loading'
+    ){
+
+        document.addEventListener(
+            'DOMContentLoaded',
+            applySpj26LogoutUrl
+        );
+
+    }else{
+
+        applySpj26LogoutUrl();
+
+    }
+
+})();
+JS;
+
+	echo '</script>';
+}
+
+add_action(
+	'wp_footer',
+	'spj26_print_global_logout_config',
+	100
+);
+

@@ -1,0 +1,368 @@
+/*
+ * =========================================================
+ * SIPATUJU PPDS FK UNHAS
+ * 000 — 04 - SIPATUJU Admin Submission Operations — CANONICAL 2026.4
+ * VERSION   : 2026.4
+ * TYPE      : WordPress PHP / WPCode / Code Snippets
+ *
+ * REQUIREMENTS:
+ * - Snippet 000-01 Core, 000-02 User Management, dan 000-03 Submission Workflow aktif.
+ * - Helper berikut tersedia dari 000-03:
+ *   spj26_sub_is_admin()
+ *   spj26_sub_table_submissions()
+ *   spj26_sub_table_journals()
+ *
+ * SECURITY:
+ * - Hanya authenticated AJAX (wp_ajax_*) yang didaftarkan.
+ * - Role Administrator diverifikasi server-side.
+ * - Nonce sama dengan workflow Admin:
+ *   spj26_user_management_action
+ *
+ * DATA BEHAVIOR:
+ * - Hard delete / permanent delete.
+ * - Child rows pada spj26_submission_journals dihapus lebih dahulu.
+ * - Parent row pada spj26_submissions dihapus setelahnya.
+ * - Menggunakan SQL transaction + row lock.
+ * - Jika salah satu operasi gagal, seluruh transaksi di-ROLLBACK.
+ * =========================================================
+ */
+
+
+add_action(
+    'wp_ajax_spj26_admin_delete_submission',
+    'spj26_sub_ajax_admin_delete_submission'
+);
+
+
+function spj26_sub_ajax_admin_delete_submission() {
+
+    /*
+     * 1. AUTHORIZATION + CSRF
+     *
+     * Source of truth adalah verifier Admin dari 000-02.
+     * Fallback dipertahankan untuk kegagalan load-order yang tidak terduga.
+     */
+    if (
+        function_exists(
+            'spj26_um_verify_request'
+        )
+    ) {
+
+        spj26_um_verify_request();
+
+    } else {
+
+        if (
+            ! function_exists(
+                'spj26_sub_is_admin'
+            )
+            ||
+            ! spj26_sub_is_admin()
+        ) {
+
+            wp_send_json_error(
+                array(
+                    'message' =>
+                        'Anda tidak memiliki izin untuk menghapus pengajuan.',
+                ),
+                403
+            );
+        }
+
+        check_ajax_referer(
+            'spj26_user_management_action',
+            'nonce'
+        );
+    }
+
+
+    /*
+     * 2. INPUT VALIDATION
+     */
+    $submission_id =
+        isset(
+            $_POST['submission_id']
+        )
+        ? absint(
+            $_POST['submission_id']
+        )
+        : 0;
+
+
+    if (
+        ! $submission_id
+    ) {
+
+        wp_send_json_error(
+            array(
+                'message' =>
+                    'ID pengajuan tidak valid.',
+            ),
+            400
+        );
+    }
+
+
+    if (
+        ! function_exists(
+            'spj26_sub_table_submissions'
+        )
+        ||
+        ! function_exists(
+            'spj26_sub_table_journals'
+        )
+    ) {
+
+        wp_send_json_error(
+            array(
+                'message' =>
+                    'Modul database SIPATUJU belum tersedia.',
+            ),
+            500
+        );
+    }
+
+
+    global $wpdb;
+
+    $submission_table =
+        spj26_sub_table_submissions();
+
+    $journal_table =
+        spj26_sub_table_journals();
+
+
+    /*
+     * 3. ATOMIC HARD DELETE
+     *
+     * Urutan:
+     * - START TRANSACTION
+     * - lock parent submission
+     * - delete all child journal rows
+     * - delete parent submission
+     * - COMMIT
+     */
+    $transaction_started =
+        $wpdb->query(
+            'START TRANSACTION'
+        );
+
+
+    if (
+        $transaction_started === false
+    ) {
+
+        wp_send_json_error(
+            array(
+                'message' =>
+                    'Transaksi database tidak dapat dimulai.',
+            ),
+            500
+        );
+    }
+
+
+    try {
+
+        /*
+         * Lock record agar tidak berubah di tengah proses delete.
+         */
+        $submission =
+            $wpdb->get_row(
+                $wpdb->prepare(
+                    "
+                    SELECT
+                        id,
+                        code,
+                        resident_id,
+                        status,
+                        assigned_reviewer_id
+                    FROM
+                        {$submission_table}
+                    WHERE
+                        id = %d
+                    FOR UPDATE
+                    ",
+                    $submission_id
+                )
+            );
+
+
+        if (
+            ! $submission
+        ) {
+
+            $wpdb->query(
+                'ROLLBACK'
+            );
+
+            wp_send_json_error(
+                array(
+                    'message' =>
+                        'Pengajuan tidak ditemukan atau sudah dihapus.',
+                ),
+                404
+            );
+        }
+
+
+        /*
+         * Delete child records first.
+         * Nilai 0 tetap valid jika tidak ada jurnal anak.
+         */
+        $deleted_journals =
+            $wpdb->delete(
+                $journal_table,
+                array(
+                    'submission_id' =>
+                        $submission_id,
+                ),
+                array(
+                    '%d',
+                )
+            );
+
+
+        if (
+            $deleted_journals === false
+        ) {
+
+            $wpdb->query(
+                'ROLLBACK'
+            );
+
+            wp_send_json_error(
+                array(
+                    'message' =>
+                        'Data jurnal terkait gagal dihapus. Tidak ada perubahan yang disimpan.',
+                ),
+                500
+            );
+        }
+
+
+        /*
+         * Delete parent submission.
+         * Harus tepat 1 row.
+         */
+        $deleted_submission =
+            $wpdb->delete(
+                $submission_table,
+                array(
+                    'id' =>
+                        $submission_id,
+                ),
+                array(
+                    '%d',
+                )
+            );
+
+
+        if (
+            $deleted_submission !== 1
+        ) {
+
+            $wpdb->query(
+                'ROLLBACK'
+            );
+
+            wp_send_json_error(
+                array(
+                    'message' =>
+                        'Pengajuan gagal dihapus. Tidak ada perubahan yang disimpan.',
+                ),
+                409
+            );
+        }
+
+
+        $commit_result =
+            $wpdb->query(
+                'COMMIT'
+            );
+
+
+        if (
+            $commit_result === false
+        ) {
+
+            /*
+             * Pada kegagalan COMMIT, upayakan rollback.
+             * Database engine tetap menjadi sumber kebenaran.
+             */
+            $wpdb->query(
+                'ROLLBACK'
+            );
+
+            wp_send_json_error(
+                array(
+                    'message' =>
+                        'Penghapusan tidak dapat dikonfirmasi oleh database.',
+                ),
+                500
+            );
+        }
+
+
+        /*
+         * Extension hook setelah database berhasil commit.
+         * Modul tambahan dapat mendengarkan event ini tanpa
+         * mengubah endpoint inti.
+         */
+        do_action(
+            'spj26_admin_submission_deleted',
+            $submission_id,
+            (string) $submission->code,
+            (int) $submission->resident_id,
+            (string) $submission->status,
+            (
+                $submission->assigned_reviewer_id
+                ? (int) $submission->assigned_reviewer_id
+                : 0
+            )
+        );
+
+
+        wp_send_json_success(
+            array(
+                'message' =>
+                    'Pengajuan berhasil dihapus permanen.',
+                'submission_id' =>
+                    $submission_id,
+                'code' =>
+                    (string) $submission->code,
+                'deleted_journals' =>
+                    (int) $deleted_journals,
+            )
+        );
+
+
+    } catch ( Throwable $error ) {
+
+        $wpdb->query(
+            'ROLLBACK'
+        );
+
+
+        /*
+         * Detail exception tidak dikirim ke browser.
+         * Simpan detail teknis hanya pada PHP error log.
+         */
+        error_log(
+            sprintf(
+                '[SIPATUJU] Admin delete submission #%d failed: %s',
+                $submission_id,
+                $error->getMessage()
+            )
+        );
+
+
+        wp_send_json_error(
+            array(
+                'message' =>
+                    'Terjadi kesalahan server saat menghapus pengajuan.',
+            ),
+            500
+        );
+    }
+}

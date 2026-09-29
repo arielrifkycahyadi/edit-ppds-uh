@@ -1,0 +1,3547 @@
+<!-- =========================================================
+     SIPATUJU PPDS FK UNHAS
+     PAGE      : PENGAJUAN TERSEDIA
+     WORDPRESS : 00 – 01 Reviewer – Pengajuan Tersedia
+     PARENT    : 00 Dashboard Reviewer
+     SLUG      : pengajuan-tersedia
+     URL       : /reviewer-sipatuju/pengajuan-tersedia/
+     ROLE      : Reviewer
+     FORMAT    : Elementor HTML Widget
+     NAMESPACE : spj26rev
+     ROOT      : #spj26rev-available-root
+
+     Fungsi:
+     - Menampilkan pengajuan nyata berstatus Menunggu Pemeriksaan
+     - Hanya menampilkan pengajuan yang belum memiliki Reviewer
+     - Reviewer dapat melihat detail pengajuan
+     - Reviewer dapat mengambil pengajuan secara atomic
+     - Tidak ada dummy data
+     - Browser/page utama tidak scroll
+     - Header/sidebar/footer tetap
+     - Hanya area konten kanan yang dapat scroll
+========================================================== -->
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:wght@600;700;800&family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap');
+
+#spj26rev-available-root{
+    --spj26rev-maroon:#800000;
+    --spj26rev-maroon-dark:#5c0000;
+    --spj26rev-maroon-medium:#8b1e1e;
+
+    --spj26rev-white:#ffffff;
+    --spj26rev-background:#f3f5f8;
+    --spj26rev-surface:#ffffff;
+    --spj26rev-surface-soft:#f8fafc;
+
+    --spj26rev-text:#0f172a;
+    --spj26rev-text-secondary:#475569;
+    --spj26rev-text-muted:#64748b;
+
+    --spj26rev-border:#e2e8f0;
+    --spj26rev-border-strong:#cbd5e1;
+
+    --spj26rev-green:#047857;
+    --spj26rev-green-bg:#ecfdf5;
+    --spj26rev-amber:#b45309;
+    --spj26rev-amber-bg:#fffbeb;
+
+    width:100%;
+    height:100vh;
+    height:100dvh;
+    min-height:0;
+
+    margin:0;
+    padding:0;
+
+    overflow:hidden;
+
+    background:var(--spj26rev-background);
+    color:var(--spj26rev-text);
+
+    font-family:"Inter",Arial,sans-serif;
+
+    box-sizing:border-box;
+}
+
+#spj26rev-available-root *,
+#spj26rev-available-root *::before,
+#spj26rev-available-root *::after{
+    box-sizing:border-box;
+}
+
+#spj26rev-available-root h1,
+#spj26rev-available-root h2,
+#spj26rev-available-root h3,
+#spj26rev-available-root p{
+    margin:0;
+}
+
+#spj26rev-available-root a{
+    color:inherit;
+    text-decoration:none;
+}
+
+#spj26rev-available-root button,
+#spj26rev-available-root input{
+    font:inherit;
+}
+
+#spj26rev-available-root [hidden]{
+    display:none !important;
+}
+
+
+/* =========================================================
+   PAGE LOCK
+========================================================= */
+
+html.spj26rev-page-lock,
+body.spj26rev-page-lock{
+    width:100% !important;
+    height:100% !important;
+    min-height:100% !important;
+
+    margin:0 !important;
+    padding:0 !important;
+
+    overflow:hidden !important;
+}
+
+body.spj26rev-page-lock #page,
+body.spj26rev-page-lock .site,
+body.spj26rev-page-lock .site-content,
+body.spj26rev-page-lock .elementor,
+body.spj26rev-page-lock .elementor-section-wrap,
+body.spj26rev-page-lock .elementor-element,
+body.spj26rev-page-lock .elementor-widget,
+body.spj26rev-page-lock .elementor-widget-container{
+    max-height:none !important;
+}
+
+
+/* =========================================================
+   HEADER
+========================================================= */
+
+#spj26rev-available-root .spj26rev-header{
+    height:76px;
+    min-height:76px;
+
+    position:relative;
+    z-index:50;
+
+    padding:0 30px;
+
+    background:#fff;
+    border-bottom:1px solid var(--spj26rev-border);
+
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+
+    gap:24px;
+
+    box-shadow:0 1px 2px rgba(15,23,42,.03);
+}
+
+#spj26rev-available-root .spj26rev-header-left,
+#spj26rev-available-root .spj26rev-header-right,
+#spj26rev-available-root .spj26rev-user{
+    display:flex;
+    align-items:center;
+}
+
+#spj26rev-available-root .spj26rev-header-left{
+    gap:14px;
+    min-width:0;
+}
+
+#spj26rev-available-root .spj26rev-header-right{
+    gap:10px;
+    flex:0 0 auto;
+}
+
+#spj26rev-available-root .spj26rev-logo{
+    width:48px;
+    height:48px;
+    flex:0 0 48px;
+
+    border-radius:8px;
+
+    background:var(--spj26rev-maroon);
+    color:#fff;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+}
+
+#spj26rev-available-root .spj26rev-logo .material-symbols-outlined{
+    font-size:25px;
+}
+
+#spj26rev-available-root .spj26rev-brand{
+    min-width:0;
+}
+
+#spj26rev-available-root .spj26rev-brand-row{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    min-width:0;
+}
+
+#spj26rev-available-root .spj26rev-brand-name{
+    font-family:"Plus Jakarta Sans",sans-serif;
+    color:var(--spj26rev-maroon);
+    font-size:15px;
+    font-weight:800;
+    letter-spacing:-.02em;
+    white-space:nowrap;
+}
+
+#spj26rev-available-root .spj26rev-brand-divider{
+    color:#cbd5e1;
+}
+
+#spj26rev-available-root .spj26rev-brand-description{
+    color:#6b5b58;
+    font-size:12px;
+    font-weight:500;
+
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+}
+
+#spj26rev-available-root .spj26rev-faculty{
+    margin-top:3px;
+
+    color:#695653;
+
+    font-family:"JetBrains Mono",monospace;
+    font-size:10px;
+    font-weight:600;
+    letter-spacing:.08em;
+    text-transform:uppercase;
+}
+
+#spj26rev-available-root .spj26rev-user{
+    gap:10px;
+}
+
+#spj26rev-available-root .spj26rev-user-text{
+    text-align:right;
+}
+
+#spj26rev-available-root .spj26rev-user-name{
+    display:block;
+
+    font-family:"Plus Jakarta Sans",sans-serif;
+    font-size:13px;
+    font-weight:700;
+}
+
+#spj26rev-available-root .spj26rev-user-role{
+    display:block;
+
+    margin-top:1px;
+
+    color:var(--spj26rev-maroon);
+
+    font-size:10px;
+    font-weight:700;
+}
+
+#spj26rev-available-root .spj26rev-avatar{
+    width:38px;
+    height:38px;
+
+    border-radius:50%;
+
+    background:var(--spj26rev-maroon);
+    color:#fff;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+}
+
+#spj26rev-available-root .spj26rev-avatar .material-symbols-outlined{
+    font-size:21px;
+}
+
+#spj26rev-available-root .spj26rev-mobile-menu{
+    display:none;
+}
+
+
+/* =========================================================
+   BODY / SIDEBAR
+========================================================= */
+
+#spj26rev-available-root .spj26rev-body{
+    display:grid;
+
+    grid-template-columns:
+        300px
+        minmax(0,1fr);
+
+    height:calc(100% - 76px);
+    min-height:0;
+
+    align-items:stretch;
+
+    overflow:hidden;
+}
+
+#spj26rev-available-root .spj26rev-sidebar{
+    position:relative;
+
+    height:100%;
+    min-height:0;
+
+    padding:18px 16px 14px;
+
+    background:#fff;
+    border-right:1px solid var(--spj26rev-border);
+
+    display:flex;
+    flex-direction:column;
+    justify-content:space-between;
+
+    overflow:hidden;
+
+    z-index:30;
+}
+
+#spj26rev-available-root .spj26rev-sidebar-main{
+    min-height:0;
+}
+
+#spj26rev-available-root .spj26rev-nav-title{
+    margin:4px 8px 7px;
+
+    color:#6c5a57;
+
+    font-size:10px;
+    font-weight:700;
+
+    text-transform:uppercase;
+    letter-spacing:.04em;
+}
+
+#spj26rev-available-root .spj26rev-nav{
+    display:flex;
+    flex-direction:column;
+
+    gap:5px;
+}
+
+#spj26rev-available-root .spj26rev-nav-link{
+    width:100%;
+    min-height:42px;
+
+    padding:9px 13px;
+
+    border-radius:6px;
+
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+
+    gap:10px;
+
+    color:#5b4744;
+
+    font-size:13px;
+    font-weight:500;
+
+    transition:
+        background-color .18s ease,
+        color .18s ease;
+}
+
+#spj26rev-available-root .spj26rev-nav-link:hover{
+    background:var(--spj26rev-surface-soft);
+    color:var(--spj26rev-text);
+}
+
+#spj26rev-available-root .spj26rev-nav-link.active{
+    background:#941c1c;
+    color:#fff;
+    font-weight:700;
+}
+
+#spj26rev-available-root .spj26rev-nav-left{
+    display:flex;
+    align-items:center;
+
+    gap:10px;
+
+    min-width:0;
+}
+
+#spj26rev-available-root .spj26rev-nav-link .material-symbols-outlined{
+    font-size:19px;
+}
+
+#spj26rev-available-root .spj26rev-nav-badge{
+    min-width:22px;
+    height:22px;
+
+    padding:0 6px;
+
+    border-radius:999px;
+
+    background:#fee2e2;
+    color:var(--spj26rev-maroon);
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    font-size:9px;
+    font-weight:800;
+}
+
+#spj26rev-available-root .spj26rev-nav-link.active .spj26rev-nav-badge{
+    background:rgba(255,255,255,.16);
+    color:#fff;
+}
+
+#spj26rev-available-root .spj26rev-nav-section-gap{
+    height:20px;
+}
+
+#spj26rev-available-root .spj26rev-sidebar-info{
+    padding:14px 15px;
+
+    border-radius:7px;
+
+    background:#f8fafc;
+}
+
+#spj26rev-available-root .spj26rev-sidebar-info-title{
+    display:flex;
+    align-items:center;
+
+    gap:7px;
+
+    color:var(--spj26rev-maroon);
+
+    font-size:10px;
+    font-weight:700;
+}
+
+#spj26rev-available-root .spj26rev-sidebar-info-title .material-symbols-outlined{
+    font-size:16px;
+}
+
+#spj26rev-available-root .spj26rev-version{
+    margin-top:5px;
+
+    color:#594b48;
+
+    font-family:"JetBrains Mono",monospace;
+    font-size:10px;
+}
+
+#spj26rev-available-root .spj26rev-department{
+    margin-top:4px;
+
+    color:#665855;
+
+    font-size:10px;
+    line-height:1.45;
+}
+
+
+/* =========================================================
+   RIGHT PANE
+========================================================= */
+
+#spj26rev-available-root .spj26rev-rightpane{
+    height:100%;
+    min-width:0;
+    min-height:0;
+
+    overflow:hidden;
+
+    display:grid;
+
+    grid-template-rows:
+        minmax(0,1fr)
+        50px;
+}
+
+#spj26rev-available-root .spj26rev-main{
+    width:100%;
+    min-width:0;
+    min-height:0;
+
+    padding:24px 30px 28px;
+
+    overflow-y:auto;
+    overflow-x:hidden;
+
+    overscroll-behavior:contain;
+    scrollbar-gutter:stable;
+}
+
+#spj26rev-available-root .spj26rev-main::-webkit-scrollbar{
+    width:8px;
+}
+
+#spj26rev-available-root .spj26rev-main::-webkit-scrollbar-track{
+    background:#eef2f6;
+}
+
+#spj26rev-available-root .spj26rev-main::-webkit-scrollbar-thumb{
+    background:#cbd5e1;
+
+    border-radius:999px;
+    border:2px solid #eef2f6;
+}
+
+#spj26rev-available-root .spj26rev-content{
+    width:100%;
+    max-width:1320px;
+
+    margin:0 auto;
+}
+
+
+/* =========================================================
+   PAGE HEAD
+========================================================= */
+
+#spj26rev-available-root .spj26rev-page-head{
+    margin-bottom:17px;
+
+    display:flex;
+    align-items:flex-end;
+    justify-content:space-between;
+
+    gap:18px;
+}
+
+#spj26rev-available-root .spj26rev-page-kicker{
+    display:flex;
+    align-items:center;
+
+    gap:7px;
+
+    margin-bottom:6px;
+
+    color:var(--spj26rev-maroon-medium);
+
+    font-size:9px;
+    font-weight:800;
+
+    text-transform:uppercase;
+    letter-spacing:.06em;
+}
+
+#spj26rev-available-root .spj26rev-page-kicker .material-symbols-outlined{
+    font-size:16px;
+}
+
+#spj26rev-available-root .spj26rev-page-title{
+    font-family:"Plus Jakarta Sans",sans-serif;
+
+    color:#111827;
+
+    font-size:23px;
+    line-height:1.25;
+    font-weight:800;
+
+    letter-spacing:-.02em;
+}
+
+#spj26rev-available-root .spj26rev-page-subtitle{
+    margin-top:5px;
+
+    color:#64748b;
+
+    font-size:11px;
+    line-height:1.55;
+}
+
+#spj26rev-available-root .spj26rev-count-box{
+    flex:0 0 auto;
+
+    min-width:130px;
+
+    padding:11px 14px;
+
+    border:1px solid var(--spj26rev-border);
+    border-radius:10px;
+
+    background:#fff;
+
+    text-align:right;
+}
+
+#spj26rev-available-root .spj26rev-count-label{
+    color:#94a3b8;
+
+    font-size:8.5px;
+    font-weight:800;
+
+    text-transform:uppercase;
+    letter-spacing:.05em;
+}
+
+#spj26rev-available-root .spj26rev-count-number{
+    margin-top:3px;
+
+    font-family:"Plus Jakarta Sans",sans-serif;
+
+    color:#111827;
+
+    font-size:22px;
+    font-weight:800;
+}
+
+
+/* =========================================================
+   CARD / TOOLBAR
+========================================================= */
+
+#spj26rev-available-root .spj26rev-card{
+    border:1px solid var(--spj26rev-border);
+    border-radius:13px;
+
+    background:#fff;
+
+    box-shadow:0 2px 6px rgba(15,23,42,.03);
+
+    overflow:hidden;
+}
+
+#spj26rev-available-root .spj26rev-card-head{
+    min-height:70px;
+
+    padding:14px 16px;
+
+    border-bottom:1px solid #f1f5f9;
+
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+
+    gap:14px;
+}
+
+#spj26rev-available-root .spj26rev-card-title{
+    font-family:"Plus Jakarta Sans",sans-serif;
+
+    color:#111827;
+
+    font-size:14px;
+    font-weight:800;
+}
+
+#spj26rev-available-root .spj26rev-card-subtitle{
+    margin-top:3px;
+
+    color:#94a3b8;
+
+    font-size:9.8px;
+    line-height:1.4;
+}
+
+#spj26rev-available-root .spj26rev-toolbar{
+    display:flex;
+    align-items:center;
+
+    gap:8px;
+
+    flex:0 0 auto;
+}
+
+#spj26rev-available-root .spj26rev-search{
+    width:245px;
+    min-height:36px;
+
+    padding:7px 10px;
+
+    border:1px solid #dbe3ec;
+    border-radius:8px;
+
+    background:#fff;
+    color:#334155;
+
+    outline:none;
+
+    font-size:9.8px;
+}
+
+#spj26rev-available-root .spj26rev-search:focus{
+    border-color:var(--spj26rev-maroon-medium);
+
+    box-shadow:
+        0 0 0 3px
+        rgba(139,30,30,.07);
+}
+
+#spj26rev-available-root .spj26rev-refresh-btn{
+    min-height:36px;
+
+    padding:7px 11px;
+
+    border:1px solid #dbe3ec;
+    border-radius:8px;
+
+    background:#fff;
+    color:#475569;
+
+    display:inline-flex;
+    align-items:center;
+
+    gap:6px;
+
+    font-size:9.5px;
+    font-weight:800;
+
+    cursor:pointer;
+}
+
+#spj26rev-available-root .spj26rev-refresh-btn:hover{
+    background:#f8fafc;
+}
+
+#spj26rev-available-root .spj26rev-refresh-btn .material-symbols-outlined{
+    font-size:16px;
+}
+
+
+/* =========================================================
+   TABLE
+========================================================= */
+
+#spj26rev-available-root .spj26rev-table-wrap{
+    width:100%;
+
+    overflow-x:auto;
+}
+
+#spj26rev-available-root .spj26rev-table{
+    width:100%;
+    min-width:980px;
+
+    border-collapse:collapse;
+}
+
+#spj26rev-available-root .spj26rev-table th{
+    padding:10px 12px;
+
+    border-bottom:1px solid #e9eef4;
+
+    background:#f8fafc;
+    color:#64748b;
+
+    text-align:left;
+
+    font-size:9px;
+    font-weight:800;
+
+    text-transform:uppercase;
+    letter-spacing:.04em;
+}
+
+#spj26rev-available-root .spj26rev-table td{
+    padding:12px;
+
+    border-bottom:1px solid #f1f5f9;
+
+    vertical-align:middle;
+
+    color:#334155;
+
+    font-size:10.5px;
+}
+
+#spj26rev-available-root .spj26rev-table tbody tr:last-child td{
+    border-bottom:0;
+}
+
+#spj26rev-available-root .spj26rev-table tbody tr:hover{
+    background:#fcfcfd;
+}
+
+#spj26rev-available-root .spj26rev-code{
+    font-family:"JetBrains Mono",monospace;
+
+    color:#475569;
+
+    font-size:9.5px;
+    font-weight:700;
+}
+
+#spj26rev-available-root .spj26rev-name{
+    color:#111827;
+
+    font-size:10.5px;
+    font-weight:800;
+}
+
+#spj26rev-available-root .spj26rev-subtext{
+    margin-top:3px;
+
+    color:#94a3b8;
+
+    font-size:8.8px;
+    line-height:1.35;
+}
+
+#spj26rev-available-root .spj26rev-status{
+    display:inline-flex;
+    align-items:center;
+
+    gap:5px;
+
+    padding:5px 8px;
+
+    border:1px solid #fde68a;
+    border-radius:999px;
+
+    background:#fffbeb;
+    color:#b45309;
+
+    font-size:8.8px;
+    font-weight:800;
+
+    white-space:nowrap;
+}
+
+#spj26rev-available-root .spj26rev-action-group{
+    display:flex;
+
+    gap:6px;
+
+    flex-wrap:wrap;
+}
+
+#spj26rev-available-root .spj26rev-action{
+    min-height:32px;
+
+    padding:7px 9px;
+
+    border:1px solid #d1d5db;
+    border-radius:7px;
+
+    background:#fff;
+    color:#475569;
+
+    font-size:9px;
+    font-weight:700;
+
+    cursor:pointer;
+}
+
+#spj26rev-available-root .spj26rev-action:hover{
+    background:#f8fafc;
+}
+
+#spj26rev-available-root .spj26rev-action.primary{
+    border-color:var(--spj26rev-maroon-medium);
+
+    background:var(--spj26rev-maroon-medium);
+    color:#fff;
+}
+
+#spj26rev-available-root .spj26rev-action.primary:hover{
+    background:var(--spj26rev-maroon-dark);
+}
+
+#spj26rev-available-root .spj26rev-action:disabled{
+    opacity:.55;
+    cursor:not-allowed;
+}
+
+#spj26rev-available-root .spj26rev-empty{
+    min-height:190px;
+
+    padding:30px 18px;
+
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+
+    gap:7px;
+
+    color:#94a3b8;
+
+    text-align:center;
+}
+
+#spj26rev-available-root .spj26rev-empty .material-symbols-outlined{
+    color:#cbd5e1;
+
+    font-size:34px;
+}
+
+#spj26rev-available-root .spj26rev-empty strong{
+    color:#475569;
+
+    font-size:11px;
+    font-weight:800;
+}
+
+#spj26rev-available-root .spj26rev-empty span:not(.material-symbols-outlined){
+    max-width:440px;
+
+    font-size:9.5px;
+    line-height:1.5;
+}
+
+
+/* =========================================================
+   FOOTER
+========================================================= */
+
+#spj26rev-available-root .spj26rev-footer{
+    height:50px;
+    min-height:50px;
+
+    padding:0 28px;
+
+    border-top:1px solid var(--spj26rev-border);
+
+    background:#fff;
+
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+
+    gap:20px;
+
+    overflow:hidden;
+}
+
+#spj26rev-available-root .spj26rev-footer-left{
+    display:flex;
+    align-items:center;
+
+    gap:8px;
+
+    color:#6b5b58;
+
+    font-size:10px;
+}
+
+#spj26rev-available-root .spj26rev-footer-brand{
+    color:var(--spj26rev-maroon);
+
+    font-weight:800;
+}
+
+#spj26rev-available-root .spj26rev-footer-right{
+    color:#625451;
+
+    font-family:"JetBrains Mono",monospace;
+    font-size:9px;
+}
+
+
+/* =========================================================
+   MODAL
+========================================================= */
+
+#spj26rev-available-root .spj26rev-modal-backdrop{
+    position:fixed;
+
+    inset:0;
+
+    z-index:200;
+
+    padding:20px;
+
+    background:rgba(15,23,42,.48);
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+}
+
+#spj26rev-available-root .spj26rev-modal{
+    width:min(860px,100%);
+    max-height:92vh;
+
+    overflow-y:auto;
+
+    border-radius:14px;
+
+    background:#fff;
+
+    box-shadow:
+        0 22px 55px
+        rgba(15,23,42,.22);
+}
+
+#spj26rev-available-root .spj26rev-modal-head{
+    position:sticky;
+    top:0;
+
+    z-index:5;
+
+    padding:17px 18px;
+
+    border-bottom:1px solid var(--spj26rev-border);
+
+    background:#fff;
+
+    display:flex;
+    align-items:flex-start;
+    justify-content:space-between;
+
+    gap:14px;
+}
+
+#spj26rev-available-root .spj26rev-modal-title{
+    font-family:"Plus Jakarta Sans",sans-serif;
+
+    font-size:15px;
+    font-weight:800;
+}
+
+#spj26rev-available-root .spj26rev-modal-subtitle{
+    margin-top:4px;
+
+    color:#64748b;
+
+    font-size:9.8px;
+    line-height:1.45;
+}
+
+#spj26rev-available-root .spj26rev-modal-close{
+    width:32px;
+    height:32px;
+    flex:0 0 32px;
+
+    border:0;
+    border-radius:7px;
+
+    background:#f8fafc;
+    color:#64748b;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    cursor:pointer;
+}
+
+#spj26rev-available-root .spj26rev-modal-body{
+    padding:18px;
+}
+
+#spj26rev-available-root .spj26rev-detail-grid{
+    display:grid;
+
+    grid-template-columns:
+        1fr
+        1fr;
+
+    gap:12px;
+}
+
+#spj26rev-available-root .spj26rev-detail-item{
+    padding:11px;
+
+    border:1px solid var(--spj26rev-border);
+    border-radius:9px;
+
+    background:#f8fafc;
+}
+
+#spj26rev-available-root .spj26rev-detail-item.full{
+    grid-column:1 / -1;
+}
+
+#spj26rev-available-root .spj26rev-detail-label{
+    color:#94a3b8;
+
+    font-size:8.8px;
+    font-weight:800;
+
+    text-transform:uppercase;
+    letter-spacing:.04em;
+}
+
+#spj26rev-available-root .spj26rev-detail-value{
+    margin-top:4px;
+
+    color:#1e293b;
+
+    font-size:10.5px;
+    font-weight:700;
+    line-height:1.5;
+
+    white-space:pre-line;
+}
+
+#spj26rev-available-root .spj26rev-journal-list{
+    display:flex;
+    flex-direction:column;
+
+    gap:12px;
+
+    margin-top:16px;
+}
+
+#spj26rev-available-root .spj26rev-journal-card{
+    padding:14px;
+
+    border:1px solid var(--spj26rev-border);
+    border-radius:10px;
+
+    background:#fff;
+}
+
+#spj26rev-available-root .spj26rev-journal-head{
+    display:flex;
+    align-items:center;
+
+    gap:8px;
+}
+
+#spj26rev-available-root .spj26rev-journal-number{
+    width:23px;
+    height:23px;
+
+    flex:0 0 23px;
+
+    border-radius:50%;
+
+    background:#111827;
+    color:#fff;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    font-size:9px;
+    font-weight:800;
+}
+
+#spj26rev-available-root .spj26rev-journal-name{
+    color:#1e293b;
+
+    font-size:11px;
+    font-weight:800;
+}
+
+#spj26rev-available-root .spj26rev-journal-meta{
+    margin-top:2px;
+
+    color:#64748b;
+
+    font-family:"JetBrains Mono",monospace;
+    font-size:9.3px;
+}
+
+#spj26rev-available-root .spj26rev-modal-actions{
+    padding:14px 18px 18px;
+
+    display:flex;
+    justify-content:flex-end;
+
+    gap:9px;
+}
+
+#spj26rev-available-root .spj26rev-modal-btn{
+    min-height:38px;
+
+    padding:8px 13px;
+
+    border:1px solid #cbd5e1;
+    border-radius:8px;
+
+    background:#fff;
+    color:#475569;
+
+    font-size:10px;
+    font-weight:800;
+
+    cursor:pointer;
+}
+
+#spj26rev-available-root .spj26rev-modal-btn.primary{
+    border-color:var(--spj26rev-maroon-medium);
+
+    background:var(--spj26rev-maroon-medium);
+    color:#fff;
+}
+
+#spj26rev-available-root .spj26rev-modal-btn:disabled{
+    opacity:.55;
+    cursor:not-allowed;
+}
+
+#spj26rev-available-root .spj26rev-toast{
+    position:fixed;
+
+    right:22px;
+    bottom:22px;
+
+    z-index:300;
+
+    max-width:390px;
+
+    padding:12px 14px;
+
+    border:1px solid #a7f3d0;
+    border-radius:9px;
+
+    background:#ecfdf5;
+    color:#047857;
+
+    box-shadow:
+        0 12px 30px
+        rgba(15,23,42,.14);
+
+    font-size:10.5px;
+    line-height:1.45;
+}
+
+#spj26rev-available-root .spj26rev-overlay{
+    display:none;
+}
+
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media(max-width:1180px){
+
+    #spj26rev-available-root .spj26rev-body{
+        grid-template-columns:
+            240px
+            minmax(0,1fr);
+    }
+
+    #spj26rev-available-root .spj26rev-brand-divider,
+    #spj26rev-available-root .spj26rev-brand-description{
+        display:none;
+    }
+
+    #spj26rev-available-root .spj26rev-toolbar{
+        flex-wrap:wrap;
+        justify-content:flex-end;
+    }
+
+    #spj26rev-available-root .spj26rev-search{
+        width:210px;
+    }
+
+}
+
+@media(max-width:800px){
+
+    #spj26rev-available-root .spj26rev-header{
+        height:64px;
+        min-height:64px;
+
+        padding:8px 14px;
+    }
+
+    #spj26rev-available-root .spj26rev-mobile-menu{
+        display:flex;
+
+        width:38px;
+        height:38px;
+        flex:0 0 38px;
+
+        align-items:center;
+        justify-content:center;
+
+        border:1px solid var(--spj26rev-border);
+        border-radius:7px;
+
+        background:#fff;
+        color:var(--spj26rev-maroon);
+
+        cursor:pointer;
+    }
+
+    #spj26rev-available-root .spj26rev-logo{
+        width:38px;
+        height:38px;
+        flex-basis:38px;
+    }
+
+    #spj26rev-available-root .spj26rev-brand-name{
+        font-size:11px;
+    }
+
+    #spj26rev-available-root .spj26rev-faculty,
+    #spj26rev-available-root .spj26rev-user-text{
+        display:none;
+    }
+
+    #spj26rev-available-root .spj26rev-body{
+        display:block;
+
+        height:calc(100% - 64px);
+        min-height:0;
+
+        overflow:hidden;
+    }
+
+    #spj26rev-available-root .spj26rev-sidebar{
+        position:fixed;
+
+        top:0;
+        left:0;
+
+        width:270px;
+        height:100vh;
+        height:100dvh;
+
+        overflow-y:auto;
+        overflow-x:hidden;
+
+        transform:translateX(-102%);
+
+        transition:transform .22s ease;
+
+        box-shadow:
+            8px 0 24px
+            rgba(15,23,42,.14);
+
+        z-index:100;
+    }
+
+    #spj26rev-available-root .spj26rev-sidebar.open{
+        transform:translateX(0);
+    }
+
+    #spj26rev-available-root .spj26rev-overlay{
+        position:fixed;
+
+        inset:0;
+
+        z-index:90;
+
+        background:rgba(15,23,42,.40);
+    }
+
+    #spj26rev-available-root .spj26rev-overlay.open{
+        display:block;
+    }
+
+    #spj26rev-available-root .spj26rev-rightpane{
+        height:100%;
+
+        grid-template-rows:
+            minmax(0,1fr)
+            auto;
+
+        overflow:hidden;
+    }
+
+    #spj26rev-available-root .spj26rev-main{
+        padding:18px 14px 22px;
+    }
+
+    #spj26rev-available-root .spj26rev-page-head{
+        align-items:flex-start;
+        flex-direction:column;
+    }
+
+    #spj26rev-available-root .spj26rev-count-box{
+        width:100%;
+        text-align:left;
+    }
+
+    #spj26rev-available-root .spj26rev-card-head{
+        align-items:stretch;
+        flex-direction:column;
+    }
+
+    #spj26rev-available-root .spj26rev-toolbar{
+        width:100%;
+        justify-content:stretch;
+    }
+
+    #spj26rev-available-root .spj26rev-search{
+        width:100%;
+        flex:1 1 auto;
+    }
+
+    #spj26rev-available-root .spj26rev-detail-grid{
+        grid-template-columns:1fr;
+    }
+
+    #spj26rev-available-root .spj26rev-detail-item.full{
+        grid-column:auto;
+    }
+
+    #spj26rev-available-root .spj26rev-footer{
+        height:auto;
+        min-height:50px;
+
+        padding:8px 14px;
+
+        align-items:flex-start;
+        justify-content:center;
+
+        flex-direction:column;
+
+        gap:3px;
+    }
+
+}
+
+
+/* =========================================================
+   REVIEWER WORKFLOW SYNC v2
+   Sidebar canonical mengikuti page Pemeriksaan Saya
+========================================================= */
+
+#spj26rev-available-root .spj26rev-sidebar{
+    position:relative;
+    height:100%;
+    min-height:0;
+    padding:18px 16px 14px;
+    background:#fff;
+    border-right:1px solid #e2e8f0;
+    display:flex;
+    flex-direction:column;
+    justify-content:space-between;
+    overflow:hidden;
+    z-index:30;
+}
+
+#spj26rev-available-root .spj26rev-sidebar-main{min-height:0;}
+
+#spj26rev-available-root .spj26rev-nav-title{
+    margin:4px 8px 7px;
+    color:#6c5a57;
+    font-size:10px;
+    font-weight:700;
+    text-transform:uppercase;
+    letter-spacing:.04em;
+}
+
+#spj26rev-available-root .spj26rev-nav{
+    display:flex;
+    flex-direction:column;
+    gap:5px;
+}
+
+#spj26rev-available-root .spj26rev-nav-link{
+    width:100%;
+    min-height:42px;
+    padding:9px 13px;
+    border-radius:6px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+    color:#5b4744;
+    font-size:13px;
+    font-weight:500;
+    transition:background-color .18s ease,color .18s ease;
+}
+
+#spj26rev-available-root .spj26rev-nav-link:hover{
+    background:#f8fafc;
+    color:#0f172a;
+}
+
+#spj26rev-available-root .spj26rev-nav-link.active{
+    background:#941c1c;
+    color:#fff;
+    font-weight:700;
+}
+
+#spj26rev-available-root .spj26rev-nav-left{
+    min-width:0;
+    display:flex;
+    align-items:center;
+    gap:10px;
+}
+
+#spj26rev-available-root .spj26rev-nav-link .material-symbols-outlined{font-size:19px;}
+
+#spj26rev-available-root .spj26rev-nav-notification{
+    position:relative;
+    width:30px;
+    min-width:30px;
+    height:28px;
+    flex:0 0 30px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+}
+
+#spj26rev-available-root .spj26rev-nav-badge{
+    min-width:22px;
+    height:22px;
+    padding:0 6px;
+    border-radius:999px;
+    background:#fee2e2;
+    color:#800000;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:9px;
+    line-height:1;
+    font-weight:800;
+}
+
+#spj26rev-available-root .spj26rev-nav-link.active .spj26rev-nav-badge{
+    background:rgba(255,255,255,.16);
+    color:#fff;
+}
+
+#spj26rev-available-root .spj26rev-nav-dot{
+    position:absolute;
+    top:0;
+    right:0;
+    width:8px;
+    height:8px;
+    border:2px solid #fff;
+    border-radius:50%;
+    background:#ef4444;
+}
+
+#spj26rev-available-root .spj26rev-nav-link.active .spj26rev-nav-dot{
+    border-color:#941c1c;
+    background:#fde68a;
+}
+
+#spj26rev-available-root .spj26rev-nav-dot[hidden]{display:none !important;}
+
+#spj26rev-available-root .spj26rev-nav-section-gap{height:20px;}
+
+#spj26rev-available-root .spj26rev-sidebar-info{
+    padding:14px 15px;
+    border-radius:7px;
+    background:#f8fafc;
+}
+
+#spj26rev-available-root .spj26rev-sidebar-info-title{
+    display:flex;
+    align-items:center;
+    gap:7px;
+    color:#800000;
+    font-size:10px;
+    font-weight:700;
+}
+
+#spj26rev-available-root .spj26rev-sidebar-info-title .material-symbols-outlined{font-size:16px;}
+
+#spj26rev-available-root .spj26rev-version{
+    margin-top:5px;
+    color:#594b48;
+    font-family:"JetBrains Mono",monospace;
+    font-size:10px;
+}
+
+#spj26rev-available-root .spj26rev-department{
+    margin-top:4px;
+    color:#665855;
+    font-size:10px;
+    line-height:1.45;
+}
+
+
+
+/* =========================================================
+   TRUE FULLPAGE - BYPASS ELEMENTOR/THEME WRAPPER
+========================================================= */
+#spj26rev-available-root{
+    position:fixed !important;
+    inset:0 !important;
+    z-index:9999 !important;
+    width:100vw !important;
+    max-width:none !important;
+    height:100vh !important;
+    height:100dvh !important;
+    margin:0 !important;
+    padding:0 !important;
+}
+
+</style>
+
+
+<div id="spj26rev-available-root">
+
+    <div
+        class="spj26rev-overlay"
+        id="spj26rev-available-overlay"
+    ></div>
+
+
+    <!-- HEADER -->
+    <header class="spj26rev-header">
+
+        <div class="spj26rev-header-left">
+
+            <button
+                class="spj26rev-mobile-menu"
+                id="spj26rev-available-menu-button"
+                type="button"
+                aria-label="Buka menu"
+            >
+                <span class="material-symbols-outlined">menu</span>
+            </button>
+
+            <div class="spj26rev-logo">
+                <span class="material-symbols-outlined">fact_check</span>
+            </div>
+
+            <div class="spj26rev-brand">
+
+                <div class="spj26rev-brand-row">
+
+                    <div class="spj26rev-brand-name">
+                        SIPATUJU PPDS
+                    </div>
+
+                    <div class="spj26rev-brand-divider">|</div>
+
+                    <div class="spj26rev-brand-description">
+                        Sistem Pemeriksaan Kelayakan Jurnal PPDS FK UNHAS
+                    </div>
+
+                </div>
+
+                <div class="spj26rev-faculty">
+                    Fakultas Kedokteran • Akreditasi Unggul
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="spj26rev-header-right">
+
+            <div class="spj26rev-user">
+
+                <div class="spj26rev-user-text">
+                    <span
+                        class="spj26rev-user-name"
+                        id="spj26rev-available-user-name"
+                    >
+                        Reviewer
+                    </span>
+
+                    <span class="spj26rev-user-role">
+                        Reviewer
+                    </span>
+                </div>
+
+                <div class="spj26rev-avatar">
+                    <span class="material-symbols-outlined">person_search</span>
+                </div>
+
+            </div>
+
+        </div>
+
+    </header>
+
+
+    <div class="spj26rev-body">
+
+        <!-- SIDEBAR -->
+        <aside
+            class="spj26rev-sidebar"
+            id="spj26rev-available-sidebar"
+        >
+
+            <div class="spj26rev-sidebar-main">
+
+                <div class="spj26rev-nav-title">
+                    Menu Reviewer
+                </div>
+
+                <nav class="spj26rev-nav">
+
+                    <a
+                        class="spj26rev-nav-link"
+                        href="/reviewer-sipatuju/"
+                    >
+                        <span class="spj26rev-nav-left">
+                            <span class="material-symbols-outlined">grid_view</span>
+                            <span>Dashboard</span>
+                        </span>
+                    </a>
+
+                    <a
+                        class="spj26rev-nav-link active"
+                        href="/reviewer-sipatuju/pengajuan-tersedia/"
+                    >
+                        <span class="spj26rev-nav-left">
+                            <span class="material-symbols-outlined">inbox</span>
+                            <span>Pengajuan Tersedia</span>
+                        </span>
+
+                        <span
+                            class="spj26rev-nav-badge"
+                            id="spj26rev-available-nav-count"
+                        >0</span>
+                    </a>
+
+                    <a
+                        class="spj26rev-nav-link"
+                        href="/reviewer-sipatuju/pemeriksaan-saya/"
+                    >
+                        <span class="spj26rev-nav-left">
+                            <span class="material-symbols-outlined">rate_review</span>
+                            <span>Pemeriksaan Saya</span>
+                        </span>
+                    </a>
+
+                    <a
+                        class="spj26rev-nav-link"
+                        href="/reviewer-sipatuju/riwayat-pemeriksaan/"
+                    >
+                        <span class="spj26rev-nav-left">
+                            <span class="material-symbols-outlined">history</span>
+                            <span>Riwayat Pemeriksaan</span>
+                        </span>
+                    </a>
+
+                </nav>
+
+
+                <div class="spj26rev-nav-section-gap"></div>
+
+
+                <div class="spj26rev-nav-title">
+                    Akun
+                </div>
+
+                <nav class="spj26rev-nav">
+
+                    <a
+                        class="spj26rev-nav-link"
+                        href="/reviewer-sipatuju/profil/"
+                    >
+                        <span class="spj26rev-nav-left">
+                            <span class="material-symbols-outlined">manage_accounts</span>
+                            <span>Profil &amp; Password</span>
+                        </span>
+                    </a>
+
+                    <a
+                        class="spj26rev-nav-link"
+                        id="spj26rev-logout"
+                        href="#"
+                        data-spj26-logout
+                    >
+                        <span class="spj26rev-nav-left">
+                            <span class="material-symbols-outlined">logout</span>
+                            <span>Logout</span>
+                        </span>
+                    </a>
+
+                </nav>
+
+            </div>
+
+
+            <div class="spj26rev-sidebar-info">
+
+                <div class="spj26rev-sidebar-info-title">
+                    <span class="material-symbols-outlined">verified</span>
+                    <span>PPDS FK UNHAS</span>
+                </div>
+
+                <div class="spj26rev-version">
+                    Versi Sistem 2026.1
+                </div>
+
+                <div class="spj26rev-department">
+                    Program Pendidikan Dokter Spesialis
+                </div>
+
+            </div>
+
+        </aside>
+
+
+        <!-- RIGHT PANE -->
+        <div class="spj26rev-rightpane">
+
+            <main class="spj26rev-main">
+
+                <div class="spj26rev-content">
+
+                    <div class="spj26rev-page-head">
+
+                        <div>
+
+                            <div class="spj26rev-page-kicker">
+                                <span class="material-symbols-outlined">inbox</span>
+                                <span>Reviewer Workspace</span>
+                            </div>
+
+                            <h1 class="spj26rev-page-title">
+                                Pengajuan Tersedia
+                            </h1>
+
+                            <p class="spj26rev-page-subtitle">
+                                Daftar pengajuan berstatus Menunggu Pemeriksaan yang belum memiliki Reviewer. Buka detail pengajuan sebelum mengambilnya untuk diperiksa.
+                            </p>
+
+                        </div>
+
+
+                        <div class="spj26rev-count-box">
+
+                            <div class="spj26rev-count-label">
+                                Tersedia
+                            </div>
+
+                            <div
+                                class="spj26rev-count-number"
+                                id="spj26rev-available-count"
+                            >
+                                0
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <section class="spj26rev-card">
+
+                        <div class="spj26rev-card-head">
+
+                            <div>
+
+                                <div class="spj26rev-card-title">
+                                    Daftar Pengajuan
+                                </div>
+
+                                <div class="spj26rev-card-subtitle">
+                                    Pengajuan yang telah diambil atau ditugaskan kepada Reviewer lain otomatis tidak lagi muncul pada daftar ini.
+                                </div>
+
+                            </div>
+
+
+                            <div class="spj26rev-toolbar">
+
+                                <input
+                                    class="spj26rev-search"
+                                    id="spj26rev-available-search"
+                                    type="search"
+                                    placeholder="Cari kode, Residen, NIM, atau judul..."
+                                    autocomplete="off"
+                                >
+
+                                <button
+                                    class="spj26rev-refresh-btn"
+                                    id="spj26rev-available-refresh"
+                                    type="button"
+                                >
+                                    <span class="material-symbols-outlined">refresh</span>
+                                    <span>Perbarui</span>
+                                </button>
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="spj26rev-table-wrap">
+
+                            <table class="spj26rev-table">
+
+                                <thead>
+                                    <tr>
+                                        <th>Kode</th>
+                                        <th>Residen</th>
+                                        <th>Artikel</th>
+                                        <th>Pembimbing</th>
+                                        <th>Diajukan</th>
+                                        <th>Status</th>
+                                        <th>Aksi</th>
+                                    </tr>
+                                </thead>
+
+                                <tbody id="spj26rev-available-body"></tbody>
+
+                            </table>
+
+                        </div>
+
+                    </section>
+
+                </div>
+
+            </main>
+
+
+            <footer class="spj26rev-footer">
+
+                <div class="spj26rev-footer-left">
+                    <span class="spj26rev-footer-brand">SIPATUJU PPDS</span>
+                    <span>•</span>
+                    <span>Fakultas Kedokteran Universitas Hasanuddin</span>
+                </div>
+
+                <div class="spj26rev-footer-right">
+                    PPDS FK UNHAS - Versi Sistem 2026.1
+                </div>
+
+            </footer>
+
+        </div>
+
+    </div>
+
+
+    <!-- DETAIL MODAL -->
+    <div
+        class="spj26rev-modal-backdrop"
+        id="spj26rev-available-modal"
+        hidden
+    >
+
+        <div
+            class="spj26rev-modal"
+            role="dialog"
+            aria-modal="true"
+        >
+
+            <div class="spj26rev-modal-head">
+
+                <div>
+                    <div class="spj26rev-modal-title">
+                        Detail Pengajuan
+                    </div>
+
+                    <div
+                        class="spj26rev-modal-subtitle"
+                        id="spj26rev-available-modal-code"
+                    ></div>
+                </div>
+
+                <button
+                    class="spj26rev-modal-close"
+                    id="spj26rev-available-modal-close"
+                    type="button"
+                    aria-label="Tutup detail"
+                >
+                    <span class="material-symbols-outlined">close</span>
+                </button>
+
+            </div>
+
+
+            <div class="spj26rev-modal-body">
+
+                <div class="spj26rev-detail-grid">
+
+                    <div class="spj26rev-detail-item">
+                        <div class="spj26rev-detail-label">Residen</div>
+                        <div
+                            class="spj26rev-detail-value"
+                            id="spj26rev-available-detail-resident"
+                        >-</div>
+                    </div>
+
+                    <div class="spj26rev-detail-item">
+                        <div class="spj26rev-detail-label">Program PPDS</div>
+                        <div
+                            class="spj26rev-detail-value"
+                            id="spj26rev-available-detail-program"
+                        >-</div>
+                    </div>
+
+                    <div class="spj26rev-detail-item">
+                        <div class="spj26rev-detail-label">Jenis Artikel</div>
+                        <div
+                            class="spj26rev-detail-value"
+                            id="spj26rev-available-detail-type"
+                        >-</div>
+                    </div>
+
+                    <div class="spj26rev-detail-item">
+                        <div class="spj26rev-detail-label">Pembimbing Utama</div>
+                        <div
+                            class="spj26rev-detail-value"
+                            id="spj26rev-available-detail-supervisor"
+                        >-</div>
+                    </div>
+
+                    <div class="spj26rev-detail-item full">
+                        <div class="spj26rev-detail-label">Judul Artikel</div>
+                        <div
+                            class="spj26rev-detail-value"
+                            id="spj26rev-available-detail-title"
+                        >-</div>
+                    </div>
+
+                    <div class="spj26rev-detail-item full">
+                        <div class="spj26rev-detail-label">Abstrak</div>
+                        <div
+                            class="spj26rev-detail-value"
+                            id="spj26rev-available-detail-abstract"
+                        >-</div>
+                    </div>
+
+                </div>
+
+
+                <div
+                    class="spj26rev-journal-list"
+                    id="spj26rev-available-detail-journals"
+                ></div>
+
+            </div>
+
+
+            <div class="spj26rev-modal-actions">
+
+                <button
+                    class="spj26rev-modal-btn"
+                    id="spj26rev-available-modal-cancel"
+                    type="button"
+                >
+                    Tutup
+                </button>
+
+                <button
+                    class="spj26rev-modal-btn primary"
+                    id="spj26rev-available-modal-take"
+                    type="button"
+                >
+                    Ambil untuk Diperiksa
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <div
+        class="spj26rev-toast"
+        id="spj26rev-available-toast"
+        hidden
+    ></div>
+
+</div>
+
+
+<script>
+(function(){
+
+    document.documentElement.classList.add(
+        'spj26rev-page-lock'
+    );
+
+    document.body.classList.add(
+        'spj26rev-page-lock'
+    );
+
+
+    const root =
+        document.getElementById(
+            'spj26rev-available-root'
+        );
+
+    if(!root) return;
+
+
+    const isElementorEditor =
+        document.body.classList.contains(
+            'elementor-editor-active'
+        )
+        ||
+        /(?:^|[?&])elementor-preview=/.test(
+            window.location.search
+        );
+
+    if(
+        !isElementorEditor
+        &&
+        root.parentElement !== document.body
+    ){
+        document.body.appendChild(root);
+    }
+
+
+    let availableSubmissions = [];
+    let filteredSubmissions = [];
+    let selectedSubmission = null;
+
+
+    /* =====================================================
+       BASIC UI
+    ===================================================== */
+
+    const menuButton =
+        root.querySelector(
+            '#spj26rev-available-menu-button'
+        );
+
+    const sidebar =
+        root.querySelector(
+            '#spj26rev-available-sidebar'
+        );
+
+    const overlay =
+        root.querySelector(
+            '#spj26rev-available-overlay'
+        );
+
+    const toast =
+        root.querySelector(
+            '#spj26rev-available-toast'
+        );
+
+
+    function openSidebar(){
+
+        if(sidebar){
+            sidebar.classList.add('open');
+        }
+
+        if(overlay){
+            overlay.classList.add('open');
+        }
+
+    }
+
+
+    function closeSidebar(){
+
+        if(sidebar){
+            sidebar.classList.remove('open');
+        }
+
+        if(overlay){
+            overlay.classList.remove('open');
+        }
+
+    }
+
+
+    if(menuButton){
+        menuButton.addEventListener(
+            'click',
+            openSidebar
+        );
+    }
+
+
+    if(overlay){
+        overlay.addEventListener(
+            'click',
+            closeSidebar
+        );
+    }
+
+
+    root
+        .querySelectorAll(
+            '.spj26rev-sidebar a'
+        )
+        .forEach(function(link){
+
+            link.addEventListener(
+                'click',
+                function(){
+
+                    if(
+                        window.innerWidth <= 800
+                    ){
+                        closeSidebar();
+                    }
+
+                }
+            );
+
+        });
+
+
+    function setText(
+        id,
+        value
+    ){
+
+        const element =
+            root.querySelector(
+                '#' + id
+            );
+
+        if(element){
+
+            element.textContent =
+                String(
+                    value ?? ''
+                );
+
+        }
+
+    }
+
+
+    function showToast(message){
+
+        if(!toast) return;
+
+        toast.textContent =
+            String(message || '');
+
+        toast.hidden = false;
+
+
+        window.setTimeout(
+            function(){
+                toast.hidden = true;
+            },
+            3200
+        );
+
+    }
+
+
+    function createEl(
+        tag,
+        className,
+        text
+    ){
+
+        const element =
+            document.createElement(tag);
+
+        if(className){
+            element.className = className;
+        }
+
+        if(
+            text !== undefined
+            &&
+            text !== null
+        ){
+
+            element.textContent = text;
+
+        }
+
+        return element;
+    }
+
+
+    /* =====================================================
+       BACKEND
+    ===================================================== */
+
+    async function backendRequest(
+        action,
+        payload
+    ){
+
+        const config =
+            window.spj26ReviewerPortalConfig;
+
+
+        if(
+            !config
+            ||
+            !config.ajaxUrl
+            ||
+            !config.nonce
+        ){
+
+            throw new Error(
+                'Konfigurasi backend Reviewer belum tersedia.'
+            );
+
+        }
+
+
+        const body =
+            new URLSearchParams();
+
+        body.append(
+            'action',
+            action
+        );
+
+        body.append(
+            'nonce',
+            config.nonce
+        );
+
+
+        Object.keys(
+            payload || {}
+        )
+        .forEach(function(key){
+
+            body.append(
+                key,
+                payload[key]
+            );
+
+        });
+
+
+        const response =
+            await fetch(
+                config.ajaxUrl,
+                {
+                    method:'POST',
+                    credentials:'same-origin',
+                    headers:{
+                        'Content-Type':
+                            'application/x-www-form-urlencoded; charset=UTF-8'
+                    },
+                    body:
+                        body.toString()
+                }
+            );
+
+
+        const result =
+            await response.json();
+
+
+        if(
+            !result
+            ||
+            result.success !== true
+        ){
+
+            const message =
+                result
+                &&
+                result.data
+                &&
+                result.data.message
+                ? result.data.message
+                : 'Permintaan ke server gagal.';
+
+            throw new Error(message);
+
+        }
+
+
+        return result.data;
+
+    }
+
+
+    /* =====================================================
+       IDENTITY
+    ===================================================== */
+
+    function renderIdentity(){
+
+        const config =
+            window.spj26ReviewerPortalConfig;
+
+        if(!config) return;
+
+
+        setText(
+            'spj26rev-available-user-name',
+            config.name || 'Reviewer'
+        );
+
+
+        const logout =
+            root.querySelector(
+                '#spj26rev-logout'
+            );
+
+
+        if(
+            logout
+            &&
+            config.logoutUrl
+        ){
+
+            logout.href =
+                config.logoutUrl;
+
+        }
+
+    }
+
+
+    /* =====================================================
+       EMPTY STATE
+    ===================================================== */
+
+    function renderEmptyRow(
+        title,
+        message
+    ){
+
+        const tbody =
+            root.querySelector(
+                '#spj26rev-available-body'
+            );
+
+        if(!tbody) return;
+
+
+        tbody.innerHTML = '';
+
+
+        const row =
+            document.createElement('tr');
+
+        const cell =
+            document.createElement('td');
+
+        cell.colSpan = 7;
+
+
+        const empty =
+            createEl(
+                'div',
+                'spj26rev-empty'
+            );
+
+
+        empty.appendChild(
+            createEl(
+                'span',
+                'material-symbols-outlined',
+                'inbox'
+            )
+        );
+
+        empty.appendChild(
+            createEl(
+                'strong',
+                '',
+                title
+            )
+        );
+
+        empty.appendChild(
+            createEl(
+                'span',
+                '',
+                message
+            )
+        );
+
+
+        cell.appendChild(empty);
+        row.appendChild(cell);
+        tbody.appendChild(row);
+
+    }
+
+
+    /* =====================================================
+       TABLE
+    ===================================================== */
+
+    function buildResidentCell(item){
+
+        const cell =
+            document.createElement('td');
+
+
+        cell.appendChild(
+            createEl(
+                'div',
+                'spj26rev-name',
+                item.resident_name || '-'
+            )
+        );
+
+
+        cell.appendChild(
+            createEl(
+                'div',
+                'spj26rev-subtext',
+                [
+                    item.resident_nim,
+                    item.resident_program
+                ]
+                .filter(Boolean)
+                .join(' • ') || '-'
+            )
+        );
+
+
+        return cell;
+    }
+
+
+    function buildArticleCell(item){
+
+        const cell =
+            document.createElement('td');
+
+
+        cell.appendChild(
+            createEl(
+                'div',
+                'spj26rev-name',
+                item.article_title || '-'
+            )
+        );
+
+
+        cell.appendChild(
+            createEl(
+                'div',
+                'spj26rev-subtext',
+                item.article_type || '-'
+            )
+        );
+
+
+        return cell;
+    }
+
+
+    function renderTable(){
+
+        const tbody =
+            root.querySelector(
+                '#spj26rev-available-body'
+            );
+
+        if(!tbody) return;
+
+
+        setText(
+            'spj26rev-available-count',
+            filteredSubmissions.length
+        );
+
+        setText(
+            'spj26rev-available-nav-count',
+            availableSubmissions.length
+        );
+
+
+        if(
+            availableSubmissions.length === 0
+        ){
+
+            renderEmptyRow(
+                'Tidak ada pengajuan tersedia',
+                'Pengajuan baru yang belum memiliki Reviewer akan muncul di halaman ini.'
+            );
+
+            return;
+
+        }
+
+
+        if(
+            filteredSubmissions.length === 0
+        ){
+
+            renderEmptyRow(
+                'Pengajuan tidak ditemukan',
+                'Tidak ada pengajuan yang sesuai dengan kata kunci pencarian.'
+            );
+
+            return;
+
+        }
+
+
+        tbody.innerHTML = '';
+
+
+        filteredSubmissions
+            .forEach(function(item){
+
+                const row =
+                    document.createElement('tr');
+
+
+                const codeCell =
+                    document.createElement('td');
+
+                codeCell.appendChild(
+                    createEl(
+                        'div',
+                        'spj26rev-code',
+                        item.code || '-'
+                    )
+                );
+
+
+                const residentCell =
+                    buildResidentCell(item);
+
+                const articleCell =
+                    buildArticleCell(item);
+
+
+                const supervisorCell =
+                    document.createElement('td');
+
+                supervisorCell.appendChild(
+                    createEl(
+                        'div',
+                        'spj26rev-name',
+                        item.supervisor_name || '-'
+                    )
+                );
+
+
+                const dateCell =
+                    createEl(
+                        'td',
+                        '',
+                        item.submitted_at || '-'
+                    );
+
+
+                const statusCell =
+                    document.createElement('td');
+
+                statusCell.appendChild(
+                    createEl(
+                        'span',
+                        'spj26rev-status',
+                        item.status_label ||
+                        'Menunggu Pemeriksaan'
+                    )
+                );
+
+
+                const actionCell =
+                    document.createElement('td');
+
+                const group =
+                    createEl(
+                        'div',
+                        'spj26rev-action-group'
+                    );
+
+
+                const detailButton =
+                    createEl(
+                        'button',
+                        'spj26rev-action',
+                        'Detail'
+                    );
+
+                detailButton.type =
+                    'button';
+
+                detailButton.addEventListener(
+                    'click',
+                    function(){
+
+                        openDetail(item);
+
+                    }
+                );
+
+
+                const takeButton =
+                    createEl(
+                        'button',
+                        'spj26rev-action primary',
+                        'Ambil'
+                    );
+
+                takeButton.type =
+                    'button';
+
+                takeButton.addEventListener(
+                    'click',
+                    function(){
+
+                        takeSubmission(
+                            item.id,
+                            takeButton
+                        );
+
+                    }
+                );
+
+
+                group.appendChild(
+                    detailButton
+                );
+
+                group.appendChild(
+                    takeButton
+                );
+
+                actionCell.appendChild(
+                    group
+                );
+
+
+                row.appendChild(
+                    codeCell
+                );
+
+                row.appendChild(
+                    residentCell
+                );
+
+                row.appendChild(
+                    articleCell
+                );
+
+                row.appendChild(
+                    supervisorCell
+                );
+
+                row.appendChild(
+                    dateCell
+                );
+
+                row.appendChild(
+                    statusCell
+                );
+
+                row.appendChild(
+                    actionCell
+                );
+
+
+                tbody.appendChild(
+                    row
+                );
+
+            });
+
+    }
+
+
+    /* =====================================================
+       SEARCH
+    ===================================================== */
+
+    const searchInput =
+        root.querySelector(
+            '#spj26rev-available-search'
+        );
+
+
+    function applySearch(){
+
+        const query =
+            searchInput
+            ? searchInput.value
+                .trim()
+                .toLowerCase()
+            : '';
+
+
+        if(!query){
+
+            filteredSubmissions =
+                availableSubmissions.slice();
+
+            renderTable();
+
+            return;
+
+        }
+
+
+        filteredSubmissions =
+            availableSubmissions
+                .filter(function(item){
+
+                    const haystack =
+                        [
+                            item.code,
+                            item.resident_name,
+                            item.resident_nim,
+                            item.resident_program,
+                            item.article_title,
+                            item.article_type,
+                            item.supervisor_name
+                        ]
+                        .filter(Boolean)
+                        .join(' ')
+                        .toLowerCase();
+
+
+                    return haystack.includes(
+                        query
+                    );
+
+                });
+
+
+        renderTable();
+
+    }
+
+
+    if(searchInput){
+
+        searchInput.addEventListener(
+            'input',
+            applySearch
+        );
+
+    }
+
+
+    /* =====================================================
+       DETAIL MODAL
+    ===================================================== */
+
+    const modal =
+        root.querySelector(
+            '#spj26rev-available-modal'
+        );
+
+    const modalClose =
+        root.querySelector(
+            '#spj26rev-available-modal-close'
+        );
+
+    const modalCancel =
+        root.querySelector(
+            '#spj26rev-available-modal-cancel'
+        );
+
+    const modalTake =
+        root.querySelector(
+            '#spj26rev-available-modal-take'
+        );
+
+
+    function renderJournalInfo(
+        journals
+    ){
+
+        const container =
+            root.querySelector(
+                '#spj26rev-available-detail-journals'
+            );
+
+        if(!container) return;
+
+
+        container.innerHTML = '';
+
+
+        (journals || [])
+            .forEach(function(journal){
+
+                const card =
+                    createEl(
+                        'div',
+                        'spj26rev-journal-card'
+                    );
+
+
+                const head =
+                    createEl(
+                        'div',
+                        'spj26rev-journal-head'
+                    );
+
+
+                head.appendChild(
+                    createEl(
+                        'span',
+                        'spj26rev-journal-number',
+                        journal.order
+                    )
+                );
+
+
+                const info =
+                    document.createElement('div');
+
+
+                info.appendChild(
+                    createEl(
+                        'div',
+                        'spj26rev-journal-name',
+                        journal.name || '-'
+                    )
+                );
+
+
+                info.appendChild(
+                    createEl(
+                        'div',
+                        'spj26rev-journal-meta',
+                        'ISSN: ' +
+                        (journal.issn || '-') +
+                        ' • Kuartil: ' +
+                        (journal.quartile || '-')
+                    )
+                );
+
+
+                head.appendChild(info);
+                card.appendChild(head);
+                container.appendChild(card);
+
+            });
+
+    }
+
+
+    function openDetail(item){
+
+        selectedSubmission = item;
+
+
+        setText(
+            'spj26rev-available-modal-code',
+            item.code || ''
+        );
+
+
+        setText(
+            'spj26rev-available-detail-resident',
+            [
+                item.resident_name,
+                item.resident_nim
+            ]
+            .filter(Boolean)
+            .join(' • ') || '-'
+        );
+
+
+        setText(
+            'spj26rev-available-detail-program',
+            item.resident_program || '-'
+        );
+
+
+        setText(
+            'spj26rev-available-detail-type',
+            item.article_type || '-'
+        );
+
+
+        setText(
+            'spj26rev-available-detail-supervisor',
+            item.supervisor_name || '-'
+        );
+
+
+        setText(
+            'spj26rev-available-detail-title',
+            item.article_title || '-'
+        );
+
+
+        setText(
+            'spj26rev-available-detail-abstract',
+            item.article_abstract || '-'
+        );
+
+
+        renderJournalInfo(
+            item.journals || []
+        );
+
+
+        if(modal){
+            modal.hidden = false;
+        }
+
+    }
+
+
+    function closeDetail(){
+
+        selectedSubmission = null;
+
+
+        if(modal){
+            modal.hidden = true;
+        }
+
+    }
+
+
+    if(modalClose){
+
+        modalClose.addEventListener(
+            'click',
+            closeDetail
+        );
+
+    }
+
+
+    if(modalCancel){
+
+        modalCancel.addEventListener(
+            'click',
+            closeDetail
+        );
+
+    }
+
+
+    if(modal){
+
+        modal.addEventListener(
+            'click',
+            function(event){
+
+                if(
+                    event.target ===
+                    modal
+                ){
+
+                    closeDetail();
+
+                }
+
+            }
+        );
+
+    }
+
+
+    if(modalTake){
+
+        modalTake.addEventListener(
+            'click',
+            function(){
+
+                if(
+                    selectedSubmission
+                ){
+
+                    takeSubmission(
+                        selectedSubmission.id,
+                        modalTake
+                    );
+
+                }
+
+            }
+        );
+
+    }
+
+
+    /* =====================================================
+       TAKE SUBMISSION
+    ===================================================== */
+
+    async function takeSubmission(
+        submissionId,
+        button
+    ){
+
+        try{
+
+            if(button){
+                button.disabled = true;
+            }
+
+
+            await backendRequest(
+                'spj26_reviewer_take_submission',
+                {
+                    submission_id:
+                        submissionId
+                }
+            );
+
+
+            closeDetail();
+
+
+            showToast(
+                'Pengajuan berhasil diambil. Pengajuan tersebut sekarang berada pada Pemeriksaan Saya.'
+            );
+
+
+            await loadAvailable();
+
+
+        }catch(error){
+
+            showToast(
+                error.message ||
+                'Pengajuan gagal diambil.'
+            );
+
+
+            await loadAvailable();
+
+
+        }finally{
+
+            if(button){
+                button.disabled = false;
+            }
+
+        }
+
+    }
+
+
+    /* =====================================================
+       LOAD DATA
+    ===================================================== */
+
+    async function loadAvailable(){
+
+        try{
+
+            const data =
+                await backendRequest(
+                    'spj26_reviewer_dashboard_data',
+                    {}
+                );
+
+
+            availableSubmissions =
+                Array.isArray(
+                    data.available
+                )
+                ? data.available
+                : [];
+
+
+            filteredSubmissions =
+                availableSubmissions.slice();
+
+
+            if(searchInput){
+                searchInput.value = '';
+            }
+
+
+            renderTable();
+
+
+        }catch(error){
+
+            console.error(
+                'SIPATUJU Reviewer - Pengajuan Tersedia:',
+                error
+            );
+
+
+            availableSubmissions = [];
+            filteredSubmissions = [];
+
+
+            renderTable();
+
+
+            showToast(
+                error.message ||
+                'Data Pengajuan Tersedia gagal dimuat.'
+            );
+
+        }
+
+    }
+
+
+    const refreshButton =
+        root.querySelector(
+            '#spj26rev-available-refresh'
+        );
+
+
+    if(refreshButton){
+
+        refreshButton.addEventListener(
+            'click',
+            loadAvailable
+        );
+
+    }
+
+
+    /* =====================================================
+       INITIAL
+    ===================================================== */
+
+    function initializeAvailablePage(){
+
+        if(
+            !window.spj26ReviewerPortalConfig
+            ||
+            !window.spj26ReviewerPortalConfig.ajaxUrl
+            ||
+            !window.spj26ReviewerPortalConfig.nonce
+        ){
+
+            console.error(
+                'SIPATUJU Reviewer: spj26ReviewerPortalConfig tidak ditemukan.'
+            );
+
+
+            showToast(
+                'Konfigurasi backend Reviewer belum tersedia.'
+            );
+
+
+            return;
+
+        }
+
+
+        renderIdentity();
+        loadAvailable();
+
+        window.setInterval(
+            loadAvailable,
+            30000
+        );
+
+    }
+
+
+    if(
+        document.readyState ===
+        'complete'
+    ){
+
+        initializeAvailablePage();
+
+    }else{
+
+        window.addEventListener(
+            'load',
+            initializeAvailablePage,
+            { once:true }
+        );
+
+    }
+
+})();
+</script>
+
+<script>
+(function(){
+    const root = document.getElementById("spj26rev-available-root");
+    if(!root) return;
+
+    const CURRENT_SECTION = "available";
+    const STORAGE_VERSION = 'v2';
+
+    const PATHS = {
+        available:'/reviewer-sipatuju/pengajuan-tersedia/',
+        active:'/reviewer-sipatuju/pemeriksaan-saya/',
+        completed:'/reviewer-sipatuju/riwayat-pemeriksaan/'
+    };
+
+    function normalizePath(value){
+        try{
+            return new URL(value, window.location.origin).pathname.replace(/\/+$/, '') + '/';
+        }catch(error){
+            return '';
+        }
+    }
+
+    function findNavLink(path){
+        const wanted = normalizePath(path);
+        const links = root.querySelectorAll('.spj26rev-nav-link[href]');
+
+        for(const link of links){
+            if(normalizePath(link.getAttribute('href')) === wanted){
+                return link;
+            }
+        }
+
+        return null;
+    }
+
+    function ensureIndicator(section){
+        const link = findNavLink(PATHS[section]);
+        if(!link) return null;
+
+        Array.from(link.children).forEach(function(node){
+            if(
+                node.classList
+                &&
+                (
+                    node.classList.contains('spj26rev-nav-badge')
+                    ||
+                    node.classList.contains('spj26rev-nav-count')
+                    ||
+                    node.classList.contains('spj26rev-nav-notification')
+                )
+            ){
+                node.remove();
+            }
+        });
+
+        const wrap = document.createElement('span');
+        wrap.className = 'spj26rev-nav-notification';
+
+        const badge = document.createElement('span');
+        badge.className = 'spj26rev-nav-badge';
+        badge.textContent = '0';
+
+        const dot = document.createElement('span');
+        dot.className = 'spj26rev-nav-dot';
+        dot.hidden = true;
+
+        wrap.appendChild(badge);
+        wrap.appendChild(dot);
+        link.appendChild(wrap);
+
+        return {link:link,wrap:wrap,badge:badge,dot:dot};
+    }
+
+    const indicators = {
+        available:ensureIndicator('available'),
+        active:ensureIndicator('active'),
+        completed:ensureIndicator('completed')
+    };
+
+    function getConfig(){
+        return window.spj26ReviewerPortalConfig || null;
+    }
+
+    function getIdentity(){
+        const cfg = getConfig() || {};
+        return String(cfg.username || cfg.name || 'reviewer')
+            .trim()
+            .replace(/[^a-zA-Z0-9_-]/g,'_');
+    }
+
+    function getStorageKey(){
+        return 'spj26rev_sidebar_seen_' + STORAGE_VERSION + '_' + getIdentity();
+    }
+
+    function buildSnapshot(items){
+        const result = {};
+        const list = Array.isArray(items) ? items : [];
+
+        list.forEach(function(item){
+            if(!item) return;
+
+            const key = String(item.id || item.code || '').trim();
+            if(!key) return;
+
+            const journals = Array.isArray(item.journals)
+                ? item.journals.map(function(journal){
+                    return {
+                        id:journal && journal.id ? String(journal.id) : '',
+                        order:journal && journal.order ? String(journal.order) : '',
+                        name:journal && journal.name ? String(journal.name) : '',
+                        issn:journal && journal.issn ? String(journal.issn) : '',
+                        quartile:journal && journal.quartile ? String(journal.quartile) : '',
+                        link:journal && journal.link ? String(journal.link) : '',
+                        decision:journal && journal.decision ? String(journal.decision) : '',
+                        comment:journal && journal.comment ? String(journal.comment) : ''
+                    };
+                })
+                : [];
+
+            result[key] = JSON.stringify({
+                code:item.code ? String(item.code) : '',
+                status:item.status ? String(item.status) : '',
+                status_label:item.status_label ? String(item.status_label) : '',
+                assigned_at:item.assigned_at ? String(item.assigned_at) : '',
+                updated_at:item.updated_at ? String(item.updated_at) : '',
+                completed_at:item.completed_at ? String(item.completed_at) : '',
+                journals:journals
+            });
+        });
+
+        return result;
+    }
+
+    function diffCount(current, seen){
+        const keys = new Set([
+            ...Object.keys(current || {}),
+            ...Object.keys(seen || {})
+        ]);
+
+        let count = 0;
+
+        keys.forEach(function(key){
+            if((current || {})[key] !== (seen || {})[key]){
+                count += 1;
+            }
+        });
+
+        return count;
+    }
+
+    function readState(){
+        try{
+            const raw = window.localStorage.getItem(getStorageKey());
+            if(!raw) return null;
+
+            const parsed = JSON.parse(raw);
+            return parsed && typeof parsed === 'object'
+                ? parsed
+                : null;
+        }catch(error){
+            console.warn(
+                'SIPATUJU Reviewer: state notifikasi tidak dapat dibaca.',
+                error
+            );
+            return null;
+        }
+    }
+
+    function writeState(state){
+        try{
+            window.localStorage.setItem(
+                getStorageKey(),
+                JSON.stringify(state)
+            );
+        }catch(error){
+            console.warn(
+                'SIPATUJU Reviewer: state notifikasi tidak dapat disimpan.',
+                error
+            );
+        }
+    }
+
+    function setIndicator(section,total,unread){
+        const indicator = indicators[section];
+        if(!indicator) return;
+
+        indicator.badge.textContent = String(total);
+        indicator.dot.hidden = unread <= 0;
+
+        indicator.wrap.title = unread > 0
+            ? unread + ' pembaruan belum dilihat'
+            : total + ' data saat ini';
+    }
+
+    async function requestData(){
+        const cfg = getConfig();
+
+        if(!cfg || !cfg.ajaxUrl || !cfg.nonce){
+            throw new Error('Konfigurasi Reviewer belum tersedia.');
+        }
+
+        const body = new URLSearchParams();
+        body.append('action','spj26_reviewer_dashboard_data');
+        body.append('nonce',cfg.nonce);
+
+        const response = await fetch(
+            cfg.ajaxUrl,
+            {
+                method:'POST',
+                credentials:'same-origin',
+                headers:{
+                    'Content-Type':'application/x-www-form-urlencoded; charset=UTF-8'
+                },
+                body:body.toString()
+            }
+        );
+
+        const result = await response.json();
+
+        if(!result || result.success !== true){
+            throw new Error(
+                result && result.data && result.data.message
+                    ? result.data.message
+                    : 'Data Reviewer gagal dimuat.'
+            );
+        }
+
+        return result.data || {};
+    }
+
+    async function refreshSidebar(){
+        try{
+            const data = await requestData();
+
+            const lists = {
+                available:Array.isArray(data.available) ? data.available : [],
+                active:Array.isArray(data.active) ? data.active : [],
+                completed:Array.isArray(data.completed) ? data.completed : []
+            };
+
+            const current = {
+                available:buildSnapshot(lists.available),
+                active:buildSnapshot(lists.active),
+                completed:buildSnapshot(lists.completed)
+            };
+
+            let state = readState();
+
+            if(!state){
+                state = {
+                    available:current.available,
+                    active:current.active,
+                    completed:current.completed
+                };
+            }
+
+            const unread = {
+                available:diffCount(current.available,state.available || {}),
+                active:diffCount(current.active,state.active || {}),
+                completed:diffCount(current.completed,state.completed || {})
+            };
+
+            if(CURRENT_SECTION === 'available'){
+                state.available = current.available;
+                unread.available = 0;
+            }
+
+            if(CURRENT_SECTION === 'active'){
+                state.active = current.active;
+                unread.active = 0;
+            }
+
+            if(CURRENT_SECTION === 'completed'){
+                state.completed = current.completed;
+                unread.completed = 0;
+            }
+
+            setIndicator('available',lists.available.length,unread.available);
+            setIndicator('active',lists.active.length,unread.active);
+            setIndicator('completed',lists.completed.length,unread.completed);
+
+            writeState(state);
+
+            window.dispatchEvent(
+                new CustomEvent(
+                    'spj26:reviewer-sidebar-sync',
+                    {detail:{data:data,unread:unread}}
+                )
+            );
+
+        }catch(error){
+            console.warn(
+                'SIPATUJU Reviewer: sinkronisasi notifikasi sidebar gagal.',
+                error
+            );
+        }
+    }
+
+    function init(){
+        refreshSidebar();
+        window.setInterval(refreshSidebar,30000);
+    }
+
+    if(document.readyState === 'complete'){
+        init();
+    }else{
+        window.addEventListener('load',init,{once:true});
+    }
+})();
+</script>

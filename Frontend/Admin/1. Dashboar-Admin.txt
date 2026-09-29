@@ -1,0 +1,4948 @@
+<!-- =========================================================
+     SIPATUJU PPDS FK UNHAS
+     PAGE      : DASHBOARD ADMIN
+     WORDPRESS : 00 Admin Sipatuju
+     SLUG      : admin-sipatuju
+     URL       : /admin-sipatuju/
+     ROLE      : Admin
+     FORMAT    : Elementor HTML Widget
+     NAMESPACE : spj26adm
+     ROOT      : #spj26adm-root
+
+     Fungsi dashboard:
+     - Memantau seluruh pengajuan Residen secara real-time
+     - Melihat status Menunggu Pemeriksaan / Dalam Pemeriksaan / Selesai
+     - Melihat Reviewer yang menangani setiap pengajuan
+     - Menugaskan Reviewer pada pengajuan yang masih menunggu
+     - Memilih satu atau banyak pengajuan dan menghapusnya secara permanen (Admin only)
+     - Melihat ringkasan akun Reviewer aktif
+     - Menampilkan ringkasan aktivitas pengajuan terbaru
+     - Sidebar tetap diam; hanya area kanan yang dapat scroll
+     - Footer berada di akhir area kanan dan tetap di dasar viewport bila konten pendek
+
+     Data policy:
+     - Tidak ada dummy data.
+     - Tidak menggunakan localStorage untuk data operasional.
+     - Dashboard hanya menampilkan data nyata dari backend SIPATUJU.
+     - Inisialisasi menunggu konfigurasi wp_footer tersedia.
+     - Desktop: header/sidebar tetap; hanya area kanan yang scroll.
+     - Tidak ada scrollbar browser/page utama.
+========================================================== -->
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:wght@600;700;800&family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap');
+
+#spj26adm-root{
+    --spj26adm-maroon:#800000;
+    --spj26adm-maroon-dark:#5c0000;
+    --spj26adm-maroon-medium:#8b1e1e;
+    --spj26adm-primary:#6a020a;
+
+    --spj26adm-white:#ffffff;
+    --spj26adm-background:#f3f5f8;
+    --spj26adm-surface:#ffffff;
+    --spj26adm-surface-soft:#f8fafc;
+
+    --spj26adm-text:#0f172a;
+    --spj26adm-text-secondary:#475569;
+    --spj26adm-text-muted:#64748b;
+
+    --spj26adm-border:#e2e8f0;
+    --spj26adm-border-strong:#cbd5e1;
+
+    --spj26adm-green:#047857;
+    --spj26adm-green-bg:#ecfdf5;
+
+    --spj26adm-blue:#1d4ed8;
+    --spj26adm-blue-bg:#eff6ff;
+
+    --spj26adm-amber:#b45309;
+    --spj26adm-amber-bg:#fffbeb;
+
+    --spj26adm-red:#b91c1c;
+    --spj26adm-red-bg:#fef2f2;
+
+    width:100%;
+    height:100vh;
+    height:100dvh;
+    min-height:0;
+    margin:0;
+    padding:0;
+    background:var(--spj26adm-background);
+    color:var(--spj26adm-text);
+    font-family:"Inter",Arial,sans-serif;
+    box-sizing:border-box;
+    overflow:hidden;
+}
+
+#spj26adm-root *,
+#spj26adm-root *::before,
+#spj26adm-root *::after{
+    box-sizing:border-box;
+}
+
+#spj26adm-root h1,
+#spj26adm-root h2,
+#spj26adm-root h3,
+#spj26adm-root p{
+    margin:0;
+}
+
+#spj26adm-root a{
+    color:inherit;
+    text-decoration:none;
+}
+
+#spj26adm-root button,
+#spj26adm-root input,
+#spj26adm-root select{
+    font:inherit;
+}
+
+#spj26adm-root [hidden]{
+    display:none !important;
+}
+
+
+/* =========================================================
+   PAGE VIEWPORT LOCK
+   Desktop: tidak ada scrollbar browser/page utama.
+   Hanya .spj26adm-rightpane yang dapat di-scroll.
+========================================================= */
+
+html.spj26adm-page-lock,
+body.spj26adm-page-lock{
+    width:100% !important;
+    height:100% !important;
+    min-height:100% !important;
+    margin:0 !important;
+    padding:0 !important;
+    overflow:hidden !important;
+}
+
+body.spj26adm-page-lock #page,
+body.spj26adm-page-lock .site,
+body.spj26adm-page-lock .site-content,
+body.spj26adm-page-lock .elementor,
+body.spj26adm-page-lock .elementor-section-wrap,
+body.spj26adm-page-lock .elementor-element,
+body.spj26adm-page-lock .elementor-widget,
+body.spj26adm-page-lock .elementor-widget-container{
+    max-height:none !important;
+}
+
+/* =========================================================
+   HEADER
+========================================================= */
+
+#spj26adm-root .spj26adm-header{
+    height:76px;
+    min-height:76px;
+    position:relative;
+    top:auto;
+    z-index:50;
+    padding:0 30px;
+    background:#fff;
+    border-bottom:1px solid var(--spj26adm-border);
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:24px;
+    box-shadow:0 1px 2px rgba(15,23,42,.03);
+}
+
+#spj26adm-root .spj26adm-header-left,
+#spj26adm-root .spj26adm-header-right,
+#spj26adm-root .spj26adm-user{
+    display:flex;
+    align-items:center;
+}
+
+#spj26adm-root .spj26adm-header-left{
+    gap:14px;
+    min-width:0;
+}
+
+#spj26adm-root .spj26adm-header-right{
+    gap:10px;
+    flex:0 0 auto;
+}
+
+#spj26adm-root .spj26adm-logo{
+    width:48px;
+    height:48px;
+    flex:0 0 48px;
+    border-radius:8px;
+    background:var(--spj26adm-maroon);
+    color:#fff;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+}
+
+#spj26adm-root .spj26adm-logo .material-symbols-outlined{
+    font-size:25px;
+}
+
+#spj26adm-root .spj26adm-brand{
+    min-width:0;
+}
+
+#spj26adm-root .spj26adm-brand-row{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    min-width:0;
+}
+
+#spj26adm-root .spj26adm-brand-name{
+    font-family:"Plus Jakarta Sans",sans-serif;
+    color:var(--spj26adm-maroon);
+    font-size:15px;
+    font-weight:800;
+    letter-spacing:-.02em;
+    white-space:nowrap;
+}
+
+#spj26adm-root .spj26adm-brand-divider{
+    color:#cbd5e1;
+}
+
+#spj26adm-root .spj26adm-brand-description{
+    color:#6b5b58;
+    font-size:12px;
+    font-weight:500;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+}
+
+#spj26adm-root .spj26adm-faculty{
+    margin-top:3px;
+    color:#695653;
+    font-family:"JetBrains Mono",monospace;
+    font-size:10px;
+    font-weight:600;
+    letter-spacing:.08em;
+    text-transform:uppercase;
+}
+
+#spj26adm-root .spj26adm-user{
+    gap:10px;
+}
+
+#spj26adm-root .spj26adm-user-text{
+    text-align:right;
+}
+
+#spj26adm-root .spj26adm-user-name{
+    display:block;
+    font-family:"Plus Jakarta Sans",sans-serif;
+    font-size:13px;
+    font-weight:700;
+}
+
+#spj26adm-root .spj26adm-user-role{
+    display:block;
+    margin-top:1px;
+    color:var(--spj26adm-maroon);
+    font-size:10px;
+    font-weight:700;
+}
+
+#spj26adm-root .spj26adm-avatar{
+    width:38px;
+    height:38px;
+    border-radius:50%;
+    background:var(--spj26adm-maroon);
+    color:#fff;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+}
+
+#spj26adm-root .spj26adm-mobile-menu{
+    display:none;
+}
+
+/* =========================================================
+   BODY / SIDEBAR
+========================================================= */
+
+#spj26adm-root .spj26adm-body{
+    display:grid;
+    grid-template-columns:300px minmax(0,1fr);
+    height:calc(100% - 76px);
+    min-height:0;
+    align-items:stretch;
+    overflow:hidden;
+}
+
+#spj26adm-root .spj26adm-sidebar{
+    position:relative;
+    top:auto;
+    height:100%;
+    padding:18px 16px 14px;
+    background:#fff;
+    border-right:1px solid var(--spj26adm-border);
+    display:flex;
+    flex-direction:column;
+    justify-content:space-between;
+    overflow:hidden;
+    z-index:30;
+}
+
+#spj26adm-root .spj26adm-sidebar-main{
+    min-height:0;
+}
+
+#spj26adm-root .spj26adm-nav-title{
+    margin:4px 8px 7px;
+    color:#6c5a57;
+    font-size:10px;
+    font-weight:700;
+    text-transform:uppercase;
+    letter-spacing:.04em;
+}
+
+#spj26adm-root .spj26adm-nav{
+    display:flex;
+    flex-direction:column;
+    gap:5px;
+}
+
+#spj26adm-root .spj26adm-nav-link{
+    width:100%;
+    min-height:42px;
+    padding:9px 13px;
+    border-radius:6px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+    color:#5b4744;
+    font-size:13px;
+    font-weight:500;
+    transition:background-color .18s ease,color .18s ease;
+}
+
+#spj26adm-root .spj26adm-nav-link:hover{
+    background:var(--spj26adm-surface-soft);
+    color:var(--spj26adm-text);
+}
+
+#spj26adm-root .spj26adm-nav-link.active{
+    background:#941c1c;
+    color:#fff;
+    font-weight:700;
+}
+
+#spj26adm-root .spj26adm-nav-left{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    min-width:0;
+}
+
+#spj26adm-root .spj26adm-nav-link .material-symbols-outlined{
+    font-size:19px;
+}
+
+#spj26adm-root .spj26adm-nav-section-gap{
+    height:20px;
+}
+
+#spj26adm-root .spj26adm-sidebar-info{
+    padding:14px 15px;
+    border-radius:7px;
+    background:#f8fafc;
+}
+
+#spj26adm-root .spj26adm-sidebar-info-title{
+    display:flex;
+    align-items:center;
+    gap:7px;
+    color:var(--spj26adm-maroon);
+    font-size:10px;
+    font-weight:700;
+}
+
+#spj26adm-root .spj26adm-sidebar-info-title .material-symbols-outlined{
+    font-size:16px;
+}
+
+#spj26adm-root .spj26adm-version{
+    margin-top:5px;
+    color:#594b48;
+    font-family:"JetBrains Mono",monospace;
+    font-size:10px;
+}
+
+#spj26adm-root .spj26adm-department{
+    margin-top:4px;
+    color:#665855;
+    font-size:10px;
+    line-height:1.45;
+}
+
+
+#spj26adm-root .spj26adm-rightpane{
+    height:100%;
+    min-width:0;
+    min-height:0;
+
+    display:flex;
+    flex-direction:column;
+
+    overflow-y:auto;
+    overflow-x:hidden;
+
+    overscroll-behavior:contain;
+    scrollbar-gutter:stable;
+}
+
+#spj26adm-root .spj26adm-rightpane::-webkit-scrollbar{
+    width:8px;
+}
+
+#spj26adm-root .spj26adm-rightpane::-webkit-scrollbar-track{
+    background:#eef2f6;
+}
+
+#spj26adm-root .spj26adm-rightpane::-webkit-scrollbar-thumb{
+    background:#cbd5e1;
+    border-radius:999px;
+    border:2px solid #eef2f6;
+}
+
+#spj26adm-root .spj26adm-rightpane::-webkit-scrollbar-thumb:hover{
+    background:#94a3b8;
+}
+
+/* =========================================================
+   MAIN
+========================================================= */
+
+#spj26adm-root .spj26adm-main{
+    width:100%;
+    min-width:0;
+    flex:1 0 auto;
+
+    padding:22px 30px 28px;
+
+    overflow-x:hidden;
+}
+
+#spj26adm-root .spj26adm-content{
+    width:100%;
+    max-width:1460px;
+    margin:0 auto;
+}
+
+#spj26adm-root .spj26adm-page-head{
+    display:flex;
+    align-items:flex-end;
+    justify-content:space-between;
+    gap:20px;
+    margin-bottom:20px;
+}
+
+#spj26adm-root .spj26adm-page-head h1{
+    font-family:"Plus Jakarta Sans",sans-serif;
+    font-size:25px;
+    line-height:1.25;
+    font-weight:800;
+    letter-spacing:-.025em;
+}
+
+#spj26adm-root .spj26adm-page-head p{
+    margin-top:5px;
+    color:var(--spj26adm-text-muted);
+    font-size:12.5px;
+    line-height:1.55;
+}
+
+#spj26adm-root .spj26adm-page-badge{
+    flex:0 0 auto;
+    display:inline-flex;
+    align-items:center;
+    gap:7px;
+    padding:7px 10px;
+    border:1px solid #e5e7eb;
+    border-radius:999px;
+    background:#fff;
+    color:#64748b;
+    font-size:10px;
+    font-weight:700;
+}
+
+#spj26adm-root .spj26adm-page-badge .material-symbols-outlined{
+    color:var(--spj26adm-maroon);
+    font-size:16px;
+}
+
+/* =========================================================
+   SUMMARY / DASHBOARD GRID
+========================================================= */
+
+#spj26adm-root .spj26adm-dashboard-grid{
+    display:grid;
+    grid-template-columns:minmax(0,1.75fr) minmax(320px,.85fr);
+    gap:16px;
+    align-items:start;
+}
+
+#spj26adm-root .spj26adm-side-stack{
+    display:grid;
+    gap:16px;
+    align-content:start;
+}
+
+#spj26adm-root .spj26adm-summary-card{
+    overflow:hidden;
+}
+
+#spj26adm-root .spj26adm-summary-grid{
+    padding:12px 14px;
+    display:grid;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:8px;
+}
+
+#spj26adm-root .spj26adm-summary-item{
+    min-height:50px;
+    padding:9px 10px;
+    border:1px solid #eef2f7;
+    border-radius:10px;
+    background:#fcfdff;
+}
+
+#spj26adm-root .spj26adm-summary-top{
+    width:100%;
+    display:grid;
+    grid-template-columns:28px minmax(0,1fr) auto;
+    align-items:center;
+    gap:7px;
+    min-width:0;
+}
+
+#spj26adm-root .spj26adm-summary-icon{
+    width:28px;
+    height:28px;
+    flex:0 0 28px;
+    border-radius:8px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+}
+
+#spj26adm-root .spj26adm-summary-icon .material-symbols-outlined{
+    font-size:17px;
+}
+
+#spj26adm-root .spj26adm-summary-label{
+    min-width:0;
+    color:#64748b;
+    font-size:8.8px;
+    font-weight:800;
+    line-height:1.25;
+    text-transform:uppercase;
+    letter-spacing:.03em;
+}
+
+#spj26adm-root .spj26adm-summary-number{
+    font-family:"Plus Jakarta Sans",sans-serif;
+    color:#111827;
+    font-size:18px;
+    line-height:1;
+    font-weight:800;
+    text-align:right;
+    white-space:nowrap;
+}
+
+#spj26adm-root .spj26adm-summary-note{
+    display:none;
+}
+
+#spj26adm-root .spj26adm-summary-item.waiting .spj26adm-summary-icon{
+    background:var(--spj26adm-amber-bg);
+    color:var(--spj26adm-amber);
+}
+
+#spj26adm-root .spj26adm-summary-item.progress .spj26adm-summary-icon{
+    background:var(--spj26adm-blue-bg);
+    color:var(--spj26adm-blue);
+}
+
+#spj26adm-root .spj26adm-summary-item.done .spj26adm-summary-icon{
+    background:var(--spj26adm-green-bg);
+    color:var(--spj26adm-green);
+}
+
+#spj26adm-root .spj26adm-summary-item.reviewer .spj26adm-summary-icon{
+    background:#f5f3ff;
+    color:#6d28d9;
+}
+
+/* =========================================================
+   ADMIN GRID
+========================================================= */
+
+#spj26adm-root .spj26adm-card{
+    border:1px solid var(--spj26adm-border);
+    border-radius:13px;
+    background:#fff;
+    box-shadow:0 2px 6px rgba(15,23,42,.03);
+    overflow:hidden;
+}
+
+#spj26adm-root .spj26adm-card-head{
+    min-height:66px;
+    padding:15px 17px;
+    border-bottom:1px solid #f1f5f9;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:14px;
+}
+
+#spj26adm-root .spj26adm-card-title{
+    font-family:"Plus Jakarta Sans",sans-serif;
+    color:#111827;
+    font-size:14px;
+    font-weight:800;
+}
+
+#spj26adm-root .spj26adm-card-subtitle{
+    margin-top:3px;
+    color:#94a3b8;
+    font-size:9.8px;
+    line-height:1.35;
+}
+
+#spj26adm-root .spj26adm-card-title-line{
+    display:flex;
+    align-items:baseline;
+    flex-wrap:wrap;
+    gap:6px;
+    min-width:0;
+}
+
+#spj26adm-root .spj26adm-card-inline-subtitle{
+    color:#94a3b8;
+    font-size:9.8px;
+    line-height:1.35;
+    font-weight:400;
+}
+
+#spj26adm-root .spj26adm-card-link{
+    color:var(--spj26adm-maroon-medium);
+    font-size:10px;
+    font-weight:800;
+    white-space:nowrap;
+}
+
+/* =========================================================
+   FILTERS
+========================================================= */
+
+#spj26adm-root .spj26adm-toolbar{
+    padding:12px 14px;
+    border-bottom:1px solid #f1f5f9;
+    background:#fbfcfd;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+}
+
+#spj26adm-root .spj26adm-search{
+    position:relative;
+    width:min(340px,100%);
+}
+
+#spj26adm-root .spj26adm-search .material-symbols-outlined{
+    position:absolute;
+    left:10px;
+    top:50%;
+    transform:translateY(-50%);
+    color:#94a3b8;
+    font-size:17px;
+    pointer-events:none;
+}
+
+#spj26adm-root .spj26adm-search-input{
+    width:100%;
+    min-height:37px;
+    padding:8px 10px 8px 34px;
+    border:1px solid #dbe3ec;
+    border-radius:8px;
+    background:#fff;
+    color:#334155;
+    outline:none;
+    font-size:10.5px;
+}
+
+#spj26adm-root .spj26adm-search-input:focus{
+    border-color:var(--spj26adm-maroon-medium);
+    box-shadow:0 0 0 3px rgba(139,30,30,.07);
+}
+
+#spj26adm-root .spj26adm-filter{
+    min-height:37px;
+    padding:8px 30px 8px 10px;
+    border:1px solid #dbe3ec;
+    border-radius:8px;
+    background:#fff;
+    color:#475569;
+    outline:none;
+    font-size:10px;
+}
+
+/* =========================================================
+   TABLE
+========================================================= */
+
+#spj26adm-root .spj26adm-table-wrap{
+    width:100%;
+    overflow-x:hidden;
+}
+
+#spj26adm-root .spj26adm-table{
+    width:100%;
+    min-width:0;
+    table-layout:fixed;
+    border-collapse:collapse;
+}
+
+#spj26adm-root .spj26adm-table th:nth-child(1),
+#spj26adm-root .spj26adm-table td:nth-child(1){
+    width:12%;
+}
+
+#spj26adm-root .spj26adm-table th:nth-child(2),
+#spj26adm-root .spj26adm-table td:nth-child(2){
+    width:22%;
+}
+
+#spj26adm-root .spj26adm-table th:nth-child(3),
+#spj26adm-root .spj26adm-table td:nth-child(3){
+    width:12%;
+}
+
+#spj26adm-root .spj26adm-table th:nth-child(4),
+#spj26adm-root .spj26adm-table td:nth-child(4){
+    width:20%;
+}
+
+#spj26adm-root .spj26adm-table th:nth-child(5),
+#spj26adm-root .spj26adm-table td:nth-child(5){
+    width:21%;
+}
+
+#spj26adm-root .spj26adm-table th:nth-child(6),
+#spj26adm-root .spj26adm-table td:nth-child(6){
+    width:13%;
+}
+
+#spj26adm-root .spj26adm-table th{
+    padding:10px 9px;
+    border-bottom:1px solid #e9eef4;
+    background:#f8fafc;
+    color:#64748b;
+    text-align:left;
+    font-size:9px;
+    font-weight:800;
+    text-transform:uppercase;
+    letter-spacing:.04em;
+}
+
+#spj26adm-root .spj26adm-table td{
+    padding:12px 9px;
+    border-bottom:1px solid #f1f5f9;
+    vertical-align:middle;
+    color:#334155;
+    font-size:10.5px;
+}
+
+#spj26adm-root .spj26adm-table tbody tr:last-child td{
+    border-bottom:0;
+}
+
+#spj26adm-root .spj26adm-table tbody tr:hover{
+    background:#fcfcfd;
+}
+
+#spj26adm-root .spj26adm-code{
+    color:#475569;
+    font-family:"JetBrains Mono",monospace;
+    font-size:9.5px;
+    font-weight:600;
+}
+
+#spj26adm-root .spj26adm-resident-name{
+    color:#111827;
+    font-size:10.5px;
+    font-weight:800;
+}
+
+#spj26adm-root .spj26adm-resident-program{
+    margin-top:3px;
+    color:#94a3b8;
+    font-size:9px;
+}
+
+#spj26adm-root .spj26adm-handler-name{
+    color:#334155;
+    font-size:10px;
+    font-weight:700;
+}
+
+#spj26adm-root .spj26adm-handler-meta{
+    margin-top:3px;
+    color:#94a3b8;
+    font-size:8.8px;
+}
+
+#spj26adm-root .spj26adm-handler-empty{
+    color:#94a3b8;
+    font-size:10px;
+    font-style:italic;
+}
+
+#spj26adm-root .spj26adm-status{
+    display:inline-flex;
+    align-items:center;
+    gap:5px;
+    padding:5px 7px;
+    border-radius:999px;
+    font-size:8.8px;
+    line-height:1;
+    font-weight:800;
+    white-space:nowrap;
+}
+
+#spj26adm-root .spj26adm-status::before{
+    content:"";
+    width:6px;
+    height:6px;
+    border-radius:50%;
+}
+
+#spj26adm-root .spj26adm-status.waiting{
+    color:#92400e;
+    background:#fffbeb;
+    border:1px solid #fde68a;
+}
+
+#spj26adm-root .spj26adm-status.waiting::before{
+    background:#f59e0b;
+}
+
+#spj26adm-root .spj26adm-status.progress{
+    color:#1d4ed8;
+    background:#eff6ff;
+    border:1px solid #bfdbfe;
+}
+
+#spj26adm-root .spj26adm-status.progress::before{
+    background:#3b82f6;
+}
+
+#spj26adm-root .spj26adm-status.done{
+    color:#047857;
+    background:#ecfdf5;
+    border:1px solid #a7f3d0;
+}
+
+#spj26adm-root .spj26adm-status.done::before{
+    background:#10b981;
+}
+
+#spj26adm-root .spj26adm-origin{
+    display:inline-block;
+    margin-top:4px;
+    color:#64748b;
+    font-size:8.5px;
+    line-height:1.3;
+}
+
+#spj26adm-root .spj26adm-action{
+    min-height:33px;
+    padding:7px 10px;
+    border:1px solid #d1d5db;
+    border-radius:7px;
+    background:#fff;
+    color:#475569;
+    font-size:9.5px;
+    font-weight:700;
+    cursor:pointer;
+    transition:all .18s ease;
+    white-space:nowrap;
+}
+
+#spj26adm-root .spj26adm-action:hover{
+    background:#f8fafc;
+    border-color:#b9c2ce;
+}
+
+#spj26adm-root .spj26adm-action.assign{
+    border-color:var(--spj26adm-maroon-medium);
+    background:var(--spj26adm-maroon-medium);
+    color:#fff;
+}
+
+#spj26adm-root .spj26adm-action.assign:hover{
+    background:var(--spj26adm-maroon-dark);
+}
+
+
+/* =========================================================
+   ADMIN ICON ACTIONS / DESTRUCTIVE DELETE
+========================================================= */
+
+#spj26adm-root .spj26adm-action-group{
+    display:flex;
+    align-items:center;
+    gap:6px;
+    flex-wrap:nowrap;
+}
+
+#spj26adm-root .spj26adm-icon-action{
+    width:34px;
+    min-width:34px;
+    height:34px;
+    min-height:34px;
+    padding:0;
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    border-radius:8px;
+}
+
+#spj26adm-root .spj26adm-icon-action .material-symbols-outlined{
+    font-size:18px;
+    line-height:1;
+}
+
+#spj26adm-root .spj26adm-icon-action.view{
+    color:#475569;
+    background:#fff;
+}
+
+#spj26adm-root .spj26adm-icon-action.view:hover{
+    color:var(--spj26adm-maroon-medium);
+    border-color:#d6b5b5;
+    background:#fff8f8;
+}
+
+#spj26adm-root .spj26adm-icon-action.assign{
+    color:#fff;
+    border-color:var(--spj26adm-maroon-medium);
+    background:var(--spj26adm-maroon-medium);
+}
+
+#spj26adm-root .spj26adm-icon-action.assign:hover{
+    color:#fff;
+    background:var(--spj26adm-maroon-dark);
+}
+
+#spj26adm-root .spj26adm-icon-action.delete{
+    color:var(--spj26adm-red);
+    border-color:#fecaca;
+    background:#fff;
+}
+
+#spj26adm-root .spj26adm-icon-action.delete:hover{
+    color:#991b1b;
+    border-color:#fca5a5;
+    background:var(--spj26adm-red-bg);
+}
+
+#spj26adm-root .spj26adm-table .spj26adm-action.spj26adm-icon-action{
+    width:34px;
+    min-width:34px;
+    padding:0;
+}
+
+#spj26adm-root .spj26adm-delete-modal{
+    width:min(520px,100%);
+}
+
+#spj26adm-root .spj26adm-delete-warning{
+    display:flex;
+    gap:12px;
+    padding:13px;
+    border:1px solid #fecaca;
+    border-radius:10px;
+    background:#fef2f2;
+}
+
+#spj26adm-root .spj26adm-delete-warning-icon{
+    width:38px;
+    height:38px;
+    flex:0 0 38px;
+    border-radius:9px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    background:#fee2e2;
+    color:#b91c1c;
+}
+
+#spj26adm-root .spj26adm-delete-warning-icon .material-symbols-outlined{
+    font-size:21px;
+}
+
+#spj26adm-root .spj26adm-delete-warning-title{
+    color:#991b1b;
+    font-size:11px;
+    font-weight:800;
+    line-height:1.4;
+}
+
+#spj26adm-root .spj26adm-delete-warning-text{
+    margin-top:3px;
+    color:#7f1d1d;
+    font-size:9.7px;
+    line-height:1.55;
+}
+
+#spj26adm-root .spj26adm-delete-summary{
+    margin-top:14px;
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:8px;
+}
+
+#spj26adm-root .spj26adm-delete-summary-item{
+    padding:10px 11px;
+    border:1px solid var(--spj26adm-border);
+    border-radius:9px;
+    background:#f8fafc;
+}
+
+#spj26adm-root .spj26adm-delete-summary-label{
+    color:#94a3b8;
+    font-size:8.4px;
+    font-weight:800;
+    text-transform:uppercase;
+    letter-spacing:.04em;
+}
+
+#spj26adm-root .spj26adm-delete-summary-value{
+    margin-top:4px;
+    color:#1e293b;
+    font-size:10.5px;
+    font-weight:800;
+    line-height:1.4;
+    overflow-wrap:anywhere;
+}
+
+
+#spj26adm-root .spj26adm-modal-btn.danger{
+    border-color:#b91c1c;
+    background:#b91c1c;
+    color:#fff;
+}
+
+#spj26adm-root .spj26adm-modal-btn.danger:hover:not(:disabled){
+    border-color:#991b1b;
+    background:#991b1b;
+}
+
+#spj26adm-root .spj26adm-modal-btn:disabled{
+    opacity:.45;
+    cursor:not-allowed;
+}
+
+
+/* =========================================================
+   BULK SELECTION / BULK DELETE
+========================================================= */
+
+#spj26adm-root .spj26adm-toolbar-actions{
+    display:flex;
+    align-items:center;
+    justify-content:flex-end;
+    gap:8px;
+    flex-wrap:wrap;
+}
+
+#spj26adm-root .spj26adm-bulk-delete{
+    min-height:37px;
+    padding:8px 11px;
+    border:1px solid #fecaca;
+    border-radius:8px;
+    background:#fff;
+    color:#b91c1c;
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    gap:6px;
+    font-size:9.5px;
+    font-weight:800;
+    cursor:pointer;
+    transition:all .18s ease;
+    white-space:nowrap;
+}
+
+#spj26adm-root .spj26adm-bulk-delete:hover{
+    border-color:#fca5a5;
+    background:#fef2f2;
+    color:#991b1b;
+}
+
+#spj26adm-root .spj26adm-bulk-delete .material-symbols-outlined{
+    font-size:17px;
+}
+
+#spj26adm-root .spj26adm-select-col,
+#spj26adm-root .spj26adm-select-cell{
+    text-align:center;
+}
+
+#spj26adm-root .spj26adm-select-checkbox{
+    width:16px;
+    height:16px;
+    margin:0;
+    accent-color:var(--spj26adm-maroon-medium);
+    cursor:pointer;
+    vertical-align:middle;
+}
+
+#spj26adm-root .spj26adm-table tbody tr.spj26adm-row-selected{
+    background:#fff8f8;
+}
+
+#spj26adm-root .spj26adm-table tbody tr.spj26adm-row-selected:hover{
+    background:#fff4f4;
+}
+
+/* Seven-column layout after selection checkbox is introduced. */
+#spj26adm-root .spj26adm-table th:nth-child(1),
+#spj26adm-root .spj26adm-table td:nth-child(1){
+    width:5%;
+}
+
+#spj26adm-root .spj26adm-table th:nth-child(2),
+#spj26adm-root .spj26adm-table td:nth-child(2){
+    width:11%;
+}
+
+#spj26adm-root .spj26adm-table th:nth-child(3),
+#spj26adm-root .spj26adm-table td:nth-child(3){
+    width:20%;
+}
+
+#spj26adm-root .spj26adm-table th:nth-child(4),
+#spj26adm-root .spj26adm-table td:nth-child(4){
+    width:11%;
+}
+
+#spj26adm-root .spj26adm-table th:nth-child(5),
+#spj26adm-root .spj26adm-table td:nth-child(5){
+    width:18%;
+}
+
+#spj26adm-root .spj26adm-table th:nth-child(6),
+#spj26adm-root .spj26adm-table td:nth-child(6){
+    width:20%;
+}
+
+#spj26adm-root .spj26adm-table th:nth-child(7),
+#spj26adm-root .spj26adm-table td:nth-child(7){
+    width:15%;
+}
+
+#spj26adm-root .spj26adm-delete-question{
+    color:#111827;
+    font-family:"Plus Jakarta Sans",sans-serif;
+    font-size:15px;
+    font-weight:800;
+    line-height:1.5;
+}
+
+#spj26adm-root .spj26adm-delete-question-note{
+    margin-top:8px;
+    color:#64748b;
+    font-size:9.8px;
+    line-height:1.55;
+}
+
+#spj26adm-root .spj26adm-delete-selection-list{
+    margin-top:14px;
+    max-height:190px;
+    overflow:auto;
+    border:1px solid var(--spj26adm-border);
+    border-radius:9px;
+    background:#f8fafc;
+}
+
+#spj26adm-root .spj26adm-delete-selection-item{
+    padding:9px 11px;
+    border-bottom:1px solid #e9eef4;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+}
+
+#spj26adm-root .spj26adm-delete-selection-item:last-child{
+    border-bottom:0;
+}
+
+#spj26adm-root .spj26adm-delete-selection-code{
+    color:#334155;
+    font-family:"JetBrains Mono",monospace;
+    font-size:9.3px;
+    font-weight:700;
+}
+
+#spj26adm-root .spj26adm-delete-selection-name{
+    color:#64748b;
+    font-size:9.2px;
+    text-align:right;
+}
+
+@media(max-width:800px){
+    #spj26adm-root .spj26adm-toolbar-actions{
+        width:100%;
+        justify-content:stretch;
+    }
+
+    #spj26adm-root .spj26adm-toolbar-actions .spj26adm-filter,
+    #spj26adm-root .spj26adm-bulk-delete{
+        flex:1 1 auto;
+    }
+
+    /* Correct mobile grid after the new checkbox column. */
+    #spj26adm-root .spj26adm-table td:nth-child(2){
+        grid-column:auto;
+    }
+
+    #spj26adm-root .spj26adm-table td:nth-child(3),
+    #spj26adm-root .spj26adm-table td:nth-child(5),
+    #spj26adm-root .spj26adm-table td:nth-child(6),
+    #spj26adm-root .spj26adm-table td:nth-child(7){
+        grid-column:1 / -1;
+    }
+
+    #spj26adm-root .spj26adm-table td:nth-child(4){
+        grid-column:auto;
+    }
+
+    #spj26adm-root .spj26adm-select-cell{
+        display:flex !important;
+        align-items:center;
+        justify-content:flex-start;
+    }
+}
+
+
+#spj26adm-root .spj26adm-table th,
+#spj26adm-root .spj26adm-table td{
+    overflow-wrap:anywhere;
+    word-break:normal;
+}
+
+#spj26adm-root .spj26adm-table .spj26adm-status{
+    white-space:normal;
+    line-height:1.25;
+}
+
+#spj26adm-root .spj26adm-table .spj26adm-origin{
+    display:block;
+    max-width:100%;
+}
+
+#spj26adm-root .spj26adm-table .spj26adm-action{
+    width:100%;
+    min-width:0;
+    padding-left:7px;
+    padding-right:7px;
+}
+
+
+#spj26adm-root .spj26adm-empty-state{
+    min-height:150px;
+    padding:26px 18px;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    gap:6px;
+    color:#94a3b8;
+    text-align:center;
+}
+
+#spj26adm-root .spj26adm-empty-state .material-symbols-outlined{
+    margin-bottom:3px;
+    color:#cbd5e1;
+    font-size:30px;
+}
+
+#spj26adm-root .spj26adm-empty-state strong{
+    color:#475569;
+    font-size:11px;
+    font-weight:800;
+}
+
+#spj26adm-root .spj26adm-empty-state span:not(.material-symbols-outlined){
+    max-width:300px;
+    font-size:9.5px;
+    line-height:1.45;
+}
+
+#spj26adm-root .spj26adm-empty-compact{
+    min-height:125px;
+}
+
+#spj26adm-root .spj26adm-data-error{
+    padding:10px 14px;
+    border-bottom:1px solid #fecaca;
+    background:#fef2f2;
+    color:#b91c1c;
+    font-size:9.5px;
+    line-height:1.45;
+}
+
+#spj26adm-root .spj26adm-dashboard-alert{
+    margin-bottom:14px;
+    padding:10px 12px;
+
+    border:1px solid #fecaca;
+    border-radius:8px;
+
+    background:#fef2f2;
+    color:#b91c1c;
+
+    font-size:10px;
+    line-height:1.5;
+}
+
+/* =========================================================
+   ACTIVITY
+========================================================= */
+
+#spj26adm-root .spj26adm-activity-list{
+    padding:4px 17px 8px;
+}
+
+#spj26adm-root .spj26adm-activity-item{
+    position:relative;
+    display:flex;
+    gap:11px;
+    padding:14px 0;
+    border-bottom:1px solid #f1f5f9;
+}
+
+#spj26adm-root .spj26adm-activity-item:last-child{
+    border-bottom:0;
+}
+
+#spj26adm-root .spj26adm-activity-icon{
+    width:32px;
+    height:32px;
+    flex:0 0 32px;
+    border-radius:8px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+}
+
+#spj26adm-root .spj26adm-activity-icon .material-symbols-outlined{
+    font-size:17px;
+}
+
+#spj26adm-root .spj26adm-activity-icon.pickup{
+    background:#eff6ff;
+    color:#2563eb;
+}
+
+#spj26adm-root .spj26adm-activity-icon.assign{
+    background:#fdf2f8;
+    color:#be185d;
+}
+
+#spj26adm-root .spj26adm-activity-icon.done{
+    background:#ecfdf5;
+    color:#047857;
+}
+
+#spj26adm-root .spj26adm-activity-icon.new{
+    background:#fffbeb;
+    color:#b45309;
+}
+
+#spj26adm-root .spj26adm-activity-text{
+    color:#475569;
+    font-size:10px;
+    line-height:1.5;
+}
+
+#spj26adm-root .spj26adm-activity-text strong{
+    color:#111827;
+    font-weight:800;
+}
+
+#spj26adm-root .spj26adm-activity-time{
+    margin-top:4px;
+    color:#94a3b8;
+    font-family:"JetBrains Mono",monospace;
+    font-size:8.5px;
+}
+
+/* =========================================================
+   REVIEWER AVAILABILITY
+========================================================= */
+
+#spj26adm-root .spj26adm-reviewer-box{
+    margin-top:16px;
+}
+
+#spj26adm-root .spj26adm-reviewer-list{
+    padding:4px 17px 9px;
+}
+
+#spj26adm-root .spj26adm-reviewer-row{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+    padding:11px 0;
+    border-bottom:1px solid #f1f5f9;
+}
+
+#spj26adm-root .spj26adm-reviewer-row:last-child{
+    border-bottom:0;
+}
+
+#spj26adm-root .spj26adm-reviewer-left{
+    display:flex;
+    align-items:center;
+    gap:9px;
+}
+
+#spj26adm-root .spj26adm-reviewer-avatar{
+    width:31px;
+    height:31px;
+    border-radius:50%;
+    background:#f1f5f9;
+    color:#475569;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+}
+
+#spj26adm-root .spj26adm-reviewer-avatar .material-symbols-outlined{
+    font-size:17px;
+}
+
+#spj26adm-root .spj26adm-reviewer-name{
+    color:#1e293b;
+    font-size:10px;
+    font-weight:800;
+}
+
+#spj26adm-root .spj26adm-reviewer-load{
+    margin-top:2px;
+    color:#94a3b8;
+    font-size:8.8px;
+}
+
+#spj26adm-root .spj26adm-online{
+    display:inline-flex;
+    align-items:center;
+    gap:5px;
+    color:#047857;
+    font-size:8.7px;
+    font-weight:700;
+}
+
+#spj26adm-root .spj26adm-online::before{
+    content:"";
+    width:6px;
+    height:6px;
+    border-radius:50%;
+    background:#10b981;
+}
+
+/* =========================================================
+   MODAL
+========================================================= */
+
+#spj26adm-root .spj26adm-modal-backdrop{
+    position:fixed;
+    inset:0;
+    z-index:200;
+    padding:20px;
+    background:rgba(15,23,42,.45);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+}
+
+#spj26adm-root .spj26adm-modal{
+    width:min(480px,100%);
+    border-radius:13px;
+    background:#fff;
+    box-shadow:0 22px 55px rgba(15,23,42,.22);
+    overflow:hidden;
+}
+
+#spj26adm-root .spj26adm-modal-head{
+    padding:17px 18px;
+    border-bottom:1px solid var(--spj26adm-border);
+    display:flex;
+    align-items:flex-start;
+    justify-content:space-between;
+    gap:14px;
+}
+
+#spj26adm-root .spj26adm-modal-title{
+    font-family:"Plus Jakarta Sans",sans-serif;
+    font-size:15px;
+    font-weight:800;
+}
+
+#spj26adm-root .spj26adm-modal-subtitle{
+    margin-top:4px;
+    color:#64748b;
+    font-size:9.8px;
+    line-height:1.45;
+}
+
+#spj26adm-root .spj26adm-modal-close{
+    width:32px;
+    height:32px;
+    border:0;
+    border-radius:7px;
+    background:#f8fafc;
+    color:#64748b;
+    cursor:pointer;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+}
+
+#spj26adm-root .spj26adm-modal-body{
+    padding:18px;
+}
+
+#spj26adm-root .spj26adm-modal-label{
+    display:block;
+    margin-bottom:7px;
+    color:#334155;
+    font-size:10.5px;
+    font-weight:800;
+}
+
+#spj26adm-root .spj26adm-modal-select{
+    width:100%;
+    min-height:44px;
+    padding:10px 12px;
+    border:1px solid #cbd5e1;
+    border-radius:8px;
+    background:#fff;
+    color:#334155;
+    outline:none;
+    font-size:11px;
+}
+
+#spj26adm-root .spj26adm-modal-select:focus{
+    border-color:var(--spj26adm-maroon-medium);
+    box-shadow:0 0 0 3px rgba(139,30,30,.08);
+}
+
+#spj26adm-root .spj26adm-modal-note{
+    margin-top:11px;
+    padding:10px 11px;
+    border-radius:8px;
+    background:#f8fafc;
+    color:#64748b;
+    font-size:9.5px;
+    line-height:1.5;
+}
+
+#spj26adm-root .spj26adm-modal-actions{
+    padding:14px 18px 18px;
+    display:flex;
+    justify-content:flex-end;
+    gap:9px;
+}
+
+#spj26adm-root .spj26adm-modal-btn{
+    min-height:38px;
+    padding:8px 13px;
+    border-radius:8px;
+    border:1px solid #cbd5e1;
+    background:#fff;
+    color:#475569;
+    font-size:10px;
+    font-weight:800;
+    cursor:pointer;
+}
+
+#spj26adm-root .spj26adm-modal-btn.primary{
+    border-color:var(--spj26adm-maroon-medium);
+    background:var(--spj26adm-maroon-medium);
+    color:#fff;
+}
+
+/* =========================================================
+   TOAST
+========================================================= */
+
+#spj26adm-root .spj26adm-toast{
+    position:fixed;
+    right:22px;
+    bottom:22px;
+    z-index:300;
+    max-width:360px;
+    padding:12px 14px;
+    border:1px solid #a7f3d0;
+    border-radius:9px;
+    background:#ecfdf5;
+    color:#047857;
+    box-shadow:0 12px 30px rgba(15,23,42,.14);
+    font-size:10.5px;
+    line-height:1.45;
+}
+
+/* =========================================================
+   FOOTER
+========================================================= */
+
+#spj26adm-root .spj26adm-footer{
+    min-height:58px;
+    margin-top:auto;
+    padding:0 28px;
+    border-top:1px solid var(--spj26adm-border);
+    background:#fff;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:20px;
+}
+
+#spj26adm-root .spj26adm-footer-left{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    color:#6b5b58;
+    font-size:10px;
+}
+
+#spj26adm-root .spj26adm-footer-brand{
+    color:var(--spj26adm-maroon);
+    font-weight:800;
+}
+
+#spj26adm-root .spj26adm-footer-right{
+    color:#625451;
+    font-family:"JetBrains Mono",monospace;
+    font-size:9px;
+}
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+#spj26adm-root .spj26adm-overlay{
+    display:none;
+}
+
+@media(max-width:1180px){
+
+    #spj26adm-root .spj26adm-body{
+        grid-template-columns:240px minmax(0,1fr);
+    }
+
+    #spj26adm-root .spj26adm-dashboard-grid{
+        grid-template-columns:1fr;
+    }
+
+    #spj26adm-root .spj26adm-brand-divider,
+    #spj26adm-root .spj26adm-brand-description{
+        display:none;
+    }
+
+}
+
+
+@media(max-width:980px) and (min-width:801px){
+
+    #spj26adm-root .spj26adm-table th:nth-child(3),
+    #spj26adm-root .spj26adm-table td:nth-child(3){
+        display:none;
+    }
+
+    #spj26adm-root .spj26adm-table th:nth-child(1),
+    #spj26adm-root .spj26adm-table td:nth-child(1){
+        width:13%;
+    }
+
+    #spj26adm-root .spj26adm-table th:nth-child(2),
+    #spj26adm-root .spj26adm-table td:nth-child(2){
+        width:25%;
+    }
+
+    #spj26adm-root .spj26adm-table th:nth-child(4),
+    #spj26adm-root .spj26adm-table td:nth-child(4){
+        width:22%;
+    }
+
+    #spj26adm-root .spj26adm-table th:nth-child(5),
+    #spj26adm-root .spj26adm-table td:nth-child(5){
+        width:25%;
+    }
+
+    #spj26adm-root .spj26adm-table th:nth-child(6),
+    #spj26adm-root .spj26adm-table td:nth-child(6){
+        width:15%;
+    }
+}
+
+@media(max-width:800px){
+
+
+    #spj26adm-root{
+        height:auto;
+        min-height:100vh;
+        overflow:visible;
+    }
+
+    #spj26adm-root .spj26adm-rightpane{
+        height:auto;
+        display:block;
+        overflow:visible;
+    }
+
+    #spj26adm-root .spj26adm-header{
+        min-height:64px;
+        padding:8px 14px;
+    }
+
+    #spj26adm-root .spj26adm-mobile-menu{
+        display:flex;
+        width:38px;
+        height:38px;
+        flex:0 0 38px;
+        align-items:center;
+        justify-content:center;
+        border:1px solid var(--spj26adm-border);
+        border-radius:7px;
+        background:#fff;
+        color:var(--spj26adm-maroon);
+        cursor:pointer;
+    }
+
+    #spj26adm-root .spj26adm-logo{
+        width:38px;
+        height:38px;
+        flex-basis:38px;
+    }
+
+    #spj26adm-root .spj26adm-brand-name{
+        font-size:11px;
+    }
+
+    #spj26adm-root .spj26adm-faculty,
+    #spj26adm-root .spj26adm-user-text{
+        display:none;
+    }
+
+    #spj26adm-root .spj26adm-body{
+        display:block;
+    }
+
+    #spj26adm-root .spj26adm-sidebar{
+        position:fixed;
+        top:0;
+        left:0;
+        width:270px;
+        height:100vh;
+        height:100dvh;
+        overflow-y:auto;
+        overflow-x:hidden;
+        transform:translateX(-102%);
+        transition:transform .22s ease;
+        box-shadow:8px 0 24px rgba(15,23,42,.14);
+        z-index:100;
+    }
+
+    #spj26adm-root .spj26adm-sidebar.open{
+        transform:translateX(0);
+    }
+
+    #spj26adm-root .spj26adm-overlay{
+        position:fixed;
+        inset:0;
+        z-index:90;
+        background:rgba(15,23,42,.4);
+    }
+
+    #spj26adm-root .spj26adm-overlay.open{
+        display:block;
+    }
+
+    #spj26adm-root .spj26adm-main{
+        padding:18px 14px 24px;
+    }
+
+    #spj26adm-root .spj26adm-page-head{
+        align-items:flex-start;
+        flex-direction:column;
+    }
+
+    #spj26adm-root .spj26adm-page-head h1{
+        font-size:21px;
+    }
+
+
+    #spj26adm-root .spj26adm-summary-grid{
+        grid-template-columns:repeat(2,minmax(0,1fr));
+    }
+
+    #spj26adm-root .spj26adm-toolbar{
+        align-items:stretch;
+        flex-direction:column;
+    }
+
+    #spj26adm-root .spj26adm-search{
+        width:100%;
+    }
+
+    #spj26adm-root .spj26adm-filter{
+        width:100%;
+    }
+
+
+    #spj26adm-root .spj26adm-table-wrap{
+        overflow:visible;
+    }
+
+    #spj26adm-root .spj26adm-table{
+        display:block;
+        width:100%;
+    }
+
+    #spj26adm-root .spj26adm-table thead{
+        display:none;
+    }
+
+    #spj26adm-root .spj26adm-table tbody{
+        display:flex;
+        flex-direction:column;
+        gap:10px;
+        padding:12px;
+    }
+
+    #spj26adm-root .spj26adm-table tbody tr{
+        display:grid;
+        grid-template-columns:1fr 1fr;
+        gap:10px 12px;
+        padding:13px;
+        border:1px solid var(--spj26adm-border);
+        border-radius:10px;
+        background:#fff;
+    }
+
+    #spj26adm-root .spj26adm-table td{
+        display:block !important;
+        width:auto !important;
+        padding:0;
+        border:0;
+    }
+
+    #spj26adm-root .spj26adm-table td:nth-child(2),
+    #spj26adm-root .spj26adm-table td:nth-child(4),
+    #spj26adm-root .spj26adm-table td:nth-child(5){
+        grid-column:1 / -1;
+    }
+
+    #spj26adm-root .spj26adm-table td:nth-child(6){
+        grid-column:1 / -1;
+    }
+
+    #spj26adm-root .spj26adm-table .spj26adm-action{
+        width:auto;
+    }
+
+    #spj26adm-root .spj26adm-footer{
+        padding:12px 16px;
+        align-items:flex-start;
+        flex-direction:column;
+        gap:4px;
+    }
+
+}
+
+@media(max-width:480px){
+
+    #spj26adm-root .spj26adm-summary-grid{
+        grid-template-columns:1fr;
+    }
+
+}
+
+
+/* =========================================================
+   ADMIN WORKFLOW SHELL FIX 2026.4
+   Full viewport, shared sidebar/footer behavior, pagination.
+========================================================= */
+html.spj26adm-page-lock{
+    margin-top:0 !important;
+}
+
+body.spj26adm-page-lock #wpadminbar,
+body.spj26adm-page-lock #masthead,
+body.spj26adm-page-lock .site-header,
+body.spj26adm-page-lock #colophon,
+body.spj26adm-page-lock .site-footer{
+    display:none !important;
+}
+
+body.spj26adm-page-lock #page,
+body.spj26adm-page-lock .site,
+body.spj26adm-page-lock #content,
+body.spj26adm-page-lock .site-content,
+body.spj26adm-page-lock .ast-container,
+body.spj26adm-page-lock .elementor,
+body.spj26adm-page-lock .elementor-section-wrap,
+body.spj26adm-page-lock .elementor-element,
+body.spj26adm-page-lock .e-con,
+body.spj26adm-page-lock .e-con-inner,
+body.spj26adm-page-lock .elementor-widget-html,
+body.spj26adm-page-lock .elementor-widget-container{
+    width:100% !important;
+    max-width:none !important;
+    margin:0 !important;
+    padding:0 !important;
+}
+
+#spj26adm-root{
+    position:fixed !important;
+    inset:0 !important;
+    z-index:99990;
+    width:100vw !important;
+    max-width:none !important;
+}
+
+#spj26adm-root .spj26adm-rightpane{
+    display:flex;
+    flex-direction:column;
+}
+
+#spj26adm-root .spj26adm-main{
+    flex:1 0 auto;
+}
+
+#spj26adm-root .spj26adm-footer{
+    width:100%;
+    margin-top:auto;
+    flex:0 0 auto;
+}
+
+#spj26adm-root .spj26adm-sidebar{
+    flex:0 0 auto;
+}
+
+#spj26adm-root .spj26adm-action-group{
+    display:flex;
+    align-items:center;
+    gap:6px;
+    flex-wrap:wrap;
+}
+
+#spj26adm-root .spj26adm-table-footer{
+    min-height:54px;
+    padding:10px 14px;
+    border-top:1px solid #eef2f7;
+    background:#fff;
+    display:grid;
+    grid-template-columns:auto 1fr auto;
+    align-items:center;
+    gap:12px;
+}
+
+#spj26adm-root .spj26adm-page-size{
+    display:flex;
+    align-items:center;
+    gap:7px;
+    color:#64748b;
+    font-size:9.5px;
+    font-weight:700;
+    white-space:nowrap;
+}
+
+#spj26adm-root .spj26adm-page-size select{
+    min-height:34px;
+    padding:6px 28px 6px 9px;
+    border:1px solid #dbe3ec;
+    border-radius:7px;
+    background:#fff;
+    color:#334155;
+    outline:none;
+    font-size:9.5px;
+}
+
+#spj26adm-root .spj26adm-page-info{
+    color:#64748b;
+    font-size:9.5px;
+    text-align:center;
+}
+
+#spj26adm-root .spj26adm-page-nav{
+    display:flex;
+    justify-content:flex-end;
+    gap:6px;
+}
+
+#spj26adm-root .spj26adm-page-btn{
+    min-height:34px;
+    padding:6px 10px;
+    border:1px solid #d1d5db;
+    border-radius:7px;
+    background:#fff;
+    color:#475569;
+    font-size:9px;
+    font-weight:800;
+    cursor:pointer;
+}
+
+#spj26adm-root .spj26adm-page-btn:hover:not(:disabled){
+    border-color:#b9c2ce;
+    background:#f8fafc;
+}
+
+#spj26adm-root .spj26adm-page-btn:disabled{
+    opacity:.45;
+    cursor:not-allowed;
+}
+
+#spj26adm-root .spj26adm-detail-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:10px;
+}
+
+#spj26adm-root .spj26adm-detail-item{
+    padding:11px;
+    border:1px solid var(--spj26adm-border);
+    border-radius:9px;
+    background:#f8fafc;
+}
+
+#spj26adm-root .spj26adm-detail-label{
+    color:#94a3b8;
+    font-size:8.5px;
+    font-weight:800;
+    text-transform:uppercase;
+    letter-spacing:.04em;
+}
+
+#spj26adm-root .spj26adm-detail-value{
+    margin-top:4px;
+    color:#1e293b;
+    font-size:10.5px;
+    font-weight:700;
+    line-height:1.45;
+    overflow-wrap:anywhere;
+}
+
+@media(max-width:800px){
+    #spj26adm-root{
+        position:relative !important;
+        inset:auto !important;
+        z-index:auto;
+        width:100% !important;
+        min-width:0 !important;
+    }
+
+    #spj26adm-root .spj26adm-rightpane{
+        display:block;
+    }
+
+    #spj26adm-root .spj26adm-table-footer{
+        grid-template-columns:1fr;
+        align-items:stretch;
+    }
+
+    #spj26adm-root .spj26adm-page-size{
+        justify-content:space-between;
+    }
+
+    #spj26adm-root .spj26adm-page-info{
+        text-align:left;
+    }
+
+    #spj26adm-root .spj26adm-page-nav{
+        justify-content:stretch;
+    }
+
+    #spj26adm-root .spj26adm-page-btn{
+        flex:1 1 0;
+    }
+
+    #spj26adm-root .spj26adm-detail-grid{
+        grid-template-columns:1fr;
+    }
+
+    #spj26adm-root .spj26adm-delete-summary{
+        grid-template-columns:1fr;
+    }
+}
+
+@media(max-width:1180px){
+    #spj26adm-root .spj26adm-side-stack{
+        display:contents;
+    }
+
+    #spj26adm-root .spj26adm-summary-card{
+        order:-20;
+    }
+
+    #spj26adm-root .spj26adm-main-table-card{
+        order:-10;
+    }
+
+    #spj26adm-root .spj26adm-reviewer-box{
+        margin-top:0;
+    }
+}
+
+
+</style>
+
+
+<div id="spj26adm-root">
+
+    <div class="spj26adm-overlay" id="spj26adm-overlay"></div>
+
+
+    <!-- =====================================================
+         HEADER
+    ====================================================== -->
+
+    <header class="spj26adm-header">
+
+        <div class="spj26adm-header-left">
+
+            <button
+                class="spj26adm-mobile-menu"
+                id="spj26adm-menu-button"
+                type="button"
+                aria-label="Buka menu"
+            >
+                <span class="material-symbols-outlined">menu</span>
+            </button>
+
+            <div class="spj26adm-logo">
+                <span class="material-symbols-outlined">school</span>
+            </div>
+
+            <div class="spj26adm-brand">
+
+                <div class="spj26adm-brand-row">
+
+                    <div class="spj26adm-brand-name">
+                        SIPATUJU PPDS
+                    </div>
+
+                    <div class="spj26adm-brand-divider">|</div>
+
+                    <div class="spj26adm-brand-description">
+                        Sistem Pemeriksaan Kelayakan Jurnal PPDS FK UNHAS
+                    </div>
+
+                </div>
+
+                <div class="spj26adm-faculty">
+                    Fakultas Kedokteran • Akreditasi Unggul
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="spj26adm-header-right">
+
+            <div class="spj26adm-user">
+
+                <div class="spj26adm-user-text">
+                    <span class="spj26adm-user-name">Admin SIPATUJU</span>
+                    <span class="spj26adm-user-role">Administrator</span>
+                </div>
+
+                <div class="spj26adm-avatar">
+                    <span class="material-symbols-outlined">admin_panel_settings</span>
+                </div>
+
+            </div>
+
+        </div>
+
+    </header>
+
+
+    <div class="spj26adm-body">
+
+
+        <!-- =================================================
+             SIDEBAR
+        ================================================== -->
+
+        <aside class="spj26adm-sidebar" id="spj26adm-sidebar">
+
+            <div class="spj26adm-sidebar-main">
+
+                <div class="spj26adm-nav-title">
+                    Menu Admin
+                </div>
+
+                <nav class="spj26adm-nav">
+
+                    <a
+                        class="spj26adm-nav-link active"
+                        href="/admin-sipatuju/"
+                    >
+                        <span class="spj26adm-nav-left">
+                            <span class="material-symbols-outlined">grid_view</span>
+                            <span>Dashboard</span>
+                        </span>
+                    </a>
+
+                </nav>
+
+
+                <div class="spj26adm-nav-section-gap"></div>
+
+
+                <div class="spj26adm-nav-title">
+                    Manajemen Akun
+                </div>
+
+                <nav class="spj26adm-nav">
+
+                    <a
+                        class="spj26adm-nav-link"
+                        href="/admin-sipatuju/reviewer/"
+                    >
+                        <span class="spj26adm-nav-left">
+                            <span class="material-symbols-outlined">fact_check</span>
+                            <span>Reviewer</span>
+                        </span>
+                    </a>
+
+                    <a
+                        class="spj26adm-nav-link"
+                        href="/admin-sipatuju/residen/"
+                    >
+                        <span class="spj26adm-nav-left">
+                            <span class="material-symbols-outlined">stethoscope</span>
+                            <span>Mahasiswa</span>
+                        </span>
+                    </a>
+
+                    <a
+                        class="spj26adm-nav-link"
+                        href="/admin-sipatuju/jurnal-predator-discontinued/"
+                    >
+                        <span class="spj26adm-nav-left">
+                            <span class="material-symbols-outlined">policy</span>
+                            <span>Jurnal Predator / Discontinued</span>
+                        </span>
+                    </a>
+
+                </nav>
+
+
+                <div class="spj26adm-nav-section-gap"></div>
+
+
+                <div class="spj26adm-nav-title">
+                    Akun
+                </div>
+
+                <nav class="spj26adm-nav">
+
+                    <a
+                        class="spj26adm-nav-link"
+                        id="spj26adm-logout"
+                        href="#"
+                        data-spj26-logout
+                    >
+                        <span class="spj26adm-nav-left">
+                            <span class="material-symbols-outlined">logout</span>
+                            <span>Logout</span>
+                        </span>
+                    </a>
+
+                </nav>
+
+            </div>
+
+
+            <div class="spj26adm-sidebar-info">
+
+                <div class="spj26adm-sidebar-info-title">
+                    <span class="material-symbols-outlined">verified</span>
+                    <span>PPDS FK UNHAS</span>
+                </div>
+
+                <div class="spj26adm-version">
+                    Versi Sistem 2026.1
+                </div>
+
+                <div class="spj26adm-department">
+                    Program Pendidikan Dokter Spesialis
+                </div>
+
+            </div>
+
+        </aside>
+
+
+        <!-- =================================================
+             RIGHT CONTENT
+             Only this area scrolls on desktop.
+        ================================================== -->
+
+        <div class="spj26adm-rightpane">
+
+            <main class="spj26adm-main">
+
+                <div class="spj26adm-content">
+
+                    <div
+                        class="spj26adm-dashboard-alert"
+                        id="spj26adm-dashboard-alert"
+                        hidden
+                    ></div>
+
+
+                    <div class="spj26adm-dashboard-grid">
+
+
+                        <!-- =============================================
+                             SUBMISSIONS / ASSIGNMENTS
+                        ============================================== -->
+
+                        <section class="spj26adm-card spj26adm-main-table-card">
+
+                            <div class="spj26adm-card-head">
+
+                                <div class="spj26adm-card-title-line">
+                                    <div class="spj26adm-card-title">
+                                        Daftar Pengajuan
+                                    </div>
+                                    <div class="spj26adm-card-inline-subtitle">
+                                        — Pantau status pengajuan Residen dan Reviewer yang sedang menangani pemeriksaan.
+                                    </div>
+                                </div>
+
+                            </div>
+
+
+                            <div class="spj26adm-toolbar">
+
+                                <div class="spj26adm-search">
+
+                                    <span class="material-symbols-outlined">
+                                        search
+                                    </span>
+
+                                    <input
+                                        class="spj26adm-search-input"
+                                        id="spj26adm-search-input"
+                                        type="text"
+                                        placeholder="Cari kode, nama Residen, atau Reviewer..."
+                                    >
+
+                                </div>
+
+
+                                <div class="spj26adm-toolbar-actions">
+
+                                    <select
+                                        class="spj26adm-filter"
+                                        id="spj26adm-status-filter"
+                                    >
+                                        <option value="all">Semua status</option>
+                                        <option value="waiting">Menunggu Pemeriksaan</option>
+                                        <option value="progress">Dalam Pemeriksaan</option>
+                                        <option value="done">Selesai</option>
+                                    </select>
+
+                                    <button
+                                        class="spj26adm-bulk-delete"
+                                        id="spj26adm-bulk-delete"
+                                        type="button"
+                                        hidden
+                                    >
+                                        <span class="material-symbols-outlined">delete</span>
+                                        <span id="spj26adm-bulk-delete-label">Hapus Terpilih</span>
+                                    </button>
+
+                                </div>
+
+                            </div>
+
+
+                            <div class="spj26adm-table-wrap">
+
+                                <table class="spj26adm-table">
+
+                                    <thead>
+                                        <tr>
+                                            <th class="spj26adm-select-col">
+                                                <input
+                                                    class="spj26adm-select-checkbox"
+                                                    id="spj26adm-select-all"
+                                                    type="checkbox"
+                                                    aria-label="Pilih semua pengajuan yang tampil"
+                                                    title="Pilih semua"
+                                                >
+                                            </th>
+                                            <th>Pengajuan</th>
+                                            <th>Residen</th>
+                                            <th>Diajukan</th>
+                                            <th>Status</th>
+                                            <th>Reviewer</th>
+                                            <th>Aksi</th>
+                                        </tr>
+                                    </thead>
+
+                                    <tbody id="spj26adm-submission-table">
+                                        <tr id="spj26adm-submission-empty">
+                                            <td colspan="7">
+                                                <div class="spj26adm-empty-state">
+                                                    <span class="material-symbols-outlined">inbox</span>
+                                                    <strong>Belum ada pengajuan</strong>
+                                                    <span>Pengajuan yang dibuat Residen akan muncul di sini.</span>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+
+                                </table>
+
+                            </div>
+
+                            <div class="spj26adm-table-footer" aria-label="Navigasi data">
+                                <label class="spj26adm-page-size">
+                                    <span>Tampilkan</span>
+                                    <select id="spj26adm-submission-page-size" aria-label="Jumlah data per halaman">
+                                        <option value="10" selected>10</option>
+                                        <option value="20">20</option>
+                                        <option value="30">30</option>
+                                        <option value="all">Semua</option>
+                                    </select>
+                                    <span>data</span>
+                                </label>
+
+                                <div class="spj26adm-page-info" id="spj26adm-submission-page-info">0 data</div>
+
+                                <div class="spj26adm-page-nav">
+                                    <button class="spj26adm-page-btn" id="spj26adm-submission-page-prev" type="button">Sebelumnya</button>
+                                    <button class="spj26adm-page-btn" id="spj26adm-submission-page-next" type="button">Berikutnya</button>
+                                </div>
+                            </div>
+
+                        </section>
+
+
+                        <!-- =============================================
+                             RIGHT COLUMN
+                        ============================================== -->
+
+                        <div class="spj26adm-side-stack">
+
+
+                            <!-- SUMMARY: tanpa judul "Ringkasan" -->
+                            <section class="spj26adm-card spj26adm-summary-card">
+
+                                <div class="spj26adm-summary-grid">
+
+                                    <div class="spj26adm-summary-item waiting">
+                                        <div class="spj26adm-summary-top">
+                                            <div class="spj26adm-summary-icon">
+                                                <span class="material-symbols-outlined">hourglass_top</span>
+                                            </div>
+                                            <div class="spj26adm-summary-label">Menunggu</div>
+                                            <div class="spj26adm-summary-number" id="spj26adm-count-waiting">0</div>
+                                        </div>
+                                    </div>
+
+                                    <div class="spj26adm-summary-item progress">
+                                        <div class="spj26adm-summary-top">
+                                            <div class="spj26adm-summary-icon">
+                                                <span class="material-symbols-outlined">rate_review</span>
+                                            </div>
+                                            <div class="spj26adm-summary-label">Diperiksa</div>
+                                            <div class="spj26adm-summary-number" id="spj26adm-count-progress">0</div>
+                                        </div>
+                                    </div>
+
+                                    <div class="spj26adm-summary-item done">
+                                        <div class="spj26adm-summary-top">
+                                            <div class="spj26adm-summary-icon">
+                                                <span class="material-symbols-outlined">task_alt</span>
+                                            </div>
+                                            <div class="spj26adm-summary-label">Selesai</div>
+                                            <div class="spj26adm-summary-number" id="spj26adm-count-done">0</div>
+                                        </div>
+                                    </div>
+
+                                    <div class="spj26adm-summary-item reviewer">
+                                        <div class="spj26adm-summary-top">
+                                            <div class="spj26adm-summary-icon">
+                                                <span class="material-symbols-outlined">groups</span>
+                                            </div>
+                                            <div class="spj26adm-summary-label">Reviewer</div>
+                                            <div class="spj26adm-summary-number" id="spj26adm-count-reviewers">0</div>
+                                        </div>
+                                    </div>
+
+                                </div>
+
+                            </section>
+
+
+                            <!-- ACTIVITY -->
+                            <section class="spj26adm-card">
+
+                                <div class="spj26adm-card-head">
+
+                                    <div>
+                                        <div class="spj26adm-card-title">
+                                            Aktivitas Pengajuan
+                                        </div>
+                                        <div class="spj26adm-card-subtitle">
+                                            Ringkasan pengajuan terbaru yang tercatat pada sistem.
+                                        </div>
+                                    </div>
+
+                                </div>
+
+
+                                <div
+                                    class="spj26adm-activity-list"
+                                    id="spj26adm-activity-list"
+                                >
+                                    <div class="spj26adm-empty-state spj26adm-empty-compact" id="spj26adm-activity-empty">
+                                        <span class="material-symbols-outlined">history</span>
+                                        <strong>Belum ada aktivitas</strong>
+                                        <span>Pengajuan terbaru akan tampil otomatis di sini.</span>
+                                    </div>
+
+                                </div>
+
+                            </section>
+
+
+                            <!-- REVIEWER LOAD -->
+                            <section class="spj26adm-card spj26adm-reviewer-box">
+
+                                <div class="spj26adm-card-head">
+
+                                    <div>
+                                        <div class="spj26adm-card-title">
+                                            Reviewer Aktif
+                                        </div>
+                                        <div class="spj26adm-card-subtitle">
+                                            Ringkasan Reviewer aktif dan jumlah pemeriksaan yang sedang ditangani.
+                                        </div>
+                                    </div>
+
+                                    <a
+                                        class="spj26adm-card-link"
+                                        href="/admin-sipatuju/reviewer/"
+                                    >
+                                        Kelola
+                                    </a>
+
+                                </div>
+
+
+                                <div class="spj26adm-reviewer-list" id="spj26adm-reviewer-list">
+
+                                    <div class="spj26adm-empty-state spj26adm-empty-compact" id="spj26adm-reviewer-empty">
+                                        <span class="material-symbols-outlined">person_search</span>
+                                        <strong>Belum ada reviewer</strong>
+                                        <span>Reviewer aktif yang dibuat Admin akan muncul di sini.</span>
+                                    </div>
+
+                                </div>
+
+                            </section>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </main>
+
+
+            <footer class="spj26adm-footer">
+
+                <div class="spj26adm-footer-left">
+                    <span class="spj26adm-footer-brand">SIPATUJU PPDS</span>
+                    <span>•</span>
+                    <span>Fakultas Kedokteran Universitas Hasanuddin</span>
+                </div>
+
+                <div class="spj26adm-footer-right">
+                    PPDS FK UNHAS - Versi Sistem 2026.1
+                </div>
+
+            </footer>
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         ASSIGNMENT MODAL
+    ====================================================== -->
+
+    <div
+        class="spj26adm-modal-backdrop"
+        id="spj26adm-assignment-modal"
+        hidden
+    >
+
+        <div
+            class="spj26adm-modal"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="spj26adm-modal-title"
+        >
+
+            <div class="spj26adm-modal-head">
+
+                <div>
+                    <div
+                        class="spj26adm-modal-title"
+                        id="spj26adm-modal-title"
+                    >
+                        Penugasan Reviewer
+                    </div>
+
+                    <div
+                        class="spj26adm-modal-subtitle"
+                        id="spj26adm-modal-subtitle"
+                    >
+                        Pilih reviewer untuk menangani pengajuan.
+                    </div>
+                </div>
+
+                <button
+                    class="spj26adm-modal-close"
+                    id="spj26adm-modal-close"
+                    type="button"
+                    aria-label="Tutup"
+                >
+                    <span class="material-symbols-outlined">close</span>
+                </button>
+
+            </div>
+
+
+            <div class="spj26adm-modal-body">
+
+                <label
+                    class="spj26adm-modal-label"
+                    for="spj26adm-reviewer-select"
+                >
+                    Reviewer
+                </label>
+
+                <select
+                    class="spj26adm-modal-select"
+                    id="spj26adm-reviewer-select"
+                >
+                    <option value="">Pilih reviewer</option>
+                </select>
+
+                <div class="spj26adm-modal-note">
+                    Setelah ditugaskan, pengajuan menjadi milik reviewer tersebut dan tidak lagi tampil sebagai pengajuan bebas pada dashboard reviewer lain.
+                </div>
+
+            </div>
+
+
+            <div class="spj26adm-modal-actions">
+
+                <button
+                    class="spj26adm-modal-btn"
+                    id="spj26adm-modal-cancel"
+                    type="button"
+                >
+                    Batal
+                </button>
+
+                <button
+                    class="spj26adm-modal-btn primary"
+                    id="spj26adm-confirm-assignment"
+                    type="button"
+                >
+                    Tugaskan Reviewer
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         SUBMISSION DETAIL MODAL
+    ====================================================== -->
+    <div
+        class="spj26adm-modal-backdrop"
+        id="spj26adm-detail-modal"
+        hidden
+    >
+        <div
+            class="spj26adm-modal"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="spj26adm-detail-title"
+        >
+            <div class="spj26adm-modal-head">
+                <div>
+                    <div class="spj26adm-modal-title" id="spj26adm-detail-title">Detail Pengajuan</div>
+                    <div class="spj26adm-modal-subtitle" id="spj26adm-detail-subtitle">Informasi pengajuan</div>
+                </div>
+                <button class="spj26adm-modal-close" id="spj26adm-detail-close" type="button" aria-label="Tutup">
+                    <span class="material-symbols-outlined">close</span>
+                </button>
+            </div>
+
+            <div class="spj26adm-modal-body">
+                <div class="spj26adm-detail-grid">
+                    <div class="spj26adm-detail-item">
+                        <div class="spj26adm-detail-label">Kode Pengajuan</div>
+                        <div class="spj26adm-detail-value" id="spj26adm-detail-code">-</div>
+                    </div>
+                    <div class="spj26adm-detail-item">
+                        <div class="spj26adm-detail-label">Status</div>
+                        <div class="spj26adm-detail-value" id="spj26adm-detail-status">-</div>
+                    </div>
+                    <div class="spj26adm-detail-item">
+                        <div class="spj26adm-detail-label">Residen</div>
+                        <div class="spj26adm-detail-value" id="spj26adm-detail-resident">-</div>
+                    </div>
+                    <div class="spj26adm-detail-item">
+                        <div class="spj26adm-detail-label">Program PPDS</div>
+                        <div class="spj26adm-detail-value" id="spj26adm-detail-program">-</div>
+                    </div>
+                    <div class="spj26adm-detail-item">
+                        <div class="spj26adm-detail-label">Diajukan</div>
+                        <div class="spj26adm-detail-value" id="spj26adm-detail-date">-</div>
+                    </div>
+                    <div class="spj26adm-detail-item">
+                        <div class="spj26adm-detail-label">Reviewer</div>
+                        <div class="spj26adm-detail-value" id="spj26adm-detail-reviewer">-</div>
+                    </div>
+                    <div class="spj26adm-detail-item">
+                        <div class="spj26adm-detail-label">Sumber Penugasan</div>
+                        <div class="spj26adm-detail-value" id="spj26adm-detail-source">-</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="spj26adm-modal-actions">
+                <button class="spj26adm-modal-btn" id="spj26adm-detail-close-bottom" type="button">Tutup</button>
+                <button class="spj26adm-modal-btn primary" id="spj26adm-detail-open-full" type="button" hidden>Buka Detail Lengkap</button>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- =====================================================
+         ADMIN DELETE CONFIRMATION MODAL
+         Used for single and bulk permanent deletion.
+    ====================================================== -->
+    <div
+        class="spj26adm-modal-backdrop"
+        id="spj26adm-delete-modal"
+        hidden
+    >
+        <div
+            class="spj26adm-modal spj26adm-delete-modal"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="spj26adm-delete-title"
+        >
+            <div class="spj26adm-modal-head">
+                <div>
+                    <div class="spj26adm-modal-title" id="spj26adm-delete-title">
+                        Konfirmasi Hapus
+                    </div>
+                    <div class="spj26adm-modal-subtitle" id="spj26adm-delete-subtitle">
+                        Penghapusan permanen
+                    </div>
+                </div>
+
+                <button
+                    class="spj26adm-modal-close"
+                    id="spj26adm-delete-close"
+                    type="button"
+                    aria-label="Tutup"
+                >
+                    <span class="material-symbols-outlined">close</span>
+                </button>
+            </div>
+
+            <div class="spj26adm-modal-body">
+
+                <div class="spj26adm-delete-warning">
+                    <div class="spj26adm-delete-warning-icon">
+                        <span class="material-symbols-outlined">delete_forever</span>
+                    </div>
+
+                    <div>
+                        <div
+                            class="spj26adm-delete-question"
+                            id="spj26adm-delete-question"
+                        >
+                            Apakah Anda yakin ingin menghapus data ini?
+                        </div>
+
+                        <div class="spj26adm-delete-question-note">
+                            Data yang dihapus tidak dapat dikembalikan. Jurnal, keputusan,
+                            dan komentar Reviewer yang terhubung dengan pengajuan juga ikut
+                            dihapus dari database.
+                        </div>
+                    </div>
+                </div>
+
+                <div
+                    class="spj26adm-delete-selection-list"
+                    id="spj26adm-delete-selection-list"
+                ></div>
+
+            </div>
+
+            <div class="spj26adm-modal-actions">
+                <button
+                    class="spj26adm-modal-btn"
+                    id="spj26adm-delete-cancel"
+                    type="button"
+                >
+                    Batal
+                </button>
+
+                <button
+                    class="spj26adm-modal-btn danger"
+                    id="spj26adm-delete-confirm"
+                    type="button"
+                >
+                    Ya Hapus
+                </button>
+            </div>
+        </div>
+    </div>
+
+
+    <div
+        class="spj26adm-toast"
+        id="spj26adm-toast"
+        hidden
+    >
+    </div>
+
+</div>
+
+
+<script>
+(function(){
+
+    /*
+     * Desktop layout lock:
+     * browser/page utama tidak scroll.
+     * Scroll hanya terjadi pada area konten kanan.
+     */
+    document.documentElement.classList.add(
+        'spj26adm-page-lock'
+    );
+
+    document.body.classList.add(
+        'spj26adm-page-lock'
+    );
+
+    const root =
+        document.getElementById(
+            'spj26adm-root'
+        );
+
+    if(!root) return;
+
+
+    /* =====================================================
+       MOBILE SIDEBAR
+    ===================================================== */
+
+    const menuButton =
+        root.querySelector(
+            '#spj26adm-menu-button'
+        );
+
+    const sidebar =
+        root.querySelector(
+            '#spj26adm-sidebar'
+        );
+
+    const overlay =
+        root.querySelector(
+            '#spj26adm-overlay'
+        );
+
+
+    function openSidebar(){
+
+        if(sidebar){
+            sidebar.classList.add('open');
+        }
+
+        if(overlay){
+            overlay.classList.add('open');
+        }
+
+    }
+
+
+    function closeSidebar(){
+
+        if(sidebar){
+            sidebar.classList.remove('open');
+        }
+
+        if(overlay){
+            overlay.classList.remove('open');
+        }
+
+    }
+
+
+    if(menuButton){
+        menuButton.addEventListener(
+            'click',
+            openSidebar
+        );
+    }
+
+
+    if(overlay){
+        overlay.addEventListener(
+            'click',
+            closeSidebar
+        );
+    }
+
+
+    /* =====================================================
+       ELEMENTS
+    ===================================================== */
+
+    const submissionTable =
+        root.querySelector(
+            '#spj26adm-submission-table'
+        );
+
+    const activityList =
+        root.querySelector(
+            '#spj26adm-activity-list'
+        );
+
+    const reviewerList =
+        root.querySelector(
+            '#spj26adm-reviewer-list'
+        );
+
+    const searchInput =
+        root.querySelector(
+            '#spj26adm-search-input'
+        );
+
+    const statusFilter =
+        root.querySelector(
+            '#spj26adm-status-filter'
+        );
+
+    const modal =
+        root.querySelector(
+            '#spj26adm-assignment-modal'
+        );
+
+    const modalClose =
+        root.querySelector(
+            '#spj26adm-modal-close'
+        );
+
+    const modalCancel =
+        root.querySelector(
+            '#spj26adm-modal-cancel'
+        );
+
+    const modalSubtitle =
+        root.querySelector(
+            '#spj26adm-modal-subtitle'
+        );
+
+    const reviewerSelect =
+        root.querySelector(
+            '#spj26adm-reviewer-select'
+        );
+
+    const confirmAssignment =
+        root.querySelector(
+            '#spj26adm-confirm-assignment'
+        );
+
+    const toast =
+        root.querySelector(
+            '#spj26adm-toast'
+        );
+
+
+    const dashboardAlert =
+        root.querySelector(
+            '#spj26adm-dashboard-alert'
+        );
+
+    const detailModal = root.querySelector('#spj26adm-detail-modal');
+    const detailClose = root.querySelector('#spj26adm-detail-close');
+    const detailCloseBottom = root.querySelector('#spj26adm-detail-close-bottom');
+    const detailOpenFull = root.querySelector('#spj26adm-detail-open-full');
+    let activeDetailUrl = '';
+
+
+    const deleteModal = root.querySelector('#spj26adm-delete-modal');
+    const deleteClose = root.querySelector('#spj26adm-delete-close');
+    const deleteCancel = root.querySelector('#spj26adm-delete-cancel');
+    const deleteConfirm = root.querySelector('#spj26adm-delete-confirm');
+    const deleteQuestion = root.querySelector('#spj26adm-delete-question');
+    const deleteSelectionList = root.querySelector('#spj26adm-delete-selection-list');
+    const selectAllCheckbox = root.querySelector('#spj26adm-select-all');
+    const bulkDeleteButton = root.querySelector('#spj26adm-bulk-delete');
+    const bulkDeleteLabel = root.querySelector('#spj26adm-bulk-delete-label');
+
+    const selectedSubmissionIds = new Set();
+    let deleteTargetSubmissions = [];
+
+
+    let dashboardData = {
+        counts:{
+            waiting:0,
+            progress:0,
+            done:0,
+            reviewers:0
+        },
+        submissions:[],
+        activities:[],
+        reviewers:[]
+    };
+
+
+    let activeSubmissionId = '';
+    let activeResidentName = '';
+
+
+    /* =====================================================
+       HELPERS
+    ===================================================== */
+
+    function setText(id,value){
+
+        const el =
+            root.querySelector(
+                '#' + id
+            );
+
+        if(el){
+            el.textContent =
+                String(value ?? '');
+        }
+
+    }
+
+
+    function showToast(message){
+
+        if(!toast) return;
+
+        toast.textContent =
+            message;
+
+        toast.hidden = false;
+
+        window.setTimeout(
+            function(){
+                toast.hidden = true;
+            },
+            3000
+        );
+
+    }
+
+
+    function createEl(
+        tag,
+        className,
+        text
+    ){
+
+        const el =
+            document.createElement(tag);
+
+        if(className){
+            el.className = className;
+        }
+
+        if(
+            text !== undefined &&
+            text !== null
+        ){
+            el.textContent = text;
+        }
+
+        return el;
+    }
+
+
+    function emptyState(
+        icon,
+        title,
+        description,
+        compact
+    ){
+
+        const box =
+            createEl(
+                'div',
+                'spj26adm-empty-state' +
+                (
+                    compact
+                    ? ' spj26adm-empty-compact'
+                    : ''
+                )
+            );
+
+        const iconEl =
+            createEl(
+                'span',
+                'material-symbols-outlined',
+                icon
+            );
+
+        const strong =
+            createEl(
+                'strong',
+                '',
+                title
+            );
+
+        const desc =
+            createEl(
+                'span',
+                '',
+                description
+            );
+
+        box.appendChild(iconEl);
+        box.appendChild(strong);
+        box.appendChild(desc);
+
+        return box;
+    }
+
+
+    /* =====================================================
+       COUNTS
+    ===================================================== */
+
+    function renderCounts(){
+
+        setText(
+            'spj26adm-count-waiting',
+            dashboardData.counts.waiting || 0
+        );
+
+        setText(
+            'spj26adm-count-progress',
+            dashboardData.counts.progress || 0
+        );
+
+        setText(
+            'spj26adm-count-done',
+            dashboardData.counts.done || 0
+        );
+
+        setText(
+            'spj26adm-count-reviewers',
+            dashboardData.counts.reviewers || 0
+        );
+
+    }
+
+
+    /* =====================================================
+       SUBMISSIONS
+    ===================================================== */
+
+    function statusMeta(status){
+
+        if(status === 'progress'){
+            return {
+                className:'progress',
+                label:'Dalam Pemeriksaan'
+            };
+        }
+
+        if(status === 'done'){
+            return {
+                className:'done',
+                label:'Selesai'
+            };
+        }
+
+        return {
+            className:'waiting',
+            label:'Menunggu Pemeriksaan'
+        };
+
+    }
+
+
+    function getSubmissionById(id){
+
+        return (dashboardData.submissions || []).find(function(item){
+            return String(item.id) === String(id);
+        }) || null;
+    }
+
+
+    function getVisibleSubmissionCheckboxes(){
+
+        if(!submissionTable){
+            return [];
+        }
+
+        return Array.from(
+            submissionTable.querySelectorAll(
+                'input[data-spj26-submission-select]'
+            )
+        ).filter(function(checkbox){
+
+            const row = checkbox.closest('tr');
+
+            return (
+                row &&
+                !row.hidden
+            );
+        });
+    }
+
+
+    function updateBulkSelectionUI(){
+
+        const count =
+            selectedSubmissionIds.size;
+
+        if(bulkDeleteButton){
+            bulkDeleteButton.hidden =
+                count === 0;
+        }
+
+        if(bulkDeleteLabel){
+            bulkDeleteLabel.textContent =
+                count > 0
+                ? 'Hapus Terpilih (' + count + ')'
+                : 'Hapus Terpilih';
+        }
+
+        if(selectAllCheckbox){
+
+            const visibleCheckboxes =
+                getVisibleSubmissionCheckboxes();
+
+            const selectedVisible =
+                visibleCheckboxes.filter(function(checkbox){
+                    return checkbox.checked;
+                }).length;
+
+            selectAllCheckbox.checked =
+                visibleCheckboxes.length > 0 &&
+                selectedVisible === visibleCheckboxes.length;
+
+            selectAllCheckbox.indeterminate =
+                selectedVisible > 0 &&
+                selectedVisible < visibleCheckboxes.length;
+
+            selectAllCheckbox.disabled =
+                visibleCheckboxes.length === 0;
+        }
+    }
+
+
+    function clearBulkSelection(){
+
+        selectedSubmissionIds.clear();
+
+        if(submissionTable){
+
+            submissionTable
+                .querySelectorAll(
+                    'input[data-spj26-submission-select]'
+                )
+                .forEach(function(checkbox){
+                    checkbox.checked = false;
+
+                    const row =
+                        checkbox.closest('tr');
+
+                    if(row){
+                        row.classList.remove(
+                            'spj26adm-row-selected'
+                        );
+                    }
+                });
+        }
+
+        updateBulkSelectionUI();
+    }
+
+
+    function renderSubmissions(){
+
+        if(!submissionTable) return;
+
+        submissionTable.innerHTML = '';
+
+
+        const query =
+            searchInput
+            ? searchInput.value.trim().toLowerCase()
+            : '';
+
+        const filter =
+            statusFilter
+            ? statusFilter.value
+            : 'all';
+
+
+        const submissions =
+            (dashboardData.submissions || [])
+            .filter(function(item){
+
+                const haystack =
+                    [
+                        item.code,
+                        item.resident_name,
+                        item.resident_program,
+                        item.reviewer_name
+                    ]
+                    .filter(Boolean)
+                    .join(' ')
+                    .toLowerCase();
+
+                const queryMatch =
+                    !query ||
+                    haystack.includes(query);
+
+                const statusMatch =
+                    filter === 'all' ||
+                    item.status === filter;
+
+                return (
+                    queryMatch &&
+                    statusMatch
+                );
+
+            });
+
+
+        if(submissions.length === 0){
+
+            const tr =
+                document.createElement('tr');
+
+            const td =
+                document.createElement('td');
+
+            td.colSpan = 7;
+
+            const hasAnySubmission =
+                (dashboardData.submissions || []).length > 0;
+
+            td.appendChild(
+                emptyState(
+                    hasAnySubmission
+                    ? 'search_off'
+                    : 'inbox',
+                    hasAnySubmission
+                    ? 'Tidak ada data yang sesuai'
+                    : 'Belum ada pengajuan',
+                    hasAnySubmission
+                    ? 'Ubah kata kunci pencarian atau filter status.'
+                    : 'Pengajuan yang dibuat Residen akan muncul di sini.',
+                    false
+                )
+            );
+
+            tr.appendChild(td);
+            submissionTable.appendChild(tr);
+
+            updateBulkSelectionUI();
+
+            return;
+
+        }
+
+
+        submissions.forEach(function(item){
+
+            const tr =
+                document.createElement('tr');
+
+            tr.setAttribute(
+                'data-submission-row',
+                ''
+            );
+
+            tr.setAttribute(
+                'data-submission-id',
+                String(item.id || '')
+            );
+
+            tr.setAttribute(
+                'data-status',
+                item.status || 'waiting'
+            );
+
+
+            const selectTd =
+                document.createElement('td');
+
+            selectTd.className =
+                'spj26adm-select-cell';
+
+            const selectCheckbox =
+                document.createElement('input');
+
+            selectCheckbox.type =
+                'checkbox';
+
+            selectCheckbox.className =
+                'spj26adm-select-checkbox';
+
+            selectCheckbox.setAttribute(
+                'data-spj26-submission-select',
+                ''
+            );
+
+            selectCheckbox.setAttribute(
+                'aria-label',
+                'Pilih ' + (item.code || 'pengajuan')
+            );
+
+            selectCheckbox.checked =
+                selectedSubmissionIds.has(
+                    String(item.id)
+                );
+
+            tr.classList.toggle(
+                'spj26adm-row-selected',
+                selectCheckbox.checked
+            );
+
+            selectCheckbox.addEventListener(
+                'change',
+                function(){
+
+                    const id =
+                        String(item.id);
+
+                    if(selectCheckbox.checked){
+                        selectedSubmissionIds.add(id);
+                    }else{
+                        selectedSubmissionIds.delete(id);
+                    }
+
+                    tr.classList.toggle(
+                        'spj26adm-row-selected',
+                        selectCheckbox.checked
+                    );
+
+                    updateBulkSelectionUI();
+                }
+            );
+
+            selectTd.appendChild(
+                selectCheckbox
+            );
+
+
+            const codeTd =
+                document.createElement('td');
+
+            codeTd.appendChild(
+                createEl(
+                    'div',
+                    'spj26adm-code',
+                    item.code || '-'
+                )
+            );
+
+
+            const residentTd =
+                document.createElement('td');
+
+            residentTd.appendChild(
+                createEl(
+                    'div',
+                    'spj26adm-resident-name',
+                    item.resident_name || '-'
+                )
+            );
+
+            residentTd.appendChild(
+                createEl(
+                    'div',
+                    'spj26adm-resident-program',
+                    item.resident_program || ''
+                )
+            );
+
+
+            const dateTd =
+                document.createElement('td');
+
+            dateTd.appendChild(
+                createEl(
+                    'div',
+                    '',
+                    item.date || '-'
+                )
+            );
+
+            dateTd.appendChild(
+                createEl(
+                    'div',
+                    'spj26adm-resident-program',
+                    item.time || ''
+                )
+            );
+
+
+            const statusTd =
+                document.createElement('td');
+
+            const meta =
+                statusMeta(
+                    item.status
+                );
+
+            statusTd.appendChild(
+                createEl(
+                    'span',
+                    'spj26adm-status ' +
+                    meta.className,
+                    meta.label
+                )
+            );
+
+            if(item.assignment_source){
+
+                let originLabel =
+                    item.assignment_source;
+
+                if(
+                    item.assignment_source === 'Admin'
+                ){
+                    originLabel =
+                        'Ditugaskan Admin';
+                }
+
+                if(
+                    item.assignment_source === 'Reviewer'
+                ){
+                    originLabel =
+                        'Diambil Reviewer';
+                }
+
+                statusTd.appendChild(
+                    createEl(
+                        'span',
+                        'spj26adm-origin',
+                        originLabel
+                    )
+                );
+
+            }
+
+
+            const reviewerTd =
+                document.createElement('td');
+
+            if(item.reviewer_name){
+
+                reviewerTd.appendChild(
+                    createEl(
+                        'div',
+                        'spj26adm-handler-name',
+                        item.reviewer_name
+                    )
+                );
+
+                reviewerTd.appendChild(
+                    createEl(
+                        'div',
+                        'spj26adm-handler-meta',
+                        'Reviewer'
+                    )
+                );
+
+            }else{
+
+                reviewerTd.appendChild(
+                    createEl(
+                        'div',
+                        'spj26adm-handler-empty',
+                        'Belum ditangani'
+                    )
+                );
+
+            }
+
+
+            const actionTd =
+                document.createElement('td');
+
+            const actionGroup =
+                createEl(
+                    'div',
+                    'spj26adm-action-group'
+                );
+
+            const viewButton =
+                createEl(
+                    'button',
+                    'spj26adm-action spj26adm-icon-action view'
+                );
+
+            viewButton.type = 'button';
+            viewButton.title = 'Lihat detail pengajuan';
+            viewButton.setAttribute(
+                'aria-label',
+                'Lihat detail ' + (item.code || 'pengajuan')
+            );
+
+            viewButton.appendChild(
+                createEl(
+                    'span',
+                    'material-symbols-outlined',
+                    'visibility'
+                )
+            );
+
+            viewButton.addEventListener(
+                'click',
+                function(){
+                    openSubmissionDetail(item);
+                }
+            );
+
+            actionGroup.appendChild(viewButton);
+
+            if(
+                item.status === 'waiting' &&
+                !item.reviewer_id
+            ){
+
+                const assignButton =
+                    createEl(
+                        'button',
+                        'spj26adm-action spj26adm-icon-action assign'
+                    );
+
+                assignButton.type = 'button';
+                assignButton.title = 'Tugaskan Reviewer';
+                assignButton.setAttribute(
+                    'aria-label',
+                    'Tugaskan Reviewer untuk ' + (item.code || 'pengajuan')
+                );
+
+                assignButton.appendChild(
+                    createEl(
+                        'span',
+                        'material-symbols-outlined',
+                        'person_add'
+                    )
+                );
+
+                assignButton.addEventListener(
+                    'click',
+                    function(){
+                        openAssignmentModal(
+                            item.id,
+                            item.code,
+                            item.resident_name
+                        );
+                    }
+                );
+
+                actionGroup.appendChild(assignButton);
+            }
+
+
+            const deleteButton =
+                createEl(
+                    'button',
+                    'spj26adm-action spj26adm-icon-action delete'
+                );
+
+            deleteButton.type = 'button';
+            deleteButton.title = 'Hapus pengajuan';
+            deleteButton.setAttribute(
+                'aria-label',
+                'Hapus ' + (item.code || 'pengajuan')
+            );
+
+            deleteButton.appendChild(
+                createEl(
+                    'span',
+                    'material-symbols-outlined',
+                    'delete'
+                )
+            );
+
+            deleteButton.addEventListener(
+                'click',
+                function(){
+                    openDeleteSubmissionModal(item);
+                }
+            );
+
+            actionGroup.appendChild(deleteButton);
+
+            actionTd.appendChild(actionGroup);
+
+
+            tr.appendChild(selectTd);
+            tr.appendChild(codeTd);
+            tr.appendChild(residentTd);
+            tr.appendChild(dateTd);
+            tr.appendChild(statusTd);
+            tr.appendChild(reviewerTd);
+            tr.appendChild(actionTd);
+
+            submissionTable.appendChild(tr);
+
+        });
+
+        updateBulkSelectionUI();
+
+    }
+
+
+    /* =====================================================
+       ACTIVITIES
+    ===================================================== */
+
+    function renderActivities(){
+
+        if(!activityList) return;
+
+        activityList.innerHTML = '';
+
+
+        const activities =
+            dashboardData.activities || [];
+
+
+        if(activities.length === 0){
+
+            activityList.appendChild(
+                emptyState(
+                    'history',
+                    'Belum ada aktivitas pengajuan',
+                    'Pengajuan terbaru akan tampil otomatis di sini.',
+                    true
+                )
+            );
+
+            return;
+        }
+
+
+        activities.forEach(function(item){
+
+            const row =
+                createEl(
+                    'div',
+                    'spj26adm-activity-item'
+                );
+
+            const icon =
+                createEl(
+                    'div',
+                    'spj26adm-activity-icon ' +
+                    (
+                        item.type || 'new'
+                    )
+                );
+
+            icon.appendChild(
+                createEl(
+                    'span',
+                    'material-symbols-outlined',
+                    item.icon || 'history'
+                )
+            );
+
+
+            const content =
+                document.createElement('div');
+
+            content.appendChild(
+                createEl(
+                    'div',
+                    'spj26adm-activity-text',
+                    item.text || ''
+                )
+            );
+
+            content.appendChild(
+                createEl(
+                    'div',
+                    'spj26adm-activity-time',
+                    item.time || ''
+                )
+            );
+
+
+            row.appendChild(icon);
+            row.appendChild(content);
+
+            activityList.appendChild(row);
+
+        });
+
+    }
+
+
+    /* =====================================================
+       REVIEWERS
+    ===================================================== */
+
+    function renderReviewers(){
+
+        if(!reviewerList) return;
+
+        reviewerList.innerHTML = '';
+
+
+        const reviewers =
+            dashboardData.reviewers || [];
+
+
+        if(reviewerSelect){
+
+            reviewerSelect.innerHTML = '';
+
+            const placeholder =
+                document.createElement('option');
+
+            placeholder.value = '';
+            placeholder.textContent =
+                'Pilih reviewer';
+
+            reviewerSelect.appendChild(
+                placeholder
+            );
+
+        }
+
+
+        if(reviewers.length === 0){
+
+            reviewerList.appendChild(
+                emptyState(
+                    'person_search',
+                    'Belum ada reviewer',
+                    'Reviewer aktif yang dibuat Admin akan muncul di sini.',
+                    true
+                )
+            );
+
+            return;
+        }
+
+
+        reviewers.forEach(function(item){
+
+            const row =
+                createEl(
+                    'div',
+                    'spj26adm-reviewer-row'
+                );
+
+            const left =
+                createEl(
+                    'div',
+                    'spj26adm-reviewer-left'
+                );
+
+            const avatar =
+                createEl(
+                    'div',
+                    'spj26adm-reviewer-avatar'
+                );
+
+            avatar.appendChild(
+                createEl(
+                    'span',
+                    'material-symbols-outlined',
+                    'person'
+                )
+            );
+
+
+            const info =
+                document.createElement('div');
+
+            info.appendChild(
+                createEl(
+                    'div',
+                    'spj26adm-reviewer-name',
+                    item.name || '-'
+                )
+            );
+
+            info.appendChild(
+                createEl(
+                    'div',
+                    'spj26adm-reviewer-load',
+                    String(
+                        item.active_submissions || 0
+                    ) +
+                    ' pengajuan aktif'
+                )
+            );
+
+
+            left.appendChild(avatar);
+            left.appendChild(info);
+
+            row.appendChild(left);
+
+
+            if(item.active !== false){
+
+                row.appendChild(
+                    createEl(
+                        'span',
+                        'spj26adm-online',
+                        'Aktif'
+                    )
+                );
+
+            }
+
+
+            reviewerList.appendChild(row);
+
+
+            if(
+                reviewerSelect &&
+                item.active !== false
+            ){
+
+                const option =
+                    document.createElement('option');
+
+                option.value =
+                    item.id;
+
+                option.textContent =
+                    item.name || '-';
+
+                reviewerSelect.appendChild(
+                    option
+                );
+
+            }
+
+        });
+
+    }
+
+
+    /* =====================================================
+       FILTERS
+    ===================================================== */
+
+    if(searchInput){
+        searchInput.addEventListener(
+            'input',
+            function(){
+                clearBulkSelection();
+                renderSubmissions();
+            }
+        );
+    }
+
+
+    if(statusFilter){
+        statusFilter.addEventListener(
+            'change',
+            function(){
+                clearBulkSelection();
+                renderSubmissions();
+            }
+        );
+    }
+
+
+    if(selectAllCheckbox){
+
+        selectAllCheckbox.addEventListener(
+            'change',
+            function(){
+
+                const visibleCheckboxes =
+                    getVisibleSubmissionCheckboxes();
+
+                visibleCheckboxes.forEach(function(checkbox){
+
+                    const row =
+                        checkbox.closest('tr');
+
+                    const id =
+                        row
+                        ? row.getAttribute('data-submission-id')
+                        : '';
+
+                    checkbox.checked =
+                        selectAllCheckbox.checked;
+
+                    if(id){
+
+                        if(selectAllCheckbox.checked){
+                            selectedSubmissionIds.add(id);
+                        }else{
+                            selectedSubmissionIds.delete(id);
+                        }
+                    }
+
+                    if(row){
+                        row.classList.toggle(
+                            'spj26adm-row-selected',
+                            checkbox.checked
+                        );
+                    }
+                });
+
+                updateBulkSelectionUI();
+            }
+        );
+    }
+
+
+    /* =====================================================
+       SUBMISSION DETAIL
+    ===================================================== */
+    function openSubmissionDetail(item){
+
+        const meta = statusMeta(item.status);
+        const source =
+            item.assignment_source === 'Admin'
+            ? 'Ditugaskan Admin'
+            : item.assignment_source === 'Reviewer'
+              ? 'Diambil Reviewer'
+              : (item.assignment_source || '-');
+
+        setText('spj26adm-detail-code', item.code || '-');
+        setText('spj26adm-detail-status', meta.label);
+        setText('spj26adm-detail-resident', item.resident_name || '-');
+        setText('spj26adm-detail-program', item.resident_program || '-');
+        setText('spj26adm-detail-date', [item.date,item.time].filter(Boolean).join(' • ') || '-');
+        setText('spj26adm-detail-reviewer', item.reviewer_name || 'Belum ditangani');
+        setText('spj26adm-detail-source', source);
+
+        const subtitle = root.querySelector('#spj26adm-detail-subtitle');
+        if(subtitle){
+            subtitle.textContent = (item.code || 'Pengajuan') + ' • ' + (item.resident_name || '-');
+        }
+
+        activeDetailUrl = item.detail_url || '';
+
+        if(detailOpenFull){
+            detailOpenFull.hidden = !activeDetailUrl;
+        }
+
+        if(detailModal){
+            detailModal.hidden = false;
+        }
+    }
+
+    function closeSubmissionDetail(){
+        if(detailModal){
+            detailModal.hidden = true;
+        }
+        activeDetailUrl = '';
+    }
+
+    [detailClose,detailCloseBottom].filter(Boolean).forEach(function(button){
+        button.addEventListener('click',closeSubmissionDetail);
+    });
+
+    if(detailOpenFull){
+        detailOpenFull.addEventListener('click',function(){
+            if(activeDetailUrl){
+                window.location.href = activeDetailUrl;
+            }
+        });
+    }
+
+    if(detailModal){
+        detailModal.addEventListener('click',function(event){
+            if(event.target === detailModal){
+                closeSubmissionDetail();
+            }
+        });
+    }
+
+
+    /* =====================================================
+       CLIENT-SIDE PAGINATION
+       10 / 20 / 30 / Semua
+    ===================================================== */
+    (function setupPagination(){
+
+        const body = root.querySelector('#spj26adm-submission-table');
+        const sizeSelect = root.querySelector('#spj26adm-submission-page-size');
+        const info = root.querySelector('#spj26adm-submission-page-info');
+        const prev = root.querySelector('#spj26adm-submission-page-prev');
+        const next = root.querySelector('#spj26adm-submission-page-next');
+
+        if(!body || !sizeSelect || !info || !prev || !next){
+            return;
+        }
+
+        let page = 1;
+
+        function getDataRows(){
+            return Array.from(body.children).filter(function(row){
+                return !row.querySelector('.spj26adm-empty-state');
+            });
+        }
+
+        function applyPagination(){
+
+            const rows = getDataRows();
+            const total = rows.length;
+            const all = sizeSelect.value === 'all';
+            const requested = Number(sizeSelect.value) || 10;
+            const pageSize = all ? Math.max(total,1) : requested;
+            const totalPages = total === 0 ? 1 : Math.max(1, Math.ceil(total / pageSize));
+
+            page = Math.min(Math.max(page,1), totalPages);
+
+            const startIndex = all ? 0 : (page - 1) * pageSize;
+            const endIndex = all ? total : Math.min(startIndex + pageSize,total);
+
+            rows.forEach(function(row,index){
+                row.hidden = !(index >= startIndex && index < endIndex);
+            });
+
+            if(total === 0){
+                info.textContent = '0 data';
+            }else if(all){
+                info.textContent = total + ' data';
+            }else{
+                info.textContent = (startIndex + 1) + '–' + endIndex + ' dari ' + total + ' data';
+            }
+
+            prev.disabled = all || total === 0 || page <= 1;
+            next.disabled = all || total === 0 || page >= totalPages;
+
+            updateBulkSelectionUI();
+        }
+
+        sizeSelect.addEventListener('change',function(){
+            page = 1;
+            applyPagination();
+        });
+
+        prev.addEventListener('click',function(){
+            if(page > 1){
+                page -= 1;
+                applyPagination();
+            }
+        });
+
+        next.addEventListener('click',function(){
+            page += 1;
+            applyPagination();
+        });
+
+        [
+            root.querySelector('#spj26adm-search-input'),
+            root.querySelector('#spj26adm-status-filter')
+        ].filter(Boolean).forEach(function(el){
+            el.addEventListener(
+                el.tagName === 'INPUT' ? 'input' : 'change',
+                function(){ page = 1; },
+                { capture:true }
+            );
+        });
+
+        if(window.MutationObserver){
+            new MutationObserver(function(){
+                applyPagination();
+            }).observe(body,{ childList:true });
+        }
+
+        applyPagination();
+
+    })();
+
+
+    /* =====================================================
+       ADMIN PERMANENT DELETE
+       Single + bulk delete using one confirmation modal.
+    ===================================================== */
+
+    function renderDeleteSelectionList(){
+
+        if(!deleteSelectionList){
+            return;
+        }
+
+        deleteSelectionList.innerHTML = '';
+
+        deleteTargetSubmissions.forEach(function(item){
+
+            const row =
+                createEl(
+                    'div',
+                    'spj26adm-delete-selection-item'
+                );
+
+            row.appendChild(
+                createEl(
+                    'div',
+                    'spj26adm-delete-selection-code',
+                    item.code || ('#' + item.id)
+                )
+            );
+
+            row.appendChild(
+                createEl(
+                    'div',
+                    'spj26adm-delete-selection-name',
+                    item.resident_name || '-'
+                )
+            );
+
+            deleteSelectionList.appendChild(row);
+        });
+    }
+
+
+    function openDeleteSubmissionModal(items){
+
+        const normalized =
+            Array.isArray(items)
+            ? items
+            : [items];
+
+        deleteTargetSubmissions =
+            normalized.filter(function(item){
+                return (
+                    item &&
+                    item.id
+                );
+            });
+
+        if(deleteTargetSubmissions.length === 0){
+            showToast(
+                'Tidak ada pengajuan yang dipilih.'
+            );
+            return;
+        }
+
+        const count =
+            deleteTargetSubmissions.length;
+
+        if(deleteQuestion){
+
+            deleteQuestion.textContent =
+                count === 1
+                ? 'Apakah Anda yakin ingin menghapus data ini?'
+                : 'Apakah Anda yakin ingin menghapus ' + count + ' data ini?';
+        }
+
+        const subtitle =
+            root.querySelector(
+                '#spj26adm-delete-subtitle'
+            );
+
+        if(subtitle){
+
+            subtitle.textContent =
+                count === 1
+                ? (
+                    (deleteTargetSubmissions[0].code || 'Pengajuan') +
+                    ' • ' +
+                    (deleteTargetSubmissions[0].resident_name || '-')
+                )
+                : (
+                    count +
+                    ' pengajuan dipilih untuk dihapus permanen'
+                );
+        }
+
+        renderDeleteSelectionList();
+
+        if(deleteConfirm){
+            deleteConfirm.disabled = false;
+            deleteConfirm.textContent = 'Ya Hapus';
+        }
+
+        if(deleteModal){
+            deleteModal.hidden = false;
+        }
+    }
+
+
+    function closeDeleteSubmissionModal(){
+
+        if(deleteModal){
+            deleteModal.hidden = true;
+        }
+
+        if(deleteConfirm){
+            deleteConfirm.disabled = false;
+            deleteConfirm.textContent = 'Ya Hapus';
+        }
+
+        deleteTargetSubmissions = [];
+
+        if(deleteSelectionList){
+            deleteSelectionList.innerHTML = '';
+        }
+    }
+
+
+    [deleteClose,deleteCancel]
+        .filter(Boolean)
+        .forEach(function(button){
+
+            button.addEventListener(
+                'click',
+                closeDeleteSubmissionModal
+            );
+        });
+
+
+    if(deleteModal){
+
+        deleteModal.addEventListener(
+            'click',
+            function(event){
+
+                if(event.target === deleteModal){
+                    closeDeleteSubmissionModal();
+                }
+            }
+        );
+    }
+
+
+    if(bulkDeleteButton){
+
+        bulkDeleteButton.addEventListener(
+            'click',
+            function(){
+
+                const items =
+                    Array.from(
+                        selectedSubmissionIds
+                    )
+                    .map(getSubmissionById)
+                    .filter(Boolean);
+
+                openDeleteSubmissionModal(
+                    items
+                );
+            }
+        );
+    }
+
+
+    if(deleteConfirm){
+
+        deleteConfirm.addEventListener(
+            'click',
+            async function(){
+
+                if(
+                    !deleteTargetSubmissions.length
+                ){
+                    showToast(
+                        'Tidak ada pengajuan yang dipilih.'
+                    );
+                    return;
+                }
+
+                const ids =
+                    deleteTargetSubmissions
+                    .map(function(item){
+                        return String(item.id);
+                    })
+                    .filter(Boolean);
+
+                const deleteCount =
+                    ids.length;
+
+                deleteConfirm.disabled = true;
+                deleteConfirm.textContent = 'Menghapus...';
+
+                try{
+
+                    await backendRequest(
+                        'spj26_admin_delete_submission',
+                        {
+                            submission_ids:
+                                ids.join(',')
+                        }
+                    );
+
+                    closeDeleteSubmissionModal();
+
+                    clearBulkSelection();
+
+                    showToast(
+                        deleteCount === 1
+                        ? 'Pengajuan berhasil dihapus.'
+                        : deleteCount + ' pengajuan berhasil dihapus.'
+                    );
+
+                    await loadDashboard();
+
+                }catch(error){
+
+                    showToast(
+                        error.message ||
+                        'Pengajuan gagal dihapus.'
+                    );
+
+                    deleteConfirm.textContent =
+                        'Ya Hapus';
+
+                    deleteConfirm.disabled =
+                        false;
+                }
+            }
+        );
+    }
+
+
+    /* =====================================================
+       ASSIGNMENT MODAL
+    ===================================================== */
+
+    function openAssignmentModal(
+        submissionId,
+        submissionCode,
+        residentName
+    ){
+
+        activeSubmissionId =
+            submissionId || '';
+
+        activeResidentName =
+            residentName || '';
+
+
+        if(modalSubtitle){
+
+            modalSubtitle.textContent =
+                (submissionCode || 'Pengajuan') +
+                ' • ' +
+                activeResidentName;
+
+        }
+
+
+        if(reviewerSelect){
+            reviewerSelect.value = '';
+        }
+
+
+        if(modal){
+            modal.hidden = false;
+        }
+
+    }
+
+
+    function closeAssignmentModal(){
+
+        if(modal){
+            modal.hidden = true;
+        }
+
+        activeSubmissionId = '';
+        activeResidentName = '';
+
+    }
+
+
+    if(modalClose){
+        modalClose.addEventListener(
+            'click',
+            closeAssignmentModal
+        );
+    }
+
+
+    if(modalCancel){
+        modalCancel.addEventListener(
+            'click',
+            closeAssignmentModal
+        );
+    }
+
+
+    if(modal){
+        modal.addEventListener(
+            'click',
+            function(event){
+
+                if(event.target === modal){
+                    closeAssignmentModal();
+                }
+
+            }
+        );
+    }
+
+
+    /* =====================================================
+       BACKEND REQUEST
+    ===================================================== */
+
+    async function backendRequest(
+        action,
+        payload
+    ){
+
+        if(
+            !window.spj26AdminDashboardConfig ||
+            !window.spj26AdminDashboardConfig.ajaxUrl ||
+            !window.spj26AdminDashboardConfig.nonce
+        ){
+
+            throw new Error(
+                'Konfigurasi backend dashboard belum tersedia.'
+            );
+
+        }
+
+
+        const body =
+            new URLSearchParams();
+
+        body.append(
+            'action',
+            action
+        );
+
+        body.append(
+            'nonce',
+            window.spj26AdminDashboardConfig.nonce
+        );
+
+
+        Object.keys(
+            payload || {}
+        ).forEach(function(key){
+
+            body.append(
+                key,
+                payload[key]
+            );
+
+        });
+
+
+        const response =
+            await fetch(
+                window.spj26AdminDashboardConfig.ajaxUrl,
+                {
+                    method:'POST',
+                    credentials:'same-origin',
+                    headers:{
+                        'Content-Type':
+                            'application/x-www-form-urlencoded; charset=UTF-8'
+                    },
+                    body:
+                        body.toString()
+                }
+            );
+
+
+        const result =
+            await response.json();
+
+
+        if(
+            !result ||
+            result.success !== true
+        ){
+
+            const message =
+                result &&
+                result.data &&
+                result.data.message
+                ? result.data.message
+                : 'Permintaan ke server gagal.';
+
+            throw new Error(message);
+
+        }
+
+
+        return result.data;
+
+    }
+
+
+    async function loadDashboard(){
+
+        /*
+         * Default selalu kosong.
+         * Tidak ada data contoh/fallback.
+         */
+
+        renderCounts();
+        renderSubmissions();
+        renderActivities();
+        renderReviewers();
+
+
+        if(
+            !window.spj26AdminDashboardConfig
+        ){
+            return;
+        }
+
+
+        try{
+
+            const data =
+                await backendRequest(
+                    'spj26_admin_dashboard_data',
+                    {}
+                );
+
+
+            if(dashboardAlert){
+                dashboardAlert.hidden = true;
+                dashboardAlert.textContent = '';
+            }
+
+
+            dashboardData = {
+                counts:
+                    data.counts || {
+                        waiting:0,
+                        progress:0,
+                        done:0,
+                        reviewers:0
+                    },
+                submissions:
+                    Array.isArray(data.submissions)
+                    ? data.submissions
+                    : [],
+                activities:
+                    Array.isArray(data.activities)
+                    ? data.activities
+                    : [],
+                reviewers:
+                    Array.isArray(data.reviewers)
+                    ? data.reviewers
+                    : []
+            };
+
+
+            const validSubmissionIds =
+                new Set(
+                    dashboardData.submissions.map(function(item){
+                        return String(item.id);
+                    })
+                );
+
+            Array.from(
+                selectedSubmissionIds
+            ).forEach(function(id){
+
+                if(!validSubmissionIds.has(id)){
+                    selectedSubmissionIds.delete(id);
+                }
+            });
+
+            renderCounts();
+            renderSubmissions();
+            renderActivities();
+            renderReviewers();
+
+
+        }catch(error){
+
+            /*
+             * Jika backend gagal, data palsu tidak ditampilkan.
+             * Error ditampilkan agar dashboard tidak terlihat seperti
+             * benar-benar memiliki nilai 0.
+             */
+            console.error(
+                'SIPATUJU Dashboard:',
+                error
+            );
+
+            if(dashboardAlert){
+
+                dashboardAlert.textContent =
+                    error.message ||
+                    'Data dashboard gagal dimuat dari backend SIPATUJU.';
+
+                dashboardAlert.hidden =
+                    false;
+            }
+
+        }
+
+    }
+
+
+    if(confirmAssignment){
+
+        confirmAssignment.addEventListener(
+            'click',
+            async function(){
+
+                const reviewerId =
+                    reviewerSelect
+                    ? reviewerSelect.value
+                    : '';
+
+
+                if(
+                    !activeSubmissionId ||
+                    !reviewerId
+                ){
+
+                    showToast(
+                        'Pilih reviewer terlebih dahulu.'
+                    );
+
+                    return;
+
+                }
+
+
+                confirmAssignment.disabled =
+                    true;
+
+
+                try{
+
+                    await backendRequest(
+                        'spj26_admin_assign_reviewer',
+                        {
+                            submission_id:
+                                activeSubmissionId,
+                            reviewer_id:
+                                reviewerId
+                        }
+                    );
+
+
+                    closeAssignmentModal();
+
+                    showToast(
+                        'Reviewer berhasil ditugaskan.'
+                    );
+
+
+                    await loadDashboard();
+
+
+                }catch(error){
+
+                    showToast(
+                        error.message ||
+                        'Penugasan reviewer gagal.'
+                    );
+
+                }finally{
+
+                    confirmAssignment.disabled =
+                        false;
+
+                }
+
+            }
+        );
+
+    }
+
+
+    /* =====================================================
+       CONFIG / LOGOUT
+    ===================================================== */
+
+    function applyDashboardConfig(){
+
+        const config =
+            window.spj26AdminDashboardConfig;
+
+
+        if(!config){
+            return false;
+        }
+
+
+        const logoutLink =
+            root.querySelector(
+                '#spj26adm-logout'
+            );
+
+
+        if(
+            logoutLink &&
+            config.logoutUrl
+        ){
+
+            logoutLink.href =
+                config.logoutUrl;
+
+        }
+
+
+        return (
+            !!config.ajaxUrl &&
+            !!config.nonce
+        );
+
+    }
+
+
+    document.addEventListener(
+        'keydown',
+        function(event){
+
+            if(event.key !== 'Escape'){
+                return;
+            }
+
+            if(
+                deleteModal &&
+                !deleteModal.hidden
+            ){
+                closeDeleteSubmissionModal();
+                return;
+            }
+
+            if(
+                detailModal &&
+                !detailModal.hidden
+            ){
+                closeSubmissionDetail();
+                return;
+            }
+
+            if(
+                modal &&
+                !modal.hidden
+            ){
+                closeAssignmentModal();
+            }
+        }
+    );
+
+
+    /* =====================================================
+       INITIAL
+    ===================================================== */
+
+    function initializeAdminDashboard(){
+
+        /*
+         * Config backend dicetak melalui wp_footer.
+         * Elementor HTML Widget dapat dieksekusi sebelum config tersebut ada,
+         * jadi dashboard harus menunggu window.load.
+         */
+        if(
+            !applyDashboardConfig()
+        ){
+
+            console.error(
+                'SIPATUJU Admin: spj26AdminDashboardConfig tidak ditemukan.'
+            );
+
+            if(dashboardAlert){
+
+                dashboardAlert.textContent =
+                    'Konfigurasi backend Dashboard Admin belum tersedia. Pastikan snippet 000 — 02 dan 000 — 03 aktif.';
+
+                dashboardAlert.hidden =
+                    false;
+            }
+
+            renderCounts();
+            renderSubmissions();
+            renderActivities();
+            renderReviewers();
+
+            return;
+        }
+
+
+        loadDashboard();
+
+    }
+
+
+    if(
+        document.readyState === 'complete'
+    ){
+
+        initializeAdminDashboard();
+
+    }else{
+
+        window.addEventListener(
+            'load',
+            initializeAdminDashboard,
+            { once:true }
+        );
+
+    }
+
+})();
+</script>

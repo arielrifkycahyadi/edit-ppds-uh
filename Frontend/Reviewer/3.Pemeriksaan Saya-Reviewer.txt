@@ -1,0 +1,2919 @@
+<!-- =========================================================
+     SIPATUJU PPDS FK UNHAS
+     PAGE      : PEMERIKSAAN SAYA
+     WORDPRESS : 00 – 02 Reviewer – Pemeriksaan Saya
+     PARENT    : 00 Dashboard Reviewer
+     SLUG      : pemeriksaan-saya
+     URL       : /reviewer-sipatuju/pemeriksaan-saya/
+     ROLE      : Reviewer
+     FORMAT    : Elementor HTML Widget
+     NAMESPACE : spj26rev
+     ROOT      : #spj26rev-active-root
+
+     Fungsi:
+     - Menampilkan pengajuan aktif milik Reviewer yang sedang login
+     - Hanya menampilkan pengajuan berstatus Dalam Pemeriksaan
+     - Tombol Buka Pemeriksaan menuju page Pemeriksaan Jurnal
+     - Tidak menggunakan popup/modal untuk form penilaian
+     - Tidak ada dummy data
+     - Browser/page utama tidak scroll
+     - Header/sidebar/footer tetap
+     - Hanya area konten kanan yang dapat scroll
+========================================================== -->
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:wght@600;700;800&family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap');
+
+#spj26rev-active-root{
+    --spj26rev-maroon:#800000;
+    --spj26rev-maroon-dark:#5c0000;
+    --spj26rev-maroon-medium:#8b1e1e;
+
+    --spj26rev-white:#ffffff;
+    --spj26rev-background:#f3f5f8;
+    --spj26rev-surface:#ffffff;
+    --spj26rev-surface-soft:#f8fafc;
+
+    --spj26rev-text:#0f172a;
+    --spj26rev-text-secondary:#475569;
+    --spj26rev-text-muted:#64748b;
+
+    --spj26rev-border:#e2e8f0;
+    --spj26rev-border-strong:#cbd5e1;
+
+    --spj26rev-green:#047857;
+    --spj26rev-green-bg:#ecfdf5;
+
+    --spj26rev-blue:#1d4ed8;
+    --spj26rev-blue-bg:#eff6ff;
+
+    --spj26rev-red:#b91c1c;
+    --spj26rev-red-bg:#fef2f2;
+
+    width:100%;
+    height:100vh;
+    height:100dvh;
+    min-height:0;
+
+    margin:0;
+    padding:0;
+
+    overflow:hidden;
+
+    background:var(--spj26rev-background);
+    color:var(--spj26rev-text);
+
+    font-family:"Inter",Arial,sans-serif;
+
+    box-sizing:border-box;
+}
+
+#spj26rev-active-root *,
+#spj26rev-active-root *::before,
+#spj26rev-active-root *::after{
+    box-sizing:border-box;
+}
+
+#spj26rev-active-root h1,
+#spj26rev-active-root h2,
+#spj26rev-active-root h3,
+#spj26rev-active-root p{
+    margin:0;
+}
+
+#spj26rev-active-root a{
+    color:inherit;
+    text-decoration:none;
+}
+
+#spj26rev-active-root button,
+#spj26rev-active-root input,
+#spj26rev-active-root textarea{
+    font:inherit;
+}
+
+#spj26rev-active-root [hidden]{
+    display:none !important;
+}
+
+
+/* =========================================================
+   PAGE LOCK
+========================================================= */
+
+html.spj26rev-page-lock,
+body.spj26rev-page-lock{
+    width:100% !important;
+    height:100% !important;
+    min-height:100% !important;
+
+    margin:0 !important;
+    padding:0 !important;
+
+    overflow:hidden !important;
+}
+
+body.spj26rev-page-lock #page,
+body.spj26rev-page-lock .site,
+body.spj26rev-page-lock .site-content,
+body.spj26rev-page-lock .elementor,
+body.spj26rev-page-lock .elementor-section-wrap,
+body.spj26rev-page-lock .elementor-element,
+body.spj26rev-page-lock .elementor-widget,
+body.spj26rev-page-lock .elementor-widget-container{
+    max-height:none !important;
+}
+
+
+/* =========================================================
+   HEADER
+========================================================= */
+
+#spj26rev-active-root .spj26rev-header{
+    height:76px;
+    min-height:76px;
+
+    position:relative;
+    z-index:50;
+
+    padding:0 30px;
+
+    background:#fff;
+    border-bottom:1px solid var(--spj26rev-border);
+
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+
+    gap:24px;
+
+    box-shadow:0 1px 2px rgba(15,23,42,.03);
+}
+
+#spj26rev-active-root .spj26rev-header-left,
+#spj26rev-active-root .spj26rev-header-right,
+#spj26rev-active-root .spj26rev-user{
+    display:flex;
+    align-items:center;
+}
+
+#spj26rev-active-root .spj26rev-header-left{
+    gap:14px;
+    min-width:0;
+}
+
+#spj26rev-active-root .spj26rev-header-right{
+    gap:10px;
+    flex:0 0 auto;
+}
+
+#spj26rev-active-root .spj26rev-logo{
+    width:48px;
+    height:48px;
+    flex:0 0 48px;
+
+    border-radius:8px;
+
+    background:var(--spj26rev-maroon);
+    color:#fff;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+}
+
+#spj26rev-active-root .spj26rev-logo .material-symbols-outlined{
+    font-size:25px;
+}
+
+#spj26rev-active-root .spj26rev-brand{
+    min-width:0;
+}
+
+#spj26rev-active-root .spj26rev-brand-row{
+    display:flex;
+    align-items:center;
+
+    gap:10px;
+
+    min-width:0;
+}
+
+#spj26rev-active-root .spj26rev-brand-name{
+    font-family:"Plus Jakarta Sans",sans-serif;
+
+    color:var(--spj26rev-maroon);
+
+    font-size:15px;
+    font-weight:800;
+
+    letter-spacing:-.02em;
+
+    white-space:nowrap;
+}
+
+#spj26rev-active-root .spj26rev-brand-divider{
+    color:#cbd5e1;
+}
+
+#spj26rev-active-root .spj26rev-brand-description{
+    color:#6b5b58;
+
+    font-size:12px;
+    font-weight:500;
+
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+}
+
+#spj26rev-active-root .spj26rev-faculty{
+    margin-top:3px;
+
+    color:#695653;
+
+    font-family:"JetBrains Mono",monospace;
+
+    font-size:10px;
+    font-weight:600;
+
+    letter-spacing:.08em;
+    text-transform:uppercase;
+}
+
+#spj26rev-active-root .spj26rev-user{
+    gap:10px;
+}
+
+#spj26rev-active-root .spj26rev-user-text{
+    text-align:right;
+}
+
+#spj26rev-active-root .spj26rev-user-name{
+    display:block;
+
+    font-family:"Plus Jakarta Sans",sans-serif;
+
+    font-size:13px;
+    font-weight:700;
+}
+
+#spj26rev-active-root .spj26rev-user-role{
+    display:block;
+
+    margin-top:1px;
+
+    color:var(--spj26rev-maroon);
+
+    font-size:10px;
+    font-weight:700;
+}
+
+#spj26rev-active-root .spj26rev-avatar{
+    width:38px;
+    height:38px;
+
+    border-radius:50%;
+
+    background:var(--spj26rev-maroon);
+    color:#fff;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+}
+
+#spj26rev-active-root .spj26rev-avatar .material-symbols-outlined{
+    font-size:21px;
+}
+
+#spj26rev-active-root .spj26rev-mobile-menu{
+    display:none;
+}
+
+
+/* =========================================================
+   BODY / SIDEBAR
+========================================================= */
+
+#spj26rev-active-root .spj26rev-body{
+    display:grid;
+
+    grid-template-columns:
+        300px
+        minmax(0,1fr);
+
+    height:calc(100% - 76px);
+    min-height:0;
+
+    align-items:stretch;
+
+    overflow:hidden;
+}
+
+#spj26rev-active-root .spj26rev-sidebar{
+    position:relative;
+
+    height:100%;
+    min-height:0;
+
+    padding:18px 16px 14px;
+
+    background:#fff;
+    border-right:1px solid var(--spj26rev-border);
+
+    display:flex;
+    flex-direction:column;
+    justify-content:space-between;
+
+    overflow:hidden;
+
+    z-index:30;
+}
+
+#spj26rev-active-root .spj26rev-sidebar-main{
+    min-height:0;
+}
+
+#spj26rev-active-root .spj26rev-nav-title{
+    margin:4px 8px 7px;
+
+    color:#6c5a57;
+
+    font-size:10px;
+    font-weight:700;
+
+    text-transform:uppercase;
+    letter-spacing:.04em;
+}
+
+#spj26rev-active-root .spj26rev-nav{
+    display:flex;
+    flex-direction:column;
+
+    gap:5px;
+}
+
+#spj26rev-active-root .spj26rev-nav-link{
+    width:100%;
+    min-height:42px;
+
+    padding:9px 13px;
+
+    border-radius:6px;
+
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+
+    gap:10px;
+
+    color:#5b4744;
+
+    font-size:13px;
+    font-weight:500;
+
+    transition:
+        background-color .18s ease,
+        color .18s ease;
+}
+
+#spj26rev-active-root .spj26rev-nav-link:hover{
+    background:var(--spj26rev-surface-soft);
+    color:var(--spj26rev-text);
+}
+
+#spj26rev-active-root .spj26rev-nav-link.active{
+    background:#941c1c;
+    color:#fff;
+
+    font-weight:700;
+}
+
+#spj26rev-active-root .spj26rev-nav-left{
+    display:flex;
+    align-items:center;
+
+    gap:10px;
+
+    min-width:0;
+}
+
+#spj26rev-active-root .spj26rev-nav-link .material-symbols-outlined{
+    font-size:19px;
+}
+
+#spj26rev-active-root .spj26rev-nav-badge{
+    min-width:22px;
+    height:22px;
+
+    padding:0 6px;
+
+    border-radius:999px;
+
+    background:#fee2e2;
+    color:var(--spj26rev-maroon);
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    font-size:9px;
+    font-weight:800;
+}
+
+#spj26rev-active-root .spj26rev-nav-link.active .spj26rev-nav-badge{
+    background:rgba(255,255,255,.16);
+    color:#fff;
+}
+
+#spj26rev-active-root .spj26rev-nav-section-gap{
+    height:20px;
+}
+
+#spj26rev-active-root .spj26rev-sidebar-info{
+    padding:14px 15px;
+
+    border-radius:7px;
+
+    background:#f8fafc;
+}
+
+#spj26rev-active-root .spj26rev-sidebar-info-title{
+    display:flex;
+    align-items:center;
+
+    gap:7px;
+
+    color:var(--spj26rev-maroon);
+
+    font-size:10px;
+    font-weight:700;
+}
+
+#spj26rev-active-root .spj26rev-sidebar-info-title .material-symbols-outlined{
+    font-size:16px;
+}
+
+#spj26rev-active-root .spj26rev-version{
+    margin-top:5px;
+
+    color:#594b48;
+
+    font-family:"JetBrains Mono",monospace;
+    font-size:10px;
+}
+
+#spj26rev-active-root .spj26rev-department{
+    margin-top:4px;
+
+    color:#665855;
+
+    font-size:10px;
+    line-height:1.45;
+}
+
+
+/* =========================================================
+   RIGHT PANE
+========================================================= */
+
+#spj26rev-active-root .spj26rev-rightpane{
+    height:100%;
+    min-width:0;
+    min-height:0;
+
+    overflow:hidden;
+
+    display:grid;
+
+    grid-template-rows:
+        minmax(0,1fr)
+        50px;
+}
+
+#spj26rev-active-root .spj26rev-main{
+    width:100%;
+    min-width:0;
+    min-height:0;
+
+    padding:24px 30px 28px;
+
+    overflow-y:auto;
+    overflow-x:hidden;
+
+    overscroll-behavior:contain;
+    scrollbar-gutter:stable;
+}
+
+#spj26rev-active-root .spj26rev-main::-webkit-scrollbar{
+    width:8px;
+}
+
+#spj26rev-active-root .spj26rev-main::-webkit-scrollbar-track{
+    background:#eef2f6;
+}
+
+#spj26rev-active-root .spj26rev-main::-webkit-scrollbar-thumb{
+    background:#cbd5e1;
+
+    border-radius:999px;
+    border:2px solid #eef2f6;
+}
+
+#spj26rev-active-root .spj26rev-content{
+    width:100%;
+    max-width:1320px;
+
+    margin:0 auto;
+}
+
+
+/* =========================================================
+   PAGE HEAD
+========================================================= */
+
+#spj26rev-active-root .spj26rev-page-head{
+    margin-bottom:17px;
+
+    display:flex;
+    align-items:flex-end;
+    justify-content:space-between;
+
+    gap:18px;
+}
+
+#spj26rev-active-root .spj26rev-page-kicker{
+    display:flex;
+    align-items:center;
+
+    gap:7px;
+
+    margin-bottom:6px;
+
+    color:var(--spj26rev-maroon-medium);
+
+    font-size:9px;
+    font-weight:800;
+
+    text-transform:uppercase;
+    letter-spacing:.06em;
+}
+
+#spj26rev-active-root .spj26rev-page-kicker .material-symbols-outlined{
+    font-size:16px;
+}
+
+#spj26rev-active-root .spj26rev-page-title{
+    font-family:"Plus Jakarta Sans",sans-serif;
+
+    color:#111827;
+
+    font-size:23px;
+    line-height:1.25;
+    font-weight:800;
+
+    letter-spacing:-.02em;
+}
+
+#spj26rev-active-root .spj26rev-page-subtitle{
+    margin-top:5px;
+
+    color:#64748b;
+
+    font-size:11px;
+    line-height:1.55;
+}
+
+#spj26rev-active-root .spj26rev-count-box{
+    flex:0 0 auto;
+
+    min-width:130px;
+
+    padding:11px 14px;
+
+    border:1px solid var(--spj26rev-border);
+    border-radius:10px;
+
+    background:#fff;
+
+    text-align:right;
+}
+
+#spj26rev-active-root .spj26rev-count-label{
+    color:#94a3b8;
+
+    font-size:8.5px;
+    font-weight:800;
+
+    text-transform:uppercase;
+    letter-spacing:.05em;
+}
+
+#spj26rev-active-root .spj26rev-count-number{
+    margin-top:3px;
+
+    font-family:"Plus Jakarta Sans",sans-serif;
+
+    color:#111827;
+
+    font-size:22px;
+    font-weight:800;
+}
+
+
+/* =========================================================
+   CARD / TOOLBAR
+========================================================= */
+
+#spj26rev-active-root .spj26rev-card{
+    border:1px solid var(--spj26rev-border);
+    border-radius:13px;
+
+    background:#fff;
+
+    box-shadow:0 2px 6px rgba(15,23,42,.03);
+
+    overflow:hidden;
+}
+
+#spj26rev-active-root .spj26rev-card-head{
+    min-height:70px;
+
+    padding:14px 16px;
+
+    border-bottom:1px solid #f1f5f9;
+
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+
+    gap:14px;
+}
+
+#spj26rev-active-root .spj26rev-card-title{
+    font-family:"Plus Jakarta Sans",sans-serif;
+
+    color:#111827;
+
+    font-size:14px;
+    font-weight:800;
+}
+
+#spj26rev-active-root .spj26rev-card-subtitle{
+    margin-top:3px;
+
+    color:#94a3b8;
+
+    font-size:9.8px;
+    line-height:1.4;
+}
+
+#spj26rev-active-root .spj26rev-toolbar{
+    display:flex;
+    align-items:center;
+
+    gap:8px;
+
+    flex:0 0 auto;
+}
+
+#spj26rev-active-root .spj26rev-search{
+    width:245px;
+    min-height:36px;
+
+    padding:7px 10px;
+
+    border:1px solid #dbe3ec;
+    border-radius:8px;
+
+    background:#fff;
+    color:#334155;
+
+    outline:none;
+
+    font-size:9.8px;
+}
+
+#spj26rev-active-root .spj26rev-search:focus{
+    border-color:var(--spj26rev-maroon-medium);
+
+    box-shadow:
+        0 0 0 3px
+        rgba(139,30,30,.07);
+}
+
+#spj26rev-active-root .spj26rev-refresh-btn{
+    min-height:36px;
+
+    padding:7px 11px;
+
+    border:1px solid #dbe3ec;
+    border-radius:8px;
+
+    background:#fff;
+    color:#475569;
+
+    display:inline-flex;
+    align-items:center;
+
+    gap:6px;
+
+    font-size:9.5px;
+    font-weight:800;
+
+    cursor:pointer;
+}
+
+#spj26rev-active-root .spj26rev-refresh-btn:hover{
+    background:#f8fafc;
+}
+
+#spj26rev-active-root .spj26rev-refresh-btn .material-symbols-outlined{
+    font-size:16px;
+}
+
+
+/* =========================================================
+   TABLE
+========================================================= */
+
+#spj26rev-active-root .spj26rev-table-wrap{
+    width:100%;
+
+    overflow-x:auto;
+}
+
+#spj26rev-active-root .spj26rev-table{
+    width:100%;
+    min-width:900px;
+
+    border-collapse:collapse;
+}
+
+#spj26rev-active-root .spj26rev-table th{
+    padding:10px 12px;
+
+    border-bottom:1px solid #e9eef4;
+
+    background:#f8fafc;
+    color:#64748b;
+
+    text-align:left;
+
+    font-size:9px;
+    font-weight:800;
+
+    text-transform:uppercase;
+    letter-spacing:.04em;
+}
+
+#spj26rev-active-root .spj26rev-table td{
+    padding:12px;
+
+    border-bottom:1px solid #f1f5f9;
+
+    vertical-align:middle;
+
+    color:#334155;
+
+    font-size:10.5px;
+}
+
+#spj26rev-active-root .spj26rev-table tbody tr:last-child td{
+    border-bottom:0;
+}
+
+#spj26rev-active-root .spj26rev-table tbody tr:hover{
+    background:#fcfcfd;
+}
+
+#spj26rev-active-root .spj26rev-code{
+    font-family:"JetBrains Mono",monospace;
+
+    color:#475569;
+
+    font-size:9.5px;
+    font-weight:700;
+}
+
+#spj26rev-active-root .spj26rev-name{
+    color:#111827;
+
+    font-size:10.5px;
+    font-weight:800;
+}
+
+#spj26rev-active-root .spj26rev-subtext{
+    margin-top:3px;
+
+    color:#94a3b8;
+
+    font-size:8.8px;
+    line-height:1.35;
+}
+
+#spj26rev-active-root .spj26rev-status{
+    display:inline-flex;
+    align-items:center;
+
+    gap:5px;
+
+    padding:5px 8px;
+
+    border:1px solid #bfdbfe;
+    border-radius:999px;
+
+    background:var(--spj26rev-blue-bg);
+    color:var(--spj26rev-blue);
+
+    font-size:8.8px;
+    font-weight:800;
+
+    white-space:nowrap;
+}
+
+#spj26rev-active-root .spj26rev-action{
+    min-height:32px;
+
+    padding:7px 10px;
+
+    border:1px solid var(--spj26rev-maroon-medium);
+    border-radius:7px;
+
+    background:var(--spj26rev-maroon-medium);
+    color:#fff;
+
+    font-size:9px;
+    font-weight:700;
+
+    cursor:pointer;
+}
+
+#spj26rev-active-root .spj26rev-action:hover{
+    background:var(--spj26rev-maroon-dark);
+}
+
+#spj26rev-active-root .spj26rev-empty{
+    min-height:190px;
+
+    padding:30px 18px;
+
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+
+    gap:7px;
+
+    color:#94a3b8;
+
+    text-align:center;
+}
+
+#spj26rev-active-root .spj26rev-empty .material-symbols-outlined{
+    color:#cbd5e1;
+    font-size:34px;
+}
+
+#spj26rev-active-root .spj26rev-empty strong{
+    color:#475569;
+
+    font-size:11px;
+    font-weight:800;
+}
+
+#spj26rev-active-root .spj26rev-empty span:not(.material-symbols-outlined){
+    max-width:440px;
+
+    font-size:9.5px;
+    line-height:1.5;
+}
+
+
+/* =========================================================
+   FOOTER
+========================================================= */
+
+#spj26rev-active-root .spj26rev-footer{
+    height:50px;
+    min-height:50px;
+
+    padding:0 28px;
+
+    border-top:1px solid var(--spj26rev-border);
+
+    background:#fff;
+
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+
+    gap:20px;
+
+    overflow:hidden;
+}
+
+#spj26rev-active-root .spj26rev-footer-left{
+    display:flex;
+    align-items:center;
+
+    gap:8px;
+
+    color:#6b5b58;
+
+    font-size:10px;
+}
+
+#spj26rev-active-root .spj26rev-footer-brand{
+    color:var(--spj26rev-maroon);
+
+    font-weight:800;
+}
+
+#spj26rev-active-root .spj26rev-footer-right{
+    color:#625451;
+
+    font-family:"JetBrains Mono",monospace;
+    font-size:9px;
+}
+
+
+
+/* =========================================================
+   TOAST
+========================================================= */
+
+#spj26rev-active-root .spj26rev-toast{
+    position:fixed;
+
+    right:22px;
+    bottom:22px;
+
+    z-index:300;
+
+    max-width:390px;
+
+    padding:12px 14px;
+
+    border:1px solid #a7f3d0;
+    border-radius:9px;
+
+    background:#ecfdf5;
+    color:#047857;
+
+    box-shadow:
+        0 12px 30px
+        rgba(15,23,42,.14);
+
+    font-size:10.5px;
+    line-height:1.45;
+}
+
+#spj26rev-active-root .spj26rev-overlay{
+    display:none;
+}
+
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media(max-width:1180px){
+
+    #spj26rev-active-root .spj26rev-body{
+        grid-template-columns:
+            240px
+            minmax(0,1fr);
+    }
+
+    #spj26rev-active-root .spj26rev-brand-divider,
+    #spj26rev-active-root .spj26rev-brand-description{
+        display:none;
+    }
+
+    #spj26rev-active-root .spj26rev-toolbar{
+        flex-wrap:wrap;
+        justify-content:flex-end;
+    }
+
+    #spj26rev-active-root .spj26rev-search{
+        width:210px;
+    }
+
+}
+
+@media(max-width:800px){
+
+    #spj26rev-active-root .spj26rev-header{
+        height:64px;
+        min-height:64px;
+
+        padding:8px 14px;
+    }
+
+    #spj26rev-active-root .spj26rev-mobile-menu{
+        display:flex;
+
+        width:38px;
+        height:38px;
+        flex:0 0 38px;
+
+        align-items:center;
+        justify-content:center;
+
+        border:1px solid var(--spj26rev-border);
+        border-radius:7px;
+
+        background:#fff;
+        color:var(--spj26rev-maroon);
+
+        cursor:pointer;
+    }
+
+    #spj26rev-active-root .spj26rev-logo{
+        width:38px;
+        height:38px;
+        flex-basis:38px;
+    }
+
+    #spj26rev-active-root .spj26rev-brand-name{
+        font-size:11px;
+    }
+
+    #spj26rev-active-root .spj26rev-faculty,
+    #spj26rev-active-root .spj26rev-user-text{
+        display:none;
+    }
+
+    #spj26rev-active-root .spj26rev-body{
+        display:block;
+
+        height:calc(100% - 64px);
+        min-height:0;
+
+        overflow:hidden;
+    }
+
+    #spj26rev-active-root .spj26rev-sidebar{
+        position:fixed;
+
+        top:0;
+        left:0;
+
+        width:270px;
+        height:100vh;
+        height:100dvh;
+
+        overflow-y:auto;
+        overflow-x:hidden;
+
+        transform:translateX(-102%);
+
+        transition:transform .22s ease;
+
+        box-shadow:
+            8px 0 24px
+            rgba(15,23,42,.14);
+
+        z-index:100;
+    }
+
+    #spj26rev-active-root .spj26rev-sidebar.open{
+        transform:translateX(0);
+    }
+
+    #spj26rev-active-root .spj26rev-overlay{
+        position:fixed;
+
+        inset:0;
+
+        z-index:90;
+
+        background:rgba(15,23,42,.40);
+    }
+
+    #spj26rev-active-root .spj26rev-overlay.open{
+        display:block;
+    }
+
+    #spj26rev-active-root .spj26rev-rightpane{
+        height:100%;
+
+        grid-template-rows:
+            minmax(0,1fr)
+            auto;
+
+        overflow:hidden;
+    }
+
+    #spj26rev-active-root .spj26rev-main{
+        padding:18px 14px 22px;
+    }
+
+    #spj26rev-active-root .spj26rev-page-head{
+        align-items:flex-start;
+        flex-direction:column;
+    }
+
+    #spj26rev-active-root .spj26rev-count-box{
+        width:100%;
+        text-align:left;
+    }
+
+    #spj26rev-active-root .spj26rev-card-head{
+        align-items:stretch;
+        flex-direction:column;
+    }
+
+    #spj26rev-active-root .spj26rev-toolbar{
+        width:100%;
+        justify-content:stretch;
+    }
+
+    #spj26rev-active-root .spj26rev-search{
+        width:100%;
+        flex:1 1 auto;
+    }
+
+    #spj26rev-active-root .spj26rev-detail-grid{
+        grid-template-columns:1fr;
+    }
+
+    #spj26rev-active-root .spj26rev-detail-item.full{
+        grid-column:auto;
+    }
+
+    #spj26rev-active-root .spj26rev-footer{
+        height:auto;
+        min-height:50px;
+
+        padding:8px 14px;
+
+        align-items:flex-start;
+        justify-content:center;
+
+        flex-direction:column;
+
+        gap:3px;
+    }
+
+}
+
+
+/* =========================================================
+   REVIEWER WORKFLOW SYNC v2
+   Sidebar canonical mengikuti page Pemeriksaan Saya
+========================================================= */
+
+#spj26rev-active-root .spj26rev-sidebar{
+    position:relative;
+    height:100%;
+    min-height:0;
+    padding:18px 16px 14px;
+    background:#fff;
+    border-right:1px solid #e2e8f0;
+    display:flex;
+    flex-direction:column;
+    justify-content:space-between;
+    overflow:hidden;
+    z-index:30;
+}
+
+#spj26rev-active-root .spj26rev-sidebar-main{min-height:0;}
+
+#spj26rev-active-root .spj26rev-nav-title{
+    margin:4px 8px 7px;
+    color:#6c5a57;
+    font-size:10px;
+    font-weight:700;
+    text-transform:uppercase;
+    letter-spacing:.04em;
+}
+
+#spj26rev-active-root .spj26rev-nav{
+    display:flex;
+    flex-direction:column;
+    gap:5px;
+}
+
+#spj26rev-active-root .spj26rev-nav-link{
+    width:100%;
+    min-height:42px;
+    padding:9px 13px;
+    border-radius:6px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+    color:#5b4744;
+    font-size:13px;
+    font-weight:500;
+    transition:background-color .18s ease,color .18s ease;
+}
+
+#spj26rev-active-root .spj26rev-nav-link:hover{
+    background:#f8fafc;
+    color:#0f172a;
+}
+
+#spj26rev-active-root .spj26rev-nav-link.active{
+    background:#941c1c;
+    color:#fff;
+    font-weight:700;
+}
+
+#spj26rev-active-root .spj26rev-nav-left{
+    min-width:0;
+    display:flex;
+    align-items:center;
+    gap:10px;
+}
+
+#spj26rev-active-root .spj26rev-nav-link .material-symbols-outlined{font-size:19px;}
+
+#spj26rev-active-root .spj26rev-nav-notification{
+    position:relative;
+    width:30px;
+    min-width:30px;
+    height:28px;
+    flex:0 0 30px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+}
+
+#spj26rev-active-root .spj26rev-nav-badge{
+    min-width:22px;
+    height:22px;
+    padding:0 6px;
+    border-radius:999px;
+    background:#fee2e2;
+    color:#800000;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:9px;
+    line-height:1;
+    font-weight:800;
+}
+
+#spj26rev-active-root .spj26rev-nav-link.active .spj26rev-nav-badge{
+    background:rgba(255,255,255,.16);
+    color:#fff;
+}
+
+#spj26rev-active-root .spj26rev-nav-dot{
+    position:absolute;
+    top:0;
+    right:0;
+    width:8px;
+    height:8px;
+    border:2px solid #fff;
+    border-radius:50%;
+    background:#ef4444;
+}
+
+#spj26rev-active-root .spj26rev-nav-link.active .spj26rev-nav-dot{
+    border-color:#941c1c;
+    background:#fde68a;
+}
+
+#spj26rev-active-root .spj26rev-nav-dot[hidden]{display:none !important;}
+
+#spj26rev-active-root .spj26rev-nav-section-gap{height:20px;}
+
+#spj26rev-active-root .spj26rev-sidebar-info{
+    padding:14px 15px;
+    border-radius:7px;
+    background:#f8fafc;
+}
+
+#spj26rev-active-root .spj26rev-sidebar-info-title{
+    display:flex;
+    align-items:center;
+    gap:7px;
+    color:#800000;
+    font-size:10px;
+    font-weight:700;
+}
+
+#spj26rev-active-root .spj26rev-sidebar-info-title .material-symbols-outlined{font-size:16px;}
+
+#spj26rev-active-root .spj26rev-version{
+    margin-top:5px;
+    color:#594b48;
+    font-family:"JetBrains Mono",monospace;
+    font-size:10px;
+}
+
+#spj26rev-active-root .spj26rev-department{
+    margin-top:4px;
+    color:#665855;
+    font-size:10px;
+    line-height:1.45;
+}
+
+
+
+/* =========================================================
+   TRUE FULLPAGE - BYPASS ELEMENTOR/THEME WRAPPER
+========================================================= */
+#spj26rev-active-root{
+    position:fixed !important;
+    inset:0 !important;
+    z-index:9999 !important;
+    width:100vw !important;
+    max-width:none !important;
+    height:100vh !important;
+    height:100dvh !important;
+    margin:0 !important;
+    padding:0 !important;
+}
+
+</style>
+
+
+<div id="spj26rev-active-root">
+
+    <div
+        class="spj26rev-overlay"
+        id="spj26rev-active-overlay"
+    ></div>
+
+
+    <!-- HEADER -->
+    <header class="spj26rev-header">
+
+        <div class="spj26rev-header-left">
+
+            <button
+                class="spj26rev-mobile-menu"
+                id="spj26rev-active-menu-button"
+                type="button"
+                aria-label="Buka menu"
+            >
+                <span class="material-symbols-outlined">menu</span>
+            </button>
+
+            <div class="spj26rev-logo">
+                <span class="material-symbols-outlined">fact_check</span>
+            </div>
+
+            <div class="spj26rev-brand">
+
+                <div class="spj26rev-brand-row">
+
+                    <div class="spj26rev-brand-name">
+                        SIPATUJU PPDS
+                    </div>
+
+                    <div class="spj26rev-brand-divider">|</div>
+
+                    <div class="spj26rev-brand-description">
+                        Sistem Pemeriksaan Kelayakan Jurnal PPDS FK UNHAS
+                    </div>
+
+                </div>
+
+                <div class="spj26rev-faculty">
+                    Fakultas Kedokteran • Akreditasi Unggul
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="spj26rev-header-right">
+
+            <div class="spj26rev-user">
+
+                <div class="spj26rev-user-text">
+
+                    <span
+                        class="spj26rev-user-name"
+                        id="spj26rev-active-user-name"
+                    >
+                        Reviewer
+                    </span>
+
+                    <span class="spj26rev-user-role">
+                        Reviewer
+                    </span>
+
+                </div>
+
+                <div class="spj26rev-avatar">
+                    <span class="material-symbols-outlined">person_search</span>
+                </div>
+
+            </div>
+
+        </div>
+
+    </header>
+
+
+    <div class="spj26rev-body">
+
+        <!-- SIDEBAR -->
+        <aside
+            class="spj26rev-sidebar"
+            id="spj26rev-active-sidebar"
+        >
+
+            <div class="spj26rev-sidebar-main">
+
+                <div class="spj26rev-nav-title">
+                    Menu Reviewer
+                </div>
+
+                <nav class="spj26rev-nav">
+
+                    <a
+                        class="spj26rev-nav-link"
+                        href="/reviewer-sipatuju/"
+                    >
+                        <span class="spj26rev-nav-left">
+                            <span class="material-symbols-outlined">grid_view</span>
+                            <span>Dashboard</span>
+                        </span>
+                    </a>
+
+                    <a
+                        class="spj26rev-nav-link"
+                        href="/reviewer-sipatuju/pengajuan-tersedia/"
+                    >
+                        <span class="spj26rev-nav-left">
+                            <span class="material-symbols-outlined">inbox</span>
+                            <span>Pengajuan Tersedia</span>
+                        </span>
+                    </a>
+
+                    <a
+                        class="spj26rev-nav-link active"
+                        href="/reviewer-sipatuju/pemeriksaan-saya/"
+                    >
+                        <span class="spj26rev-nav-left">
+                            <span class="material-symbols-outlined">rate_review</span>
+                            <span>Pemeriksaan Saya</span>
+                        </span>
+
+                        <span
+                            class="spj26rev-nav-badge"
+                            id="spj26rev-active-nav-count"
+                        >0</span>
+                    </a>
+
+                    <a
+                        class="spj26rev-nav-link"
+                        href="/reviewer-sipatuju/riwayat-pemeriksaan/"
+                    >
+                        <span class="spj26rev-nav-left">
+                            <span class="material-symbols-outlined">history</span>
+                            <span>Riwayat Pemeriksaan</span>
+                        </span>
+                    </a>
+
+                </nav>
+
+
+                <div class="spj26rev-nav-section-gap"></div>
+
+
+                <div class="spj26rev-nav-title">
+                    Akun
+                </div>
+
+                <nav class="spj26rev-nav">
+
+                    <a
+                        class="spj26rev-nav-link"
+                        href="/reviewer-sipatuju/profil/"
+                    >
+                        <span class="spj26rev-nav-left">
+                            <span class="material-symbols-outlined">manage_accounts</span>
+                            <span>Profil &amp; Password</span>
+                        </span>
+                    </a>
+
+                    <a
+                        class="spj26rev-nav-link"
+                        id="spj26rev-logout"
+                        href="#"
+                        data-spj26-logout
+                    >
+                        <span class="spj26rev-nav-left">
+                            <span class="material-symbols-outlined">logout</span>
+                            <span>Logout</span>
+                        </span>
+                    </a>
+
+                </nav>
+
+            </div>
+
+
+            <div class="spj26rev-sidebar-info">
+
+                <div class="spj26rev-sidebar-info-title">
+                    <span class="material-symbols-outlined">verified</span>
+                    <span>PPDS FK UNHAS</span>
+                </div>
+
+                <div class="spj26rev-version">
+                    Versi Sistem 2026.1
+                </div>
+
+                <div class="spj26rev-department">
+                    Program Pendidikan Dokter Spesialis
+                </div>
+
+            </div>
+
+        </aside>
+
+
+        <!-- RIGHT PANE -->
+        <div class="spj26rev-rightpane">
+
+            <main class="spj26rev-main">
+
+                <div class="spj26rev-content">
+
+                    <div class="spj26rev-page-head">
+
+                        <div>
+
+                            <div class="spj26rev-page-kicker">
+                                <span class="material-symbols-outlined">rate_review</span>
+                                <span>Reviewer Workspace</span>
+                            </div>
+
+                            <h1 class="spj26rev-page-title">
+                                Pemeriksaan Saya
+                            </h1>
+
+                            <p class="spj26rev-page-subtitle">
+                                Pengajuan yang telah Anda ambil atau ditugaskan oleh Admin. Buka pemeriksaan untuk menilai ketiga jurnal kandidat dalam satu form.
+                            </p>
+
+                        </div>
+
+
+                        <div class="spj26rev-count-box">
+
+                            <div class="spj26rev-count-label">
+                                Pemeriksaan Aktif
+                            </div>
+
+                            <div
+                                class="spj26rev-count-number"
+                                id="spj26rev-active-count"
+                            >
+                                0
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <section class="spj26rev-card">
+
+                        <div class="spj26rev-card-head">
+
+                            <div>
+
+                                <div class="spj26rev-card-title">
+                                    Daftar Pemeriksaan Aktif
+                                </div>
+
+                                <div class="spj26rev-card-subtitle">
+                                    Hanya pengajuan berstatus Dalam Pemeriksaan yang ditugaskan kepada akun Reviewer Anda.
+                                </div>
+
+                            </div>
+
+
+                            <div class="spj26rev-toolbar">
+
+                                <input
+                                    class="spj26rev-search"
+                                    id="spj26rev-active-search"
+                                    type="search"
+                                    placeholder="Cari kode, Residen, NIM, atau judul..."
+                                    autocomplete="off"
+                                >
+
+                                <button
+                                    class="spj26rev-refresh-btn"
+                                    id="spj26rev-active-refresh"
+                                    type="button"
+                                >
+                                    <span class="material-symbols-outlined">refresh</span>
+                                    <span>Perbarui</span>
+                                </button>
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="spj26rev-table-wrap">
+
+                            <table class="spj26rev-table">
+
+                                <thead>
+                                    <tr>
+                                        <th>Kode</th>
+                                        <th>Residen</th>
+                                        <th>Artikel</th>
+                                        <th>Ditugaskan</th>
+                                        <th>Status</th>
+                                        <th>Aksi</th>
+                                    </tr>
+                                </thead>
+
+                                <tbody id="spj26rev-active-body"></tbody>
+
+                            </table>
+
+                        </div>
+
+                    </section>
+
+                </div>
+
+            </main>
+
+
+            <footer class="spj26rev-footer">
+
+                <div class="spj26rev-footer-left">
+                    <span class="spj26rev-footer-brand">SIPATUJU PPDS</span>
+                    <span>•</span>
+                    <span>Fakultas Kedokteran Universitas Hasanuddin</span>
+                </div>
+
+                <div class="spj26rev-footer-right">
+                    PPDS FK UNHAS - Versi Sistem 2026.1
+                </div>
+
+            </footer>
+
+        </div>
+
+    </div>
+
+
+    <div
+        class="spj26rev-toast"
+        id="spj26rev-active-toast"
+        hidden
+    ></div>
+
+</div>
+
+
+<script>
+(function(){
+
+    document.documentElement.classList.add(
+        'spj26rev-page-lock'
+    );
+
+    document.body.classList.add(
+        'spj26rev-page-lock'
+    );
+
+
+    const root =
+        document.getElementById(
+            'spj26rev-active-root'
+        );
+
+    if(!root) return;
+
+
+    const isElementorEditor =
+        document.body.classList.contains(
+            'elementor-editor-active'
+        )
+        ||
+        /(?:^|[?&])elementor-preview=/.test(
+            window.location.search
+        );
+
+    if(
+        !isElementorEditor
+        &&
+        root.parentElement !== document.body
+    ){
+        document.body.appendChild(root);
+    }
+
+
+    let activeSubmissions = [];
+    let filteredSubmissions = [];
+    let currentSubmission = null;
+
+
+    /* =====================================================
+       BASIC UI
+    ===================================================== */
+
+    const menuButton =
+        root.querySelector(
+            '#spj26rev-active-menu-button'
+        );
+
+    const sidebar =
+        root.querySelector(
+            '#spj26rev-active-sidebar'
+        );
+
+    const overlay =
+        root.querySelector(
+            '#spj26rev-active-overlay'
+        );
+
+    const toast =
+        root.querySelector(
+            '#spj26rev-active-toast'
+        );
+
+
+    function openSidebar(){
+
+        if(sidebar){
+            sidebar.classList.add('open');
+        }
+
+        if(overlay){
+            overlay.classList.add('open');
+        }
+
+    }
+
+
+    function closeSidebar(){
+
+        if(sidebar){
+            sidebar.classList.remove('open');
+        }
+
+        if(overlay){
+            overlay.classList.remove('open');
+        }
+
+    }
+
+
+    if(menuButton){
+
+        menuButton.addEventListener(
+            'click',
+            openSidebar
+        );
+
+    }
+
+
+    if(overlay){
+
+        overlay.addEventListener(
+            'click',
+            closeSidebar
+        );
+
+    }
+
+
+    root
+        .querySelectorAll(
+            '.spj26rev-sidebar a'
+        )
+        .forEach(function(link){
+
+            link.addEventListener(
+                'click',
+                function(){
+
+                    if(
+                        window.innerWidth <= 800
+                    ){
+
+                        closeSidebar();
+
+                    }
+
+                }
+            );
+
+        });
+
+
+    function setText(
+        id,
+        value
+    ){
+
+        const element =
+            root.querySelector(
+                '#' + id
+            );
+
+
+        if(element){
+
+            element.textContent =
+                String(
+                    value ?? ''
+                );
+
+        }
+
+    }
+
+
+    function showToast(message){
+
+        if(!toast) return;
+
+
+        toast.textContent =
+            String(
+                message || ''
+            );
+
+        toast.hidden =
+            false;
+
+
+        window.setTimeout(
+            function(){
+
+                toast.hidden =
+                    true;
+
+            },
+            3200
+        );
+
+    }
+
+
+    function createEl(
+        tag,
+        className,
+        text
+    ){
+
+        const element =
+            document.createElement(
+                tag
+            );
+
+
+        if(className){
+
+            element.className =
+                className;
+
+        }
+
+
+        if(
+            text !== undefined
+            &&
+            text !== null
+        ){
+
+            element.textContent =
+                text;
+
+        }
+
+
+        return element;
+    }
+
+
+    /* =====================================================
+       BACKEND
+    ===================================================== */
+
+    async function backendRequest(
+        action,
+        payload
+    ){
+
+        const config =
+            window.spj26ReviewerPortalConfig;
+
+
+        if(
+            !config
+            ||
+            !config.ajaxUrl
+            ||
+            !config.nonce
+        ){
+
+            throw new Error(
+                'Konfigurasi backend Reviewer belum tersedia.'
+            );
+
+        }
+
+
+        const body =
+            new URLSearchParams();
+
+
+        body.append(
+            'action',
+            action
+        );
+
+
+        body.append(
+            'nonce',
+            config.nonce
+        );
+
+
+        Object.keys(
+            payload || {}
+        )
+        .forEach(function(key){
+
+            body.append(
+                key,
+                payload[key]
+            );
+
+        });
+
+
+        const response =
+            await fetch(
+                config.ajaxUrl,
+                {
+                    method:'POST',
+                    credentials:'same-origin',
+                    headers:{
+                        'Content-Type':
+                            'application/x-www-form-urlencoded; charset=UTF-8'
+                    },
+                    body:
+                        body.toString()
+                }
+            );
+
+
+        const result =
+            await response.json();
+
+
+        if(
+            !result
+            ||
+            result.success !== true
+        ){
+
+            const message =
+                result
+                &&
+                result.data
+                &&
+                result.data.message
+                ? result.data.message
+                : 'Permintaan ke server gagal.';
+
+
+            throw new Error(
+                message
+            );
+
+        }
+
+
+        return result.data;
+
+    }
+
+
+    /* =====================================================
+       IDENTITY
+    ===================================================== */
+
+    function renderIdentity(){
+
+        const config =
+            window.spj26ReviewerPortalConfig;
+
+
+        if(!config) return;
+
+
+        setText(
+            'spj26rev-active-user-name',
+            config.name || 'Reviewer'
+        );
+
+
+        const logout =
+            root.querySelector(
+                '#spj26rev-logout'
+            );
+
+
+        if(
+            logout
+            &&
+            config.logoutUrl
+        ){
+
+            logout.href =
+                config.logoutUrl;
+
+        }
+
+    }
+
+
+    /* =====================================================
+       EMPTY STATE
+    ===================================================== */
+
+    function renderEmptyRow(
+        title,
+        message
+    ){
+
+        const tbody =
+            root.querySelector(
+                '#spj26rev-active-body'
+            );
+
+
+        if(!tbody) return;
+
+
+        tbody.innerHTML =
+            '';
+
+
+        const row =
+            document.createElement(
+                'tr'
+            );
+
+
+        const cell =
+            document.createElement(
+                'td'
+            );
+
+
+        cell.colSpan =
+            6;
+
+
+        const empty =
+            createEl(
+                'div',
+                'spj26rev-empty'
+            );
+
+
+        empty.appendChild(
+            createEl(
+                'span',
+                'material-symbols-outlined',
+                'rate_review'
+            )
+        );
+
+
+        empty.appendChild(
+            createEl(
+                'strong',
+                '',
+                title
+            )
+        );
+
+
+        empty.appendChild(
+            createEl(
+                'span',
+                '',
+                message
+            )
+        );
+
+
+        cell.appendChild(
+            empty
+        );
+
+
+        row.appendChild(
+            cell
+        );
+
+
+        tbody.appendChild(
+            row
+        );
+
+    }
+
+
+    /* =====================================================
+       TABLE
+    ===================================================== */
+
+    function buildResidentCell(item){
+
+        const cell =
+            document.createElement(
+                'td'
+            );
+
+
+        cell.appendChild(
+            createEl(
+                'div',
+                'spj26rev-name',
+                item.resident_name || '-'
+            )
+        );
+
+
+        cell.appendChild(
+            createEl(
+                'div',
+                'spj26rev-subtext',
+                [
+                    item.resident_nim,
+                    item.resident_program
+                ]
+                .filter(Boolean)
+                .join(' • ') || '-'
+            )
+        );
+
+
+        return cell;
+    }
+
+
+    function buildArticleCell(item){
+
+        const cell =
+            document.createElement(
+                'td'
+            );
+
+
+        cell.appendChild(
+            createEl(
+                'div',
+                'spj26rev-name',
+                item.article_title || '-'
+            )
+        );
+
+
+        cell.appendChild(
+            createEl(
+                'div',
+                'spj26rev-subtext',
+                item.article_type || '-'
+            )
+        );
+
+
+        return cell;
+    }
+
+
+    function renderTable(){
+
+        const tbody =
+            root.querySelector(
+                '#spj26rev-active-body'
+            );
+
+
+        if(!tbody) return;
+
+
+        setText(
+            'spj26rev-active-count',
+            filteredSubmissions.length
+        );
+
+
+        setText(
+            'spj26rev-active-nav-count',
+            activeSubmissions.length
+        );
+
+
+        if(
+            activeSubmissions.length === 0
+        ){
+
+            renderEmptyRow(
+                'Belum ada pemeriksaan aktif',
+                'Pengajuan yang Anda ambil atau yang ditugaskan oleh Admin akan muncul di halaman ini.'
+            );
+
+            return;
+
+        }
+
+
+        if(
+            filteredSubmissions.length === 0
+        ){
+
+            renderEmptyRow(
+                'Pemeriksaan tidak ditemukan',
+                'Tidak ada pemeriksaan aktif yang sesuai dengan kata kunci pencarian.'
+            );
+
+            return;
+
+        }
+
+
+        tbody.innerHTML =
+            '';
+
+
+        filteredSubmissions
+            .forEach(function(item){
+
+                const row =
+                    document.createElement(
+                        'tr'
+                    );
+
+
+                const codeCell =
+                    document.createElement(
+                        'td'
+                    );
+
+
+                codeCell.appendChild(
+                    createEl(
+                        'div',
+                        'spj26rev-code',
+                        item.code || '-'
+                    )
+                );
+
+
+                const residentCell =
+                    buildResidentCell(
+                        item
+                    );
+
+
+                const articleCell =
+                    buildArticleCell(
+                        item
+                    );
+
+
+                const dateCell =
+                    createEl(
+                        'td',
+                        '',
+                        item.assigned_at || '-'
+                    );
+
+
+                const statusCell =
+                    document.createElement(
+                        'td'
+                    );
+
+
+                statusCell.appendChild(
+                    createEl(
+                        'span',
+                        'spj26rev-status',
+                        item.status_label ||
+                        'Dalam Pemeriksaan'
+                    )
+                );
+
+
+                const actionCell =
+                    document.createElement(
+                        'td'
+                    );
+
+
+                const openButton =
+                    createEl(
+                        'button',
+                        'spj26rev-action',
+                        'Buka Pemeriksaan'
+                    );
+
+
+                openButton.type =
+                    'button';
+
+
+                openButton.addEventListener(
+                    'click',
+                    function(){
+
+                        window.location.href =
+                            '/reviewer-sipatuju/pemeriksaan-jurnal/?submission_id=' +
+                            encodeURIComponent(
+                                item.id
+                            );
+
+                    }
+                );
+
+
+                actionCell.appendChild(
+                    openButton
+                );
+
+
+                row.appendChild(
+                    codeCell
+                );
+
+                row.appendChild(
+                    residentCell
+                );
+
+                row.appendChild(
+                    articleCell
+                );
+
+                row.appendChild(
+                    dateCell
+                );
+
+                row.appendChild(
+                    statusCell
+                );
+
+                row.appendChild(
+                    actionCell
+                );
+
+
+                tbody.appendChild(
+                    row
+                );
+
+            });
+
+    }
+
+
+    /* =====================================================
+       SEARCH
+    ===================================================== */
+
+    const searchInput =
+        root.querySelector(
+            '#spj26rev-active-search'
+        );
+
+
+    function applySearch(){
+
+        const query =
+            searchInput
+            ? searchInput.value
+                .trim()
+                .toLowerCase()
+            : '';
+
+
+        if(!query){
+
+            filteredSubmissions =
+                activeSubmissions.slice();
+
+
+            renderTable();
+
+
+            return;
+
+        }
+
+
+        filteredSubmissions =
+            activeSubmissions
+                .filter(function(item){
+
+                    const haystack =
+                        [
+                            item.code,
+                            item.resident_name,
+                            item.resident_nim,
+                            item.resident_program,
+                            item.article_title,
+                            item.article_type,
+                            item.supervisor_name
+                        ]
+                        .filter(Boolean)
+                        .join(' ')
+                        .toLowerCase();
+
+
+                    return haystack.includes(
+                        query
+                    );
+
+                });
+
+
+        renderTable();
+
+    }
+
+
+    if(searchInput){
+
+        searchInput.addEventListener(
+            'input',
+            applySearch
+        );
+
+    }
+
+
+    /* =====================================================
+       LOAD DATA
+    ===================================================== */
+
+    async function loadActive(){
+
+        try{
+
+            const data =
+                await backendRequest(
+                    'spj26_reviewer_dashboard_data',
+                    {}
+                );
+
+
+            activeSubmissions =
+                Array.isArray(
+                    data.active
+                )
+                ? data.active
+                : [];
+
+
+            filteredSubmissions =
+                activeSubmissions.slice();
+
+
+            if(searchInput){
+
+                searchInput.value =
+                    '';
+
+            }
+
+
+            renderTable();
+
+
+        }catch(error){
+
+            console.error(
+                'SIPATUJU Reviewer - Pemeriksaan Saya:',
+                error
+            );
+
+
+            activeSubmissions =
+                [];
+
+
+            filteredSubmissions =
+                [];
+
+
+            renderTable();
+
+
+            showToast(
+                error.message ||
+                'Data Pemeriksaan Saya gagal dimuat.'
+            );
+
+        }
+
+    }
+
+
+    const refreshButton =
+        root.querySelector(
+            '#spj26rev-active-refresh'
+        );
+
+
+    if(refreshButton){
+
+        refreshButton.addEventListener(
+            'click',
+            loadActive
+        );
+
+    }
+
+
+    /* =====================================================
+       INITIAL
+    ===================================================== */
+
+    function initializeActivePage(){
+
+        if(
+            !window.spj26ReviewerPortalConfig
+            ||
+            !window.spj26ReviewerPortalConfig.ajaxUrl
+            ||
+            !window.spj26ReviewerPortalConfig.nonce
+        ){
+
+            console.error(
+                'SIPATUJU Reviewer: spj26ReviewerPortalConfig tidak ditemukan.'
+            );
+
+
+            showToast(
+                'Konfigurasi backend Reviewer belum tersedia.'
+            );
+
+
+            return;
+
+        }
+
+
+        renderIdentity();
+        loadActive();
+
+        window.setInterval(
+            loadActive,
+            30000
+        );
+
+    }
+
+
+    if(
+        document.readyState ===
+        'complete'
+    ){
+
+        initializeActivePage();
+
+    }else{
+
+        window.addEventListener(
+            'load',
+            initializeActivePage,
+            { once:true }
+        );
+
+    }
+
+})();
+</script>
+
+<script>
+(function(){
+    const root = document.getElementById("spj26rev-active-root");
+    if(!root) return;
+
+    const CURRENT_SECTION = "active";
+    const STORAGE_VERSION = 'v2';
+
+    const PATHS = {
+        available:'/reviewer-sipatuju/pengajuan-tersedia/',
+        active:'/reviewer-sipatuju/pemeriksaan-saya/',
+        completed:'/reviewer-sipatuju/riwayat-pemeriksaan/'
+    };
+
+    function normalizePath(value){
+        try{
+            return new URL(value, window.location.origin).pathname.replace(/\/+$/, '') + '/';
+        }catch(error){
+            return '';
+        }
+    }
+
+    function findNavLink(path){
+        const wanted = normalizePath(path);
+        const links = root.querySelectorAll('.spj26rev-nav-link[href]');
+
+        for(const link of links){
+            if(normalizePath(link.getAttribute('href')) === wanted){
+                return link;
+            }
+        }
+
+        return null;
+    }
+
+    function ensureIndicator(section){
+        const link = findNavLink(PATHS[section]);
+        if(!link) return null;
+
+        Array.from(link.children).forEach(function(node){
+            if(
+                node.classList
+                &&
+                (
+                    node.classList.contains('spj26rev-nav-badge')
+                    ||
+                    node.classList.contains('spj26rev-nav-count')
+                    ||
+                    node.classList.contains('spj26rev-nav-notification')
+                )
+            ){
+                node.remove();
+            }
+        });
+
+        const wrap = document.createElement('span');
+        wrap.className = 'spj26rev-nav-notification';
+
+        const badge = document.createElement('span');
+        badge.className = 'spj26rev-nav-badge';
+        badge.textContent = '0';
+
+        const dot = document.createElement('span');
+        dot.className = 'spj26rev-nav-dot';
+        dot.hidden = true;
+
+        wrap.appendChild(badge);
+        wrap.appendChild(dot);
+        link.appendChild(wrap);
+
+        return {link:link,wrap:wrap,badge:badge,dot:dot};
+    }
+
+    const indicators = {
+        available:ensureIndicator('available'),
+        active:ensureIndicator('active'),
+        completed:ensureIndicator('completed')
+    };
+
+    function getConfig(){
+        return window.spj26ReviewerPortalConfig || null;
+    }
+
+    function getIdentity(){
+        const cfg = getConfig() || {};
+        return String(cfg.username || cfg.name || 'reviewer')
+            .trim()
+            .replace(/[^a-zA-Z0-9_-]/g,'_');
+    }
+
+    function getStorageKey(){
+        return 'spj26rev_sidebar_seen_' + STORAGE_VERSION + '_' + getIdentity();
+    }
+
+    function buildSnapshot(items){
+        const result = {};
+        const list = Array.isArray(items) ? items : [];
+
+        list.forEach(function(item){
+            if(!item) return;
+
+            const key = String(item.id || item.code || '').trim();
+            if(!key) return;
+
+            const journals = Array.isArray(item.journals)
+                ? item.journals.map(function(journal){
+                    return {
+                        id:journal && journal.id ? String(journal.id) : '',
+                        order:journal && journal.order ? String(journal.order) : '',
+                        name:journal && journal.name ? String(journal.name) : '',
+                        issn:journal && journal.issn ? String(journal.issn) : '',
+                        quartile:journal && journal.quartile ? String(journal.quartile) : '',
+                        link:journal && journal.link ? String(journal.link) : '',
+                        decision:journal && journal.decision ? String(journal.decision) : '',
+                        comment:journal && journal.comment ? String(journal.comment) : ''
+                    };
+                })
+                : [];
+
+            result[key] = JSON.stringify({
+                code:item.code ? String(item.code) : '',
+                status:item.status ? String(item.status) : '',
+                status_label:item.status_label ? String(item.status_label) : '',
+                assigned_at:item.assigned_at ? String(item.assigned_at) : '',
+                updated_at:item.updated_at ? String(item.updated_at) : '',
+                completed_at:item.completed_at ? String(item.completed_at) : '',
+                journals:journals
+            });
+        });
+
+        return result;
+    }
+
+    function diffCount(current, seen){
+        const keys = new Set([
+            ...Object.keys(current || {}),
+            ...Object.keys(seen || {})
+        ]);
+
+        let count = 0;
+
+        keys.forEach(function(key){
+            if((current || {})[key] !== (seen || {})[key]){
+                count += 1;
+            }
+        });
+
+        return count;
+    }
+
+    function readState(){
+        try{
+            const raw = window.localStorage.getItem(getStorageKey());
+            if(!raw) return null;
+
+            const parsed = JSON.parse(raw);
+            return parsed && typeof parsed === 'object'
+                ? parsed
+                : null;
+        }catch(error){
+            console.warn(
+                'SIPATUJU Reviewer: state notifikasi tidak dapat dibaca.',
+                error
+            );
+            return null;
+        }
+    }
+
+    function writeState(state){
+        try{
+            window.localStorage.setItem(
+                getStorageKey(),
+                JSON.stringify(state)
+            );
+        }catch(error){
+            console.warn(
+                'SIPATUJU Reviewer: state notifikasi tidak dapat disimpan.',
+                error
+            );
+        }
+    }
+
+    function setIndicator(section,total,unread){
+        const indicator = indicators[section];
+        if(!indicator) return;
+
+        indicator.badge.textContent = String(total);
+        indicator.dot.hidden = unread <= 0;
+
+        indicator.wrap.title = unread > 0
+            ? unread + ' pembaruan belum dilihat'
+            : total + ' data saat ini';
+    }
+
+    async function requestData(){
+        const cfg = getConfig();
+
+        if(!cfg || !cfg.ajaxUrl || !cfg.nonce){
+            throw new Error('Konfigurasi Reviewer belum tersedia.');
+        }
+
+        const body = new URLSearchParams();
+        body.append('action','spj26_reviewer_dashboard_data');
+        body.append('nonce',cfg.nonce);
+
+        const response = await fetch(
+            cfg.ajaxUrl,
+            {
+                method:'POST',
+                credentials:'same-origin',
+                headers:{
+                    'Content-Type':'application/x-www-form-urlencoded; charset=UTF-8'
+                },
+                body:body.toString()
+            }
+        );
+
+        const result = await response.json();
+
+        if(!result || result.success !== true){
+            throw new Error(
+                result && result.data && result.data.message
+                    ? result.data.message
+                    : 'Data Reviewer gagal dimuat.'
+            );
+        }
+
+        return result.data || {};
+    }
+
+    async function refreshSidebar(){
+        try{
+            const data = await requestData();
+
+            const lists = {
+                available:Array.isArray(data.available) ? data.available : [],
+                active:Array.isArray(data.active) ? data.active : [],
+                completed:Array.isArray(data.completed) ? data.completed : []
+            };
+
+            const current = {
+                available:buildSnapshot(lists.available),
+                active:buildSnapshot(lists.active),
+                completed:buildSnapshot(lists.completed)
+            };
+
+            let state = readState();
+
+            if(!state){
+                state = {
+                    available:current.available,
+                    active:current.active,
+                    completed:current.completed
+                };
+            }
+
+            const unread = {
+                available:diffCount(current.available,state.available || {}),
+                active:diffCount(current.active,state.active || {}),
+                completed:diffCount(current.completed,state.completed || {})
+            };
+
+            if(CURRENT_SECTION === 'available'){
+                state.available = current.available;
+                unread.available = 0;
+            }
+
+            if(CURRENT_SECTION === 'active'){
+                state.active = current.active;
+                unread.active = 0;
+            }
+
+            if(CURRENT_SECTION === 'completed'){
+                state.completed = current.completed;
+                unread.completed = 0;
+            }
+
+            setIndicator('available',lists.available.length,unread.available);
+            setIndicator('active',lists.active.length,unread.active);
+            setIndicator('completed',lists.completed.length,unread.completed);
+
+            writeState(state);
+
+            window.dispatchEvent(
+                new CustomEvent(
+                    'spj26:reviewer-sidebar-sync',
+                    {detail:{data:data,unread:unread}}
+                )
+            );
+
+        }catch(error){
+            console.warn(
+                'SIPATUJU Reviewer: sinkronisasi notifikasi sidebar gagal.',
+                error
+            );
+        }
+    }
+
+    function init(){
+        refreshSidebar();
+        window.setInterval(refreshSidebar,30000);
+    }
+
+    if(document.readyState === 'complete'){
+        init();
+    }else{
+        window.addEventListener('load',init,{once:true});
+    }
+})();
+</script>

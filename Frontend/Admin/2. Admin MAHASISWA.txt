@@ -1,0 +1,6632 @@
+<!-- =========================================================
+     SIPATUJU PPDS FK UNHAS
+     PAGE      : MANAJEMEN MAHASISWA
+     WORDPRESS : 01 Admin Sipatuju - Mahasiswa
+     SLUG      : residen
+     URL       : /admin-sipatuju/residen/
+     ROLE      : Admin
+     FORMAT    : Elementor HTML Widget
+     NAMESPACE : spj26adm
+     ROOT      : #spj26adm-residen-root
+
+     Fungsi:
+     - Melihat daftar akun mahasiswa
+     - Melihat status akun aktif/nonaktif
+     - Melihat apakah akun pernah login
+     - Melihat login terakhir
+     - Melihat jumlah pengajuan
+     - Menambah akun mahasiswa satu per satu
+     - Import akun mahasiswa secara massal melalui file Excel
+     - Download template Excel untuk import massal
+     - Mengaktifkan / menonaktifkan akun
+     - Mengedit data mahasiswa langsung ke database WordPress
+     - Melihat detail mahasiswa
+
+     Data policy:
+     - Tidak ada dummy data.
+     - Tidak menggunakan localStorage untuk data operasional.
+     - Data Mahasiswa dibaca dari backend SIPATUJU / WordPress.
+     - Desktop: header dan sidebar tetap; hanya konten kanan yang scroll.
+     - Password akun minimal 8 karakter.
+     - Field password memiliki tombol lihat/sembunyikan password.
+     - Backend config ditunggu sampai wp_footer selesai dimuat.
+========================================================== -->
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:wght@600;700;800&family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap');
+
+#spj26adm-residen-root{
+    --spj26adm-maroon:#800000;
+    --spj26adm-maroon-dark:#5c0000;
+    --spj26adm-maroon-medium:#8b1e1e;
+    --spj26adm-primary:#6a020a;
+
+    --spj26adm-white:#ffffff;
+    --spj26adm-background:#f3f5f8;
+    --spj26adm-surface:#ffffff;
+    --spj26adm-surface-soft:#f8fafc;
+
+    --spj26adm-text:#0f172a;
+    --spj26adm-text-secondary:#475569;
+    --spj26adm-text-muted:#64748b;
+
+    --spj26adm-border:#e2e8f0;
+    --spj26adm-border-strong:#cbd5e1;
+
+    --spj26adm-green:#047857;
+    --spj26adm-green-bg:#ecfdf5;
+
+    --spj26adm-blue:#1d4ed8;
+    --spj26adm-blue-bg:#eff6ff;
+
+    --spj26adm-amber:#b45309;
+    --spj26adm-amber-bg:#fffbeb;
+
+    --spj26adm-red:#b91c1c;
+    --spj26adm-red-bg:#fef2f2;
+
+    width:100%;
+    height:100vh;
+    height:100dvh;
+    min-height:0;
+    margin:0;
+    padding:0;
+    overflow:hidden;
+    background:var(--spj26adm-background);
+    color:var(--spj26adm-text);
+    font-family:"Inter",Arial,sans-serif;
+    box-sizing:border-box;
+}
+
+#spj26adm-residen-root *,
+#spj26adm-residen-root *::before,
+#spj26adm-residen-root *::after{
+    box-sizing:border-box;
+}
+
+#spj26adm-residen-root h1,
+#spj26adm-residen-root h2,
+#spj26adm-residen-root h3,
+#spj26adm-residen-root p{
+    margin:0;
+}
+
+#spj26adm-residen-root a{
+    color:inherit;
+    text-decoration:none;
+}
+
+#spj26adm-residen-root button,
+#spj26adm-residen-root input,
+#spj26adm-residen-root select{
+    font:inherit;
+}
+
+#spj26adm-residen-root [hidden]{
+    display:none !important;
+}
+
+
+/* =========================================================
+   PAGE VIEWPORT LOCK
+   Desktop: browser/page utama tidak scroll.
+   Hanya area konten kanan yang dapat di-scroll.
+========================================================= */
+
+html.spj26adm-page-lock,
+body.spj26adm-page-lock{
+    width:100% !important;
+    height:100% !important;
+    min-height:100% !important;
+    margin:0 !important;
+    padding:0 !important;
+    overflow:hidden !important;
+}
+
+body.spj26adm-page-lock #page,
+body.spj26adm-page-lock .site,
+body.spj26adm-page-lock .site-content,
+body.spj26adm-page-lock .elementor,
+body.spj26adm-page-lock .elementor-section-wrap,
+body.spj26adm-page-lock .elementor-element,
+body.spj26adm-page-lock .elementor-widget,
+body.spj26adm-page-lock .elementor-widget-container{
+    max-height:none !important;
+}
+
+/* =========================================================
+   HEADER
+========================================================= */
+
+#spj26adm-residen-root .spj26adm-header{
+    height:76px;
+    min-height:76px;
+    position:relative;
+    z-index:50;
+    padding:0 30px;
+    background:#fff;
+    border-bottom:1px solid var(--spj26adm-border);
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:24px;
+    box-shadow:0 1px 2px rgba(15,23,42,.03);
+}
+
+#spj26adm-residen-root .spj26adm-header-left,
+#spj26adm-residen-root .spj26adm-header-right,
+#spj26adm-residen-root .spj26adm-user{
+    display:flex;
+    align-items:center;
+}
+
+#spj26adm-residen-root .spj26adm-header-left{
+    gap:14px;
+    min-width:0;
+}
+
+#spj26adm-residen-root .spj26adm-header-right{
+    gap:10px;
+    flex:0 0 auto;
+}
+
+#spj26adm-residen-root .spj26adm-logo{
+    width:48px;
+    height:48px;
+    flex:0 0 48px;
+    border-radius:8px;
+    background:var(--spj26adm-maroon);
+    color:#fff;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+}
+
+#spj26adm-residen-root .spj26adm-logo .material-symbols-outlined{
+    font-size:25px;
+}
+
+#spj26adm-residen-root .spj26adm-brand{
+    min-width:0;
+}
+
+#spj26adm-residen-root .spj26adm-brand-row{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    min-width:0;
+}
+
+#spj26adm-residen-root .spj26adm-brand-name{
+    font-family:"Plus Jakarta Sans",sans-serif;
+    color:var(--spj26adm-maroon);
+    font-size:15px;
+    font-weight:800;
+    letter-spacing:-.02em;
+    white-space:nowrap;
+}
+
+#spj26adm-residen-root .spj26adm-brand-divider{
+    color:#cbd5e1;
+}
+
+#spj26adm-residen-root .spj26adm-brand-description{
+    color:#6b5b58;
+    font-size:12px;
+    font-weight:500;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+}
+
+#spj26adm-residen-root .spj26adm-faculty{
+    margin-top:3px;
+    color:#695653;
+    font-family:"JetBrains Mono",monospace;
+    font-size:10px;
+    font-weight:600;
+    letter-spacing:.08em;
+    text-transform:uppercase;
+}
+
+#spj26adm-residen-root .spj26adm-user{
+    gap:10px;
+}
+
+#spj26adm-residen-root .spj26adm-user-text{
+    text-align:right;
+}
+
+#spj26adm-residen-root .spj26adm-user-name{
+    display:block;
+    font-family:"Plus Jakarta Sans",sans-serif;
+    font-size:13px;
+    font-weight:700;
+}
+
+#spj26adm-residen-root .spj26adm-user-role{
+    display:block;
+    margin-top:1px;
+    color:var(--spj26adm-maroon);
+    font-size:10px;
+    font-weight:700;
+}
+
+#spj26adm-residen-root .spj26adm-avatar{
+    width:38px;
+    height:38px;
+    border-radius:50%;
+    background:var(--spj26adm-maroon);
+    color:#fff;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+}
+
+#spj26adm-residen-root .spj26adm-mobile-menu{
+    display:none;
+}
+
+/* =========================================================
+   BODY / SIDEBAR
+========================================================= */
+
+#spj26adm-residen-root .spj26adm-body{
+    display:grid;
+    grid-template-columns:300px minmax(0,1fr);
+    height:calc(100% - 76px);
+    min-height:0;
+    align-items:stretch;
+    overflow:hidden;
+}
+
+#spj26adm-residen-root .spj26adm-sidebar{
+    position:relative;
+    height:100%;
+    padding:18px 16px 14px;
+    background:#fff;
+    border-right:1px solid var(--spj26adm-border);
+    display:flex;
+    flex-direction:column;
+    justify-content:space-between;
+    overflow:hidden;
+    z-index:30;
+}
+
+#spj26adm-residen-root .spj26adm-sidebar-main{
+    min-height:0;
+}
+
+#spj26adm-residen-root .spj26adm-nav-title{
+    margin:4px 8px 7px;
+    color:#6c5a57;
+    font-size:10px;
+    font-weight:700;
+    text-transform:uppercase;
+    letter-spacing:.04em;
+}
+
+#spj26adm-residen-root .spj26adm-nav{
+    display:flex;
+    flex-direction:column;
+    gap:5px;
+}
+
+#spj26adm-residen-root .spj26adm-nav-link{
+    width:100%;
+    min-height:42px;
+    padding:9px 13px;
+    border-radius:6px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+    color:#5b4744;
+    font-size:13px;
+    font-weight:500;
+    transition:background-color .18s ease,color .18s ease;
+}
+
+#spj26adm-residen-root .spj26adm-nav-link:hover{
+    background:var(--spj26adm-surface-soft);
+    color:var(--spj26adm-text);
+}
+
+#spj26adm-residen-root .spj26adm-nav-link.active{
+    background:#941c1c;
+    color:#fff;
+    font-weight:700;
+}
+
+#spj26adm-residen-root .spj26adm-nav-left{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    min-width:0;
+}
+
+#spj26adm-residen-root .spj26adm-nav-link .material-symbols-outlined{
+    font-size:19px;
+}
+
+#spj26adm-residen-root .spj26adm-nav-section-gap{
+    height:20px;
+}
+
+#spj26adm-residen-root .spj26adm-sidebar-info{
+    padding:14px 15px;
+    border-radius:7px;
+    background:#f8fafc;
+}
+
+#spj26adm-residen-root .spj26adm-sidebar-info-title{
+    display:flex;
+    align-items:center;
+    gap:7px;
+    color:var(--spj26adm-maroon);
+    font-size:10px;
+    font-weight:700;
+}
+
+#spj26adm-residen-root .spj26adm-sidebar-info-title .material-symbols-outlined{
+    font-size:16px;
+}
+
+#spj26adm-residen-root .spj26adm-version{
+    margin-top:5px;
+    color:#594b48;
+    font-family:"JetBrains Mono",monospace;
+    font-size:10px;
+}
+
+#spj26adm-residen-root .spj26adm-department{
+    margin-top:4px;
+    color:#665855;
+    font-size:10px;
+    line-height:1.45;
+}
+
+/* =========================================================
+   RIGHT PANE
+========================================================= */
+
+#spj26adm-residen-root .spj26adm-rightpane{
+    height:100%;
+    min-width:0;
+    min-height:0;
+    overflow-y:auto;
+    overflow-x:hidden;
+    overscroll-behavior:contain;
+    scrollbar-gutter:stable;
+}
+
+#spj26adm-residen-root .spj26adm-rightpane::-webkit-scrollbar{
+    width:8px;
+}
+
+#spj26adm-residen-root .spj26adm-rightpane::-webkit-scrollbar-track{
+    background:#eef2f6;
+}
+
+#spj26adm-residen-root .spj26adm-rightpane::-webkit-scrollbar-thumb{
+    background:#cbd5e1;
+    border-radius:999px;
+    border:2px solid #eef2f6;
+}
+
+#spj26adm-residen-root .spj26adm-main{
+    width:100%;
+    min-width:0;
+    padding:22px 30px 32px;
+    overflow-x:hidden;
+}
+
+#spj26adm-residen-root .spj26adm-content{
+    width:100%;
+    max-width:1320px;
+    margin:0 auto;
+}
+
+/* =========================================================
+   METRICS
+========================================================= */
+
+#spj26adm-residen-root .spj26adm-metrics{
+    display:grid;
+    grid-template-columns:repeat(4,minmax(0,1fr));
+    gap:14px;
+    margin-bottom:18px;
+}
+
+#spj26adm-residen-root .spj26adm-metric{
+    min-height:112px;
+    padding:17px;
+    border:1px solid var(--spj26adm-border);
+    border-radius:12px;
+    background:#fff;
+    display:flex;
+    align-items:flex-start;
+    justify-content:space-between;
+    gap:12px;
+    box-shadow:0 2px 6px rgba(15,23,42,.03);
+}
+
+#spj26adm-residen-root .spj26adm-metric-label{
+    color:#64748b;
+    font-size:10px;
+    line-height:1.4;
+    font-weight:700;
+    text-transform:uppercase;
+    letter-spacing:.04em;
+}
+
+#spj26adm-residen-root .spj26adm-metric-number{
+    margin-top:8px;
+    font-family:"Plus Jakarta Sans",sans-serif;
+    color:#111827;
+    font-size:28px;
+    line-height:1;
+    font-weight:800;
+}
+
+#spj26adm-residen-root .spj26adm-metric-note{
+    margin-top:6px;
+    color:#94a3b8;
+    font-size:9.5px;
+    line-height:1.35;
+}
+
+#spj26adm-residen-root .spj26adm-metric-icon{
+    width:38px;
+    height:38px;
+    border-radius:9px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+}
+
+#spj26adm-residen-root .spj26adm-metric-icon .material-symbols-outlined{
+    font-size:20px;
+}
+
+#spj26adm-residen-root .spj26adm-metric-icon.total{
+    background:#f5f3ff;
+    color:#6d28d9;
+}
+
+#spj26adm-residen-root .spj26adm-metric-icon.active{
+    background:var(--spj26adm-green-bg);
+    color:var(--spj26adm-green);
+}
+
+#spj26adm-residen-root .spj26adm-metric-icon.never{
+    background:var(--spj26adm-amber-bg);
+    color:var(--spj26adm-amber);
+}
+
+#spj26adm-residen-root .spj26adm-metric-icon.inactive{
+    background:var(--spj26adm-red-bg);
+    color:var(--spj26adm-red);
+}
+
+/* =========================================================
+   CARD
+========================================================= */
+
+#spj26adm-residen-root .spj26adm-card{
+    border:1px solid var(--spj26adm-border);
+    border-radius:13px;
+    background:#fff;
+    box-shadow:0 2px 6px rgba(15,23,42,.03);
+    overflow:hidden;
+}
+
+#spj26adm-residen-root .spj26adm-card-head{
+    min-height:68px;
+    padding:15px 17px;
+    border-bottom:1px solid #f1f5f9;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:14px;
+}
+
+#spj26adm-residen-root .spj26adm-card-title{
+    font-family:"Plus Jakarta Sans",sans-serif;
+    color:#111827;
+    font-size:14px;
+    font-weight:800;
+}
+
+#spj26adm-residen-root .spj26adm-card-subtitle{
+    margin-top:3px;
+    color:#94a3b8;
+    font-size:9.8px;
+    line-height:1.4;
+}
+
+#spj26adm-residen-root .spj26adm-add-btn{
+    min-height:38px;
+    padding:8px 13px;
+    border:0;
+    border-radius:8px;
+    background:var(--spj26adm-maroon-medium);
+    color:#fff;
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    gap:7px;
+    font-size:10px;
+    font-weight:800;
+    cursor:pointer;
+    white-space:nowrap;
+    transition:background .18s ease;
+}
+
+#spj26adm-residen-root .spj26adm-add-btn:hover{
+    background:var(--spj26adm-maroon-dark);
+}
+
+#spj26adm-residen-root .spj26adm-add-btn .material-symbols-outlined{
+    font-size:17px;
+}
+
+/* =========================================================
+   TOOLBAR
+========================================================= */
+
+#spj26adm-residen-root .spj26adm-toolbar{
+    padding:12px 14px;
+    border-bottom:1px solid #f1f5f9;
+    background:#fbfcfd;
+    display:grid;
+    grid-template-columns:minmax(240px,1fr) 190px 170px;
+    gap:10px;
+}
+
+#spj26adm-residen-root .spj26adm-search{
+    position:relative;
+}
+
+#spj26adm-residen-root .spj26adm-search .material-symbols-outlined{
+    position:absolute;
+    left:10px;
+    top:50%;
+    transform:translateY(-50%);
+    color:#94a3b8;
+    font-size:17px;
+    pointer-events:none;
+}
+
+#spj26adm-residen-root .spj26adm-search-input,
+#spj26adm-residen-root .spj26adm-filter{
+    width:100%;
+    min-height:38px;
+    border:1px solid #dbe3ec;
+    border-radius:8px;
+    background:#fff;
+    color:#475569;
+    outline:none;
+    font-size:10.5px;
+}
+
+#spj26adm-residen-root .spj26adm-search-input{
+    padding:8px 10px 8px 34px;
+}
+
+#spj26adm-residen-root .spj26adm-filter{
+    padding:8px 30px 8px 10px;
+}
+
+#spj26adm-residen-root .spj26adm-search-input:focus,
+#spj26adm-residen-root .spj26adm-filter:focus{
+    border-color:var(--spj26adm-maroon-medium);
+    box-shadow:0 0 0 3px rgba(139,30,30,.07);
+}
+
+/* =========================================================
+   TABLE
+========================================================= */
+
+#spj26adm-residen-root .spj26adm-table-wrap{
+    width:100%;
+    overflow-x:hidden;
+}
+
+#spj26adm-residen-root .spj26adm-table{
+    width:100%;
+    min-width:0;
+    table-layout:fixed;
+    border-collapse:collapse;
+}
+
+#spj26adm-residen-root .spj26adm-table th{
+    padding:10px 9px;
+    border-bottom:1px solid #e9eef4;
+    background:#f8fafc;
+    color:#64748b;
+    text-align:left;
+    font-size:9px;
+    font-weight:800;
+    text-transform:uppercase;
+    letter-spacing:.04em;
+}
+
+#spj26adm-residen-root .spj26adm-table td{
+    padding:12px 9px;
+    border-bottom:1px solid #f1f5f9;
+    vertical-align:middle;
+    color:#334155;
+    font-size:10.5px;
+    overflow-wrap:anywhere;
+}
+
+#spj26adm-residen-root .spj26adm-table tbody tr:last-child td{
+    border-bottom:0;
+}
+
+#spj26adm-residen-root .spj26adm-table tbody tr:hover{
+    background:#fcfcfd;
+}
+
+#spj26adm-residen-root .spj26adm-table th:nth-child(1),
+#spj26adm-residen-root .spj26adm-table td:nth-child(1){
+    width:13%;
+}
+
+#spj26adm-residen-root .spj26adm-table th:nth-child(2),
+#spj26adm-residen-root .spj26adm-table td:nth-child(2){
+    width:18%;
+}
+
+#spj26adm-residen-root .spj26adm-table th:nth-child(3),
+#spj26adm-residen-root .spj26adm-table td:nth-child(3){
+    width:22%;
+}
+
+#spj26adm-residen-root .spj26adm-table th:nth-child(4),
+#spj26adm-residen-root .spj26adm-table td:nth-child(4){
+    width:12%;
+}
+
+#spj26adm-residen-root .spj26adm-table th:nth-child(5),
+#spj26adm-residen-root .spj26adm-table td:nth-child(5){
+    width:15%;
+}
+
+#spj26adm-residen-root .spj26adm-table th:nth-child(6),
+#spj26adm-residen-root .spj26adm-table td:nth-child(6){
+    width:9%;
+}
+
+#spj26adm-residen-root .spj26adm-table th:nth-child(7),
+#spj26adm-residen-root .spj26adm-table td:nth-child(7){
+    width:11%;
+}
+
+#spj26adm-residen-root .spj26adm-nim{
+    font-family:"JetBrains Mono",monospace;
+    color:#475569;
+    font-size:9.5px;
+    font-weight:600;
+}
+
+#spj26adm-residen-root .spj26adm-name{
+    color:#111827;
+    font-size:10.5px;
+    font-weight:800;
+}
+
+#spj26adm-residen-root .spj26adm-subtext{
+    margin-top:3px;
+    color:#94a3b8;
+    font-size:8.8px;
+    line-height:1.35;
+}
+
+#spj26adm-residen-root .spj26adm-status{
+    display:inline-flex;
+    align-items:center;
+    gap:5px;
+    padding:5px 7px;
+    border-radius:999px;
+    font-size:8.8px;
+    line-height:1;
+    font-weight:800;
+    white-space:nowrap;
+}
+
+#spj26adm-residen-root .spj26adm-status::before{
+    content:"";
+    width:6px;
+    height:6px;
+    border-radius:50%;
+}
+
+#spj26adm-residen-root .spj26adm-status.active{
+    color:#047857;
+    background:#ecfdf5;
+    border:1px solid #a7f3d0;
+}
+
+#spj26adm-residen-root .spj26adm-status.active::before{
+    background:#10b981;
+}
+
+#spj26adm-residen-root .spj26adm-status.inactive{
+    color:#b91c1c;
+    background:#fef2f2;
+    border:1px solid #fecaca;
+}
+
+#spj26adm-residen-root .spj26adm-status.inactive::before{
+    background:#ef4444;
+}
+
+#spj26adm-residen-root .spj26adm-login-state{
+    font-size:9.5px;
+    font-weight:700;
+    color:#475569;
+}
+
+#spj26adm-residen-root .spj26adm-login-state.never{
+    color:#b45309;
+}
+
+#spj26adm-residen-root .spj26adm-action-group{
+    display:flex;
+    gap:6px;
+    flex-wrap:wrap;
+}
+
+#spj26adm-residen-root .spj26adm-action{
+    min-height:32px;
+    padding:7px 9px;
+    border:1px solid #d1d5db;
+    border-radius:7px;
+    background:#fff;
+    color:#475569;
+    font-size:9px;
+    font-weight:700;
+    cursor:pointer;
+    transition:all .18s ease;
+}
+
+#spj26adm-residen-root .spj26adm-action:hover{
+    background:#f8fafc;
+}
+
+#spj26adm-residen-root .spj26adm-action.danger{
+    color:#b91c1c;
+}
+
+#spj26adm-residen-root .spj26adm-action.activate{
+    color:#047857;
+}
+
+
+#spj26adm-residen-root .spj26adm-action.edit{
+    color:#1d4ed8;
+}
+
+#spj26adm-residen-root .spj26adm-action.edit:hover{
+    border-color:#bfdbfe;
+    background:#eff6ff;
+}
+
+#spj26adm-residen-root .spj26adm-action .material-symbols-outlined{
+    font-size:16px;
+    line-height:1;
+    vertical-align:middle;
+}
+
+#spj26adm-residen-root .spj26adm-action.edit{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    gap:5px;
+}
+
+#spj26adm-residen-root .spj26adm-edit-note{
+    margin-top:7px;
+    color:#64748b;
+    font-size:9px;
+    line-height:1.45;
+}
+
+#spj26adm-residen-root .spj26adm-edit-note strong{
+    color:#334155;
+}
+
+#spj26adm-residen-root .spj26adm-edit-password-note{
+    margin-top:7px;
+    padding:8px 10px;
+    border:1px solid #dbeafe;
+    border-radius:7px;
+    background:#eff6ff;
+    color:#1e40af;
+    font-size:9px;
+    line-height:1.45;
+}
+
+
+#spj26adm-residen-root .spj26adm-empty-state{
+    min-height:180px;
+    padding:28px 18px;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    gap:7px;
+    color:#94a3b8;
+    text-align:center;
+}
+
+#spj26adm-residen-root .spj26adm-empty-state .material-symbols-outlined{
+    margin-bottom:4px;
+    color:#cbd5e1;
+    font-size:32px;
+}
+
+#spj26adm-residen-root .spj26adm-empty-state strong{
+    color:#475569;
+    font-size:11px;
+    font-weight:800;
+}
+
+#spj26adm-residen-root .spj26adm-empty-state span:not(.material-symbols-outlined){
+    max-width:360px;
+    font-size:9.5px;
+    line-height:1.5;
+}
+
+/* =========================================================
+   MODALS
+========================================================= */
+
+#spj26adm-residen-root .spj26adm-modal-backdrop{
+    position:fixed;
+    inset:0;
+    z-index:200;
+    padding:20px;
+    background:rgba(15,23,42,.45);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+}
+
+#spj26adm-residen-root .spj26adm-modal{
+    width:min(560px,100%);
+    max-height:90vh;
+    overflow-y:auto;
+    border-radius:13px;
+    background:#fff;
+    box-shadow:0 22px 55px rgba(15,23,42,.22);
+}
+
+#spj26adm-residen-root .spj26adm-modal-head{
+    padding:17px 18px;
+    border-bottom:1px solid var(--spj26adm-border);
+    display:flex;
+    align-items:flex-start;
+    justify-content:space-between;
+    gap:14px;
+}
+
+#spj26adm-residen-root .spj26adm-modal-title{
+    font-family:"Plus Jakarta Sans",sans-serif;
+    font-size:15px;
+    font-weight:800;
+}
+
+#spj26adm-residen-root .spj26adm-modal-subtitle{
+    margin-top:4px;
+    color:#64748b;
+    font-size:9.8px;
+    line-height:1.45;
+}
+
+#spj26adm-residen-root .spj26adm-modal-close{
+    width:32px;
+    height:32px;
+    flex:0 0 32px;
+    border:0;
+    border-radius:7px;
+    background:#f8fafc;
+    color:#64748b;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    cursor:pointer;
+}
+
+#spj26adm-residen-root .spj26adm-modal-body{
+    padding:18px;
+}
+
+#spj26adm-residen-root .spj26adm-form-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:14px;
+}
+
+#spj26adm-residen-root .spj26adm-field.full{
+    grid-column:1 / -1;
+}
+
+#spj26adm-residen-root .spj26adm-label{
+    display:block;
+    margin-bottom:7px;
+    color:#334155;
+    font-size:10.5px;
+    font-weight:800;
+}
+
+#spj26adm-residen-root .spj26adm-required{
+    color:var(--spj26adm-maroon-medium);
+}
+
+#spj26adm-residen-root .spj26adm-input,
+#spj26adm-residen-root .spj26adm-select{
+    width:100%;
+    min-height:44px;
+    padding:10px 12px;
+    border:1px solid #cbd5e1;
+    border-radius:8px;
+    background:#fff;
+    color:#334155;
+    outline:none;
+    font-size:11px;
+}
+
+#spj26adm-residen-root .spj26adm-input:focus,
+#spj26adm-residen-root .spj26adm-select:focus{
+    border-color:var(--spj26adm-maroon-medium);
+    box-shadow:0 0 0 3px rgba(139,30,30,.08);
+}
+
+#spj26adm-residen-root .spj26adm-help{
+    margin-top:5px;
+    color:#94a3b8;
+    font-size:9.3px;
+    line-height:1.4;
+}
+
+
+/* PASSWORD FIELD */
+
+#spj26adm-residen-root .spj26adm-password-wrap{
+    position:relative;
+    width:100%;
+}
+
+#spj26adm-residen-root .spj26adm-password-wrap .spj26adm-input{
+    padding-right:46px;
+}
+
+#spj26adm-residen-root .spj26adm-password-toggle{
+    position:absolute;
+    top:50%;
+    right:8px;
+    transform:translateY(-50%);
+    width:34px;
+    height:34px;
+    padding:0;
+    border:0;
+    border-radius:7px;
+    background:transparent;
+    color:#64748b;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    cursor:pointer;
+    transition:background-color .18s ease,color .18s ease;
+}
+
+#spj26adm-residen-root .spj26adm-password-toggle:hover{
+    background:#f1f5f9;
+    color:var(--spj26adm-maroon-medium);
+}
+
+#spj26adm-residen-root .spj26adm-password-toggle:focus-visible{
+    outline:2px solid rgba(139,30,30,.25);
+    outline-offset:1px;
+}
+
+#spj26adm-residen-root .spj26adm-password-toggle .material-symbols-outlined{
+    font-size:19px;
+}
+
+#spj26adm-residen-root .spj26adm-password-hint{
+    margin-top:6px;
+    color:#64748b;
+    font-size:9.2px;
+    line-height:1.45;
+}
+
+/* Sembunyikan tombol reveal password bawaan browser Edge/IE
+   agar hanya ikon mata SIPATUJU yang tampil. */
+#spj26adm-residen-root input[type="password"]::-ms-reveal,
+#spj26adm-residen-root input[type="password"]::-ms-clear{
+    display:none;
+}
+
+#spj26adm-residen-root .spj26adm-error{
+    display:none;
+    margin-bottom:14px;
+    padding:10px 11px;
+    border:1px solid #fecaca;
+    border-radius:8px;
+    background:#fef2f2;
+    color:#b91c1c;
+    font-size:9.8px;
+    line-height:1.45;
+}
+
+#spj26adm-residen-root .spj26adm-error.show{
+    display:block;
+}
+
+#spj26adm-residen-root .spj26adm-modal-actions{
+    padding:14px 18px 18px;
+    display:flex;
+    justify-content:flex-end;
+    gap:9px;
+}
+
+#spj26adm-residen-root .spj26adm-modal-btn{
+    min-height:38px;
+    padding:8px 13px;
+    border-radius:8px;
+    border:1px solid #cbd5e1;
+    background:#fff;
+    color:#475569;
+    font-size:10px;
+    font-weight:800;
+    cursor:pointer;
+}
+
+#spj26adm-residen-root .spj26adm-modal-btn.primary{
+    border-color:var(--spj26adm-maroon-medium);
+    background:var(--spj26adm-maroon-medium);
+    color:#fff;
+}
+
+
+#spj26adm-residen-root .spj26adm-modal.spj26adm-account-modal{
+    width:min(980px,100%);
+}
+
+#spj26adm-residen-root .spj26adm-account-tabs{
+    display:flex;
+    gap:6px;
+    margin-bottom:16px;
+    padding:4px;
+    border:1px solid var(--spj26adm-border);
+    border-radius:9px;
+    background:#f8fafc;
+}
+
+#spj26adm-residen-root .spj26adm-account-tab{
+    flex:1 1 0;
+    min-height:38px;
+    padding:8px 12px;
+    border:0;
+    border-radius:7px;
+    background:transparent;
+    color:#64748b;
+    font-size:10px;
+    font-weight:800;
+    cursor:pointer;
+    transition:background .18s ease,color .18s ease,box-shadow .18s ease;
+}
+
+#spj26adm-residen-root .spj26adm-account-tab.active{
+    background:#fff;
+    color:var(--spj26adm-maroon-medium);
+    box-shadow:0 1px 4px rgba(15,23,42,.08);
+}
+
+#spj26adm-residen-root .spj26adm-account-panel[hidden]{
+    display:none !important;
+}
+
+#spj26adm-residen-root .spj26adm-bulk-intro{
+    padding:13px 14px;
+    border:1px solid #e2e8f0;
+    border-radius:9px;
+    background:#f8fafc;
+    color:#475569;
+    font-size:9.8px;
+    line-height:1.55;
+}
+
+#spj26adm-residen-root .spj26adm-bulk-intro strong{
+    color:#1e293b;
+}
+
+#spj26adm-residen-root .spj26adm-bulk-tools{
+    margin-top:14px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+    flex-wrap:wrap;
+}
+
+#spj26adm-residen-root .spj26adm-template-btn{
+    min-height:38px;
+    padding:8px 12px;
+    border:1px solid var(--spj26adm-maroon-medium);
+    border-radius:8px;
+    background:#fff;
+    color:var(--spj26adm-maroon-medium);
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    gap:7px;
+    font-size:10px;
+    font-weight:800;
+    cursor:pointer;
+    transition:background .18s ease,color .18s ease;
+}
+
+#spj26adm-residen-root .spj26adm-template-btn:hover{
+    background:#fff7f7;
+}
+
+#spj26adm-residen-root .spj26adm-template-btn .material-symbols-outlined{
+    font-size:17px;
+}
+
+#spj26adm-residen-root .spj26adm-template-note{
+    color:#94a3b8;
+    font-size:9px;
+    line-height:1.4;
+}
+
+#spj26adm-residen-root .spj26adm-upload-box{
+    margin-top:14px;
+    min-height:118px;
+    padding:18px;
+    border:1.5px dashed #cbd5e1;
+    border-radius:10px;
+    background:#fbfcfd;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+    cursor:pointer;
+    transition:border-color .18s ease,background .18s ease;
+}
+
+#spj26adm-residen-root .spj26adm-upload-box:hover,
+#spj26adm-residen-root .spj26adm-upload-box.dragover{
+    border-color:var(--spj26adm-maroon-medium);
+    background:#fffafa;
+}
+
+#spj26adm-residen-root .spj26adm-upload-content{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:5px;
+}
+
+#spj26adm-residen-root .spj26adm-upload-content .material-symbols-outlined{
+    color:var(--spj26adm-maroon-medium);
+    font-size:29px;
+}
+
+#spj26adm-residen-root .spj26adm-upload-title{
+    color:#334155;
+    font-size:10.5px;
+    font-weight:800;
+}
+
+#spj26adm-residen-root .spj26adm-upload-subtitle{
+    color:#94a3b8;
+    font-size:9px;
+    line-height:1.45;
+}
+
+#spj26adm-residen-root .spj26adm-upload-file{
+    margin-top:6px;
+    color:#475569;
+    font-size:9.5px;
+    font-weight:700;
+}
+
+#spj26adm-residen-root .spj26adm-import-error{
+    display:none;
+    margin-top:12px;
+    padding:10px 11px;
+    border:1px solid #fecaca;
+    border-radius:8px;
+    background:#fef2f2;
+    color:#b91c1c;
+    font-size:9.5px;
+    line-height:1.45;
+}
+
+#spj26adm-residen-root .spj26adm-import-error.show{
+    display:block;
+}
+
+#spj26adm-residen-root .spj26adm-import-summary{
+    margin-top:14px;
+    display:grid;
+    grid-template-columns:repeat(4,minmax(0,1fr));
+    gap:8px;
+}
+
+#spj26adm-residen-root .spj26adm-import-stat{
+    padding:10px 11px;
+    border:1px solid var(--spj26adm-border);
+    border-radius:8px;
+    background:#fff;
+}
+
+#spj26adm-residen-root .spj26adm-import-stat-label{
+    color:#94a3b8;
+    font-size:8px;
+    font-weight:800;
+    text-transform:uppercase;
+    letter-spacing:.04em;
+}
+
+#spj26adm-residen-root .spj26adm-import-stat-value{
+    margin-top:4px;
+    color:#111827;
+    font-family:"Plus Jakarta Sans",sans-serif;
+    font-size:18px;
+    line-height:1;
+    font-weight:800;
+}
+
+#spj26adm-residen-root .spj26adm-import-preview{
+    margin-top:14px;
+    max-height:310px;
+    overflow:auto;
+    border:1px solid var(--spj26adm-border);
+    border-radius:9px;
+}
+
+#spj26adm-residen-root .spj26adm-import-table{
+    width:100%;
+    min-width:760px;
+    border-collapse:collapse;
+    table-layout:fixed;
+}
+
+#spj26adm-residen-root .spj26adm-import-table th{
+    position:sticky;
+    top:0;
+    z-index:2;
+    padding:9px 8px;
+    border-bottom:1px solid #e2e8f0;
+    background:#f8fafc;
+    color:#64748b;
+    text-align:left;
+    font-size:8.4px;
+    font-weight:800;
+    text-transform:uppercase;
+    letter-spacing:.04em;
+}
+
+#spj26adm-residen-root .spj26adm-import-table td{
+    padding:9px 8px;
+    border-bottom:1px solid #f1f5f9;
+    color:#334155;
+    font-size:9.2px;
+    line-height:1.4;
+    vertical-align:top;
+    overflow-wrap:anywhere;
+}
+
+#spj26adm-residen-root .spj26adm-import-table tbody tr:last-child td{
+    border-bottom:0;
+}
+
+#spj26adm-residen-root .spj26adm-import-table th:nth-child(1),
+#spj26adm-residen-root .spj26adm-import-table td:nth-child(1){
+    width:6%;
+    text-align:center;
+}
+
+#spj26adm-residen-root .spj26adm-import-table th:nth-child(2),
+#spj26adm-residen-root .spj26adm-import-table td:nth-child(2){
+    width:15%;
+}
+
+#spj26adm-residen-root .spj26adm-import-table th:nth-child(3),
+#spj26adm-residen-root .spj26adm-import-table td:nth-child(3){
+    width:22%;
+}
+
+#spj26adm-residen-root .spj26adm-import-table th:nth-child(4),
+#spj26adm-residen-root .spj26adm-import-table td:nth-child(4){
+    width:25%;
+}
+
+#spj26adm-residen-root .spj26adm-import-table th:nth-child(5),
+#spj26adm-residen-root .spj26adm-import-table td:nth-child(5){
+    width:12%;
+}
+
+#spj26adm-residen-root .spj26adm-import-table th:nth-child(6),
+#spj26adm-residen-root .spj26adm-import-table td:nth-child(6){
+    width:20%;
+}
+
+#spj26adm-residen-root .spj26adm-import-password{
+    color:#64748b;
+    font-family:"JetBrains Mono",monospace;
+    letter-spacing:.08em;
+}
+
+#spj26adm-residen-root .spj26adm-import-status{
+    display:inline-flex;
+    align-items:center;
+    padding:4px 7px;
+    border-radius:999px;
+    font-size:8px;
+    line-height:1.2;
+    font-weight:800;
+}
+
+#spj26adm-residen-root .spj26adm-import-status.ready{
+    color:#1d4ed8;
+    background:#eff6ff;
+}
+
+#spj26adm-residen-root .spj26adm-import-status.invalid,
+#spj26adm-residen-root .spj26adm-import-status.failed{
+    color:#b91c1c;
+    background:#fef2f2;
+}
+
+#spj26adm-residen-root .spj26adm-import-status.processing{
+    color:#b45309;
+    background:#fffbeb;
+}
+
+#spj26adm-residen-root .spj26adm-import-status.success{
+    color:#047857;
+    background:#ecfdf5;
+}
+
+#spj26adm-residen-root .spj26adm-import-message{
+    margin-top:4px;
+    color:#94a3b8;
+    font-size:8.3px;
+    line-height:1.35;
+}
+
+#spj26adm-residen-root .spj26adm-modal-btn:disabled,
+#spj26adm-residen-root .spj26adm-template-btn:disabled{
+    opacity:.55;
+    cursor:not-allowed;
+}
+
+#spj26adm-residen-root .spj26adm-import-progress{
+    margin-right:auto;
+    color:#64748b;
+    font-size:9.2px;
+    font-weight:700;
+}
+
+@media(max-width:800px){
+
+    #spj26adm-residen-root .spj26adm-account-tabs{
+        flex-direction:column;
+    }
+
+    #spj26adm-residen-root .spj26adm-bulk-tools{
+        align-items:stretch;
+        flex-direction:column;
+    }
+
+    #spj26adm-residen-root .spj26adm-template-btn{
+        width:100%;
+    }
+
+    #spj26adm-residen-root .spj26adm-import-summary{
+        grid-template-columns:1fr 1fr;
+    }
+
+}
+
+@media(max-width:480px){
+
+    #spj26adm-residen-root .spj26adm-import-summary{
+        grid-template-columns:1fr;
+    }
+
+}
+
+/* DETAIL */
+#spj26adm-residen-root .spj26adm-detail-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:12px;
+}
+
+#spj26adm-residen-root .spj26adm-detail-item{
+    padding:11px;
+    border:1px solid var(--spj26adm-border);
+    border-radius:9px;
+    background:#f8fafc;
+}
+
+#spj26adm-residen-root .spj26adm-detail-label{
+    color:#94a3b8;
+    font-size:8.8px;
+    font-weight:800;
+    text-transform:uppercase;
+    letter-spacing:.04em;
+}
+
+#spj26adm-residen-root .spj26adm-detail-value{
+    margin-top:4px;
+    color:#1e293b;
+    font-size:10.5px;
+    font-weight:700;
+    line-height:1.45;
+}
+
+/* TOAST */
+#spj26adm-residen-root .spj26adm-toast{
+    position:fixed;
+    right:22px;
+    bottom:22px;
+    z-index:300;
+    max-width:360px;
+    padding:12px 14px;
+    border:1px solid #a7f3d0;
+    border-radius:9px;
+    background:#ecfdf5;
+    color:#047857;
+    box-shadow:0 12px 30px rgba(15,23,42,.14);
+    font-size:10.5px;
+    line-height:1.45;
+}
+
+/* =========================================================
+   FOOTER
+========================================================= */
+
+#spj26adm-residen-root .spj26adm-footer{
+    min-height:58px;
+    padding:0 28px;
+    border-top:1px solid var(--spj26adm-border);
+    background:#fff;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:20px;
+}
+
+#spj26adm-residen-root .spj26adm-footer-left{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    color:#6b5b58;
+    font-size:10px;
+}
+
+#spj26adm-residen-root .spj26adm-footer-brand{
+    color:var(--spj26adm-maroon);
+    font-weight:800;
+}
+
+#spj26adm-residen-root .spj26adm-footer-right{
+    color:#625451;
+    font-family:"JetBrains Mono",monospace;
+    font-size:9px;
+}
+
+#spj26adm-residen-root .spj26adm-overlay{
+    display:none;
+}
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media(max-width:1180px){
+
+    #spj26adm-residen-root .spj26adm-body{
+        grid-template-columns:240px minmax(0,1fr);
+    }
+
+    #spj26adm-residen-root .spj26adm-metrics{
+        grid-template-columns:repeat(2,minmax(0,1fr));
+    }
+
+    #spj26adm-residen-root .spj26adm-brand-divider,
+    #spj26adm-residen-root .spj26adm-brand-description{
+        display:none;
+    }
+
+}
+
+@media(max-width:900px) and (min-width:801px){
+
+    #spj26adm-residen-root .spj26adm-toolbar{
+        grid-template-columns:1fr 1fr;
+    }
+
+    #spj26adm-residen-root .spj26adm-search{
+        grid-column:1 / -1;
+    }
+
+    #spj26adm-residen-root .spj26adm-table th:nth-child(5),
+    #spj26adm-residen-root .spj26adm-table td:nth-child(5){
+        display:none;
+    }
+
+}
+
+@media(max-width:800px){
+
+    html.spj26adm-page-lock,
+    body.spj26adm-page-lock{
+        height:auto !important;
+        min-height:100% !important;
+        overflow-x:hidden !important;
+        overflow-y:auto !important;
+    }
+
+    #spj26adm-residen-root{
+        height:auto;
+        min-height:100vh;
+        min-height:100dvh;
+        overflow:visible;
+    }
+
+    #spj26adm-residen-root .spj26adm-header{
+        min-height:64px;
+        height:64px;
+        padding:8px 14px;
+    }
+
+    #spj26adm-residen-root .spj26adm-mobile-menu{
+        display:flex;
+        width:38px;
+        height:38px;
+        flex:0 0 38px;
+        align-items:center;
+        justify-content:center;
+        border:1px solid var(--spj26adm-border);
+        border-radius:7px;
+        background:#fff;
+        color:var(--spj26adm-maroon);
+        cursor:pointer;
+    }
+
+    #spj26adm-residen-root .spj26adm-logo{
+        width:38px;
+        height:38px;
+        flex-basis:38px;
+    }
+
+    #spj26adm-residen-root .spj26adm-brand-name{
+        font-size:11px;
+    }
+
+    #spj26adm-residen-root .spj26adm-faculty,
+    #spj26adm-residen-root .spj26adm-user-text{
+        display:none;
+    }
+
+    #spj26adm-residen-root .spj26adm-body{
+        display:block;
+        height:auto;
+        min-height:auto;
+        overflow:visible;
+    }
+
+    #spj26adm-residen-root .spj26adm-sidebar{
+        position:fixed;
+        top:0;
+        left:0;
+        width:270px;
+        height:100vh;
+        height:100dvh;
+        overflow-y:auto;
+        overflow-x:hidden;
+        transform:translateX(-102%);
+        transition:transform .22s ease;
+        box-shadow:8px 0 24px rgba(15,23,42,.14);
+        z-index:100;
+    }
+
+    #spj26adm-residen-root .spj26adm-sidebar.open{
+        transform:translateX(0);
+    }
+
+    #spj26adm-residen-root .spj26adm-overlay{
+        position:fixed;
+        inset:0;
+        z-index:90;
+        background:rgba(15,23,42,.4);
+    }
+
+    #spj26adm-residen-root .spj26adm-overlay.open{
+        display:block;
+    }
+
+    #spj26adm-residen-root .spj26adm-rightpane{
+        height:auto;
+        overflow:visible;
+    }
+
+    #spj26adm-residen-root .spj26adm-main{
+        padding:18px 14px 24px;
+    }
+
+    #spj26adm-residen-root .spj26adm-metrics{
+        grid-template-columns:1fr 1fr;
+        gap:10px;
+    }
+
+    #spj26adm-residen-root .spj26adm-toolbar{
+        grid-template-columns:1fr;
+    }
+
+    #spj26adm-residen-root .spj26adm-card-head{
+        align-items:flex-start;
+        flex-direction:column;
+    }
+
+    #spj26adm-residen-root .spj26adm-add-btn{
+        width:100%;
+    }
+
+    #spj26adm-residen-root .spj26adm-table-wrap{
+        overflow:visible;
+    }
+
+    #spj26adm-residen-root .spj26adm-table{
+        display:block;
+        width:100%;
+    }
+
+    #spj26adm-residen-root .spj26adm-table thead{
+        display:none;
+    }
+
+    #spj26adm-residen-root .spj26adm-table tbody{
+        display:flex;
+        flex-direction:column;
+        gap:10px;
+        padding:12px;
+    }
+
+    #spj26adm-residen-root .spj26adm-table tbody tr{
+        display:grid;
+        grid-template-columns:1fr 1fr;
+        gap:10px 12px;
+        padding:13px;
+        border:1px solid var(--spj26adm-border);
+        border-radius:10px;
+        background:#fff;
+    }
+
+    #spj26adm-residen-root .spj26adm-table td{
+        display:block !important;
+        width:auto !important;
+        padding:0;
+        border:0;
+    }
+
+    #spj26adm-residen-root .spj26adm-table td:nth-child(2),
+    #spj26adm-residen-root .spj26adm-table td:nth-child(3),
+    #spj26adm-residen-root .spj26adm-table td:nth-child(7){
+        grid-column:1 / -1;
+    }
+
+    #spj26adm-residen-root .spj26adm-form-grid,
+    #spj26adm-residen-root .spj26adm-detail-grid{
+        grid-template-columns:1fr;
+    }
+
+    #spj26adm-residen-root .spj26adm-field.full{
+        grid-column:auto;
+    }
+
+    #spj26adm-residen-root .spj26adm-footer{
+        padding:12px 16px;
+        align-items:flex-start;
+        flex-direction:column;
+        gap:4px;
+    }
+
+}
+
+@media(max-width:480px){
+
+    #spj26adm-residen-root .spj26adm-metrics{
+        grid-template-columns:1fr;
+    }
+
+}
+
+
+/* =========================================================
+   ADMIN WORKFLOW SHELL FIX 2026.5
+   Full viewport, shared sidebar/footer behavior, pagination.
+========================================================= */
+html.spj26adm-page-lock{
+    margin-top:0 !important;
+}
+
+body.spj26adm-page-lock #wpadminbar,
+body.spj26adm-page-lock #masthead,
+body.spj26adm-page-lock .site-header,
+body.spj26adm-page-lock #colophon,
+body.spj26adm-page-lock .site-footer{
+    display:none !important;
+}
+
+body.spj26adm-page-lock #page,
+body.spj26adm-page-lock .site,
+body.spj26adm-page-lock #content,
+body.spj26adm-page-lock .site-content,
+body.spj26adm-page-lock .ast-container,
+body.spj26adm-page-lock .elementor,
+body.spj26adm-page-lock .elementor-section-wrap,
+body.spj26adm-page-lock .elementor-element,
+body.spj26adm-page-lock .e-con,
+body.spj26adm-page-lock .e-con-inner,
+body.spj26adm-page-lock .elementor-widget-html,
+body.spj26adm-page-lock .elementor-widget-container{
+    width:100% !important;
+    max-width:none !important;
+    margin:0 !important;
+    padding:0 !important;
+}
+
+#spj26adm-residen-root{
+    position:fixed !important;
+    inset:0 !important;
+    z-index:99990;
+    width:100vw !important;
+    max-width:none !important;
+}
+
+#spj26adm-residen-root .spj26adm-rightpane{
+    display:flex;
+    flex-direction:column;
+}
+
+#spj26adm-residen-root .spj26adm-main{
+    flex:1 0 auto;
+}
+
+#spj26adm-residen-root .spj26adm-footer{
+    width:100%;
+    margin-top:auto;
+    flex:0 0 auto;
+}
+
+#spj26adm-residen-root .spj26adm-sidebar{
+    flex:0 0 auto;
+}
+
+#spj26adm-residen-root .spj26adm-action-group{
+    display:flex;
+    align-items:center;
+    gap:6px;
+    flex-wrap:wrap;
+}
+
+#spj26adm-residen-root .spj26adm-table-footer{
+    min-height:54px;
+    padding:10px 14px;
+    border-top:1px solid #eef2f7;
+    background:#fff;
+    display:grid;
+    grid-template-columns:auto 1fr auto;
+    align-items:center;
+    gap:12px;
+}
+
+#spj26adm-residen-root .spj26adm-page-size{
+    display:flex;
+    align-items:center;
+    gap:7px;
+    color:#64748b;
+    font-size:9.5px;
+    font-weight:700;
+    white-space:nowrap;
+}
+
+#spj26adm-residen-root .spj26adm-page-size select{
+    min-height:34px;
+    padding:6px 28px 6px 9px;
+    border:1px solid #dbe3ec;
+    border-radius:7px;
+    background:#fff;
+    color:#334155;
+    outline:none;
+    font-size:9.5px;
+}
+
+#spj26adm-residen-root .spj26adm-page-info{
+    color:#64748b;
+    font-size:9.5px;
+    text-align:center;
+}
+
+#spj26adm-residen-root .spj26adm-page-nav{
+    display:flex;
+    justify-content:flex-end;
+    gap:6px;
+}
+
+#spj26adm-residen-root .spj26adm-page-btn{
+    min-height:34px;
+    padding:6px 10px;
+    border:1px solid #d1d5db;
+    border-radius:7px;
+    background:#fff;
+    color:#475569;
+    font-size:9px;
+    font-weight:800;
+    cursor:pointer;
+}
+
+#spj26adm-residen-root .spj26adm-page-btn:hover:not(:disabled){
+    border-color:#b9c2ce;
+    background:#f8fafc;
+}
+
+#spj26adm-residen-root .spj26adm-page-btn:disabled{
+    opacity:.45;
+    cursor:not-allowed;
+}
+
+#spj26adm-residen-root .spj26adm-detail-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:10px;
+}
+
+#spj26adm-residen-root .spj26adm-detail-item{
+    padding:11px;
+    border:1px solid var(--spj26adm-border);
+    border-radius:9px;
+    background:#f8fafc;
+}
+
+#spj26adm-residen-root .spj26adm-detail-label{
+    color:#94a3b8;
+    font-size:8.5px;
+    font-weight:800;
+    text-transform:uppercase;
+    letter-spacing:.04em;
+}
+
+#spj26adm-residen-root .spj26adm-detail-value{
+    margin-top:4px;
+    color:#1e293b;
+    font-size:10.5px;
+    font-weight:700;
+    line-height:1.45;
+    overflow-wrap:anywhere;
+}
+
+@media(max-width:800px){
+    #spj26adm-residen-root{
+        position:relative !important;
+        inset:auto !important;
+        z-index:auto;
+        width:100% !important;
+        min-width:0 !important;
+    }
+
+    #spj26adm-residen-root .spj26adm-rightpane{
+        display:block;
+    }
+
+    #spj26adm-residen-root .spj26adm-table-footer{
+        grid-template-columns:1fr;
+        align-items:stretch;
+    }
+
+    #spj26adm-residen-root .spj26adm-page-size{
+        justify-content:space-between;
+    }
+
+    #spj26adm-residen-root .spj26adm-page-info{
+        text-align:left;
+    }
+
+    #spj26adm-residen-root .spj26adm-page-nav{
+        justify-content:stretch;
+    }
+
+    #spj26adm-residen-root .spj26adm-page-btn{
+        flex:1 1 0;
+    }
+
+    #spj26adm-residen-root .spj26adm-detail-grid{
+        grid-template-columns:1fr;
+    }
+}
+
+
+</style>
+
+
+<div id="spj26adm-residen-root">
+
+    <div class="spj26adm-overlay" id="spj26adm-residen-overlay"></div>
+
+
+    <!-- =====================================================
+         HEADER
+    ====================================================== -->
+
+    <header class="spj26adm-header">
+
+        <div class="spj26adm-header-left">
+
+            <button
+                class="spj26adm-mobile-menu"
+                id="spj26adm-residen-menu-button"
+                type="button"
+                aria-label="Buka menu"
+            >
+                <span class="material-symbols-outlined">menu</span>
+            </button>
+
+            <div class="spj26adm-logo">
+                <span class="material-symbols-outlined">school</span>
+            </div>
+
+            <div class="spj26adm-brand">
+
+                <div class="spj26adm-brand-row">
+
+                    <div class="spj26adm-brand-name">
+                        SIPATUJU PPDS
+                    </div>
+
+                    <div class="spj26adm-brand-divider">|</div>
+
+                    <div class="spj26adm-brand-description">
+                        Sistem Pemeriksaan Kelayakan Jurnal PPDS FK UNHAS
+                    </div>
+
+                </div>
+
+                <div class="spj26adm-faculty">
+                    Fakultas Kedokteran • Akreditasi Unggul
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="spj26adm-header-right">
+
+            <div class="spj26adm-user">
+
+                <div class="spj26adm-user-text">
+                    <span class="spj26adm-user-name">Admin SIPATUJU</span>
+                    <span class="spj26adm-user-role">Administrator</span>
+                </div>
+
+                <div class="spj26adm-avatar">
+                    <span class="material-symbols-outlined">admin_panel_settings</span>
+                </div>
+
+            </div>
+
+        </div>
+
+    </header>
+
+
+    <div class="spj26adm-body">
+
+
+        <!-- =================================================
+             SIDEBAR
+        ================================================== -->
+
+        <aside class="spj26adm-sidebar" id="spj26adm-residen-sidebar">
+
+            <div class="spj26adm-sidebar-main">
+
+                <div class="spj26adm-nav-title">
+                    Menu Admin
+                </div>
+
+                <nav class="spj26adm-nav">
+
+                    <a
+                        class="spj26adm-nav-link"
+                        href="/admin-sipatuju/"
+                    >
+                        <span class="spj26adm-nav-left">
+                            <span class="material-symbols-outlined">grid_view</span>
+                            <span>Dashboard</span>
+                        </span>
+                    </a>
+
+                </nav>
+
+
+                <div class="spj26adm-nav-section-gap"></div>
+
+
+                <div class="spj26adm-nav-title">
+                    Manajemen Akun
+                </div>
+
+                <nav class="spj26adm-nav">
+
+                    <a
+                        class="spj26adm-nav-link"
+                        href="/admin-sipatuju/reviewer/"
+                    >
+                        <span class="spj26adm-nav-left">
+                            <span class="material-symbols-outlined">fact_check</span>
+                            <span>Reviewer</span>
+                        </span>
+                    </a>
+
+                    <a
+                        class="spj26adm-nav-link active"
+                        href="/admin-sipatuju/residen/"
+                    >
+                        <span class="spj26adm-nav-left">
+                            <span class="material-symbols-outlined">stethoscope</span>
+                            <span>Mahasiswa</span>
+                        </span>
+                    </a>
+
+                    <a
+                        class="spj26adm-nav-link"
+                        href="/admin-sipatuju/jurnal-predator-discontinued/"
+                    >
+                        <span class="spj26adm-nav-left">
+                            <span class="material-symbols-outlined">policy</span>
+                            <span>Jurnal Predator / Discontinued</span>
+                        </span>
+                    </a>
+
+                </nav>
+
+
+                <div class="spj26adm-nav-section-gap"></div>
+
+
+                <div class="spj26adm-nav-title">
+                    Akun
+                </div>
+
+                <nav class="spj26adm-nav">
+
+                    <a
+                        class="spj26adm-nav-link"
+                        id="spj26adm-residen-logout"
+                        href="#"
+                    >
+                        <span class="spj26adm-nav-left">
+                            <span class="material-symbols-outlined">logout</span>
+                            <span>Logout</span>
+                        </span>
+                    </a>
+
+                </nav>
+
+            </div>
+
+
+            <div class="spj26adm-sidebar-info">
+
+                <div class="spj26adm-sidebar-info-title">
+                    <span class="material-symbols-outlined">verified</span>
+                    <span>PPDS FK UNHAS</span>
+                </div>
+
+                <div class="spj26adm-version">
+                    Versi Sistem 2026.1
+                </div>
+
+                <div class="spj26adm-department">
+                    Program Pendidikan Dokter Spesialis
+                </div>
+
+            </div>
+
+        </aside>
+
+
+        <!-- =================================================
+             RIGHT PANE
+        ================================================== -->
+
+        <div class="spj26adm-rightpane">
+
+            <main class="spj26adm-main">
+
+                <div class="spj26adm-content">
+
+
+                    <!-- METRICS -->
+                    <section class="spj26adm-metrics">
+
+                        <div class="spj26adm-metric">
+
+                            <div>
+                                <div class="spj26adm-metric-label">Total Mahasiswa</div>
+                                <div class="spj26adm-metric-number" id="spj26adm-residen-count-total">0</div>
+                                <div class="spj26adm-metric-note">Seluruh akun mahasiswa</div>
+                            </div>
+
+                            <div class="spj26adm-metric-icon total">
+                                <span class="material-symbols-outlined">groups</span>
+                            </div>
+
+                        </div>
+
+
+                        <div class="spj26adm-metric">
+
+                            <div>
+                                <div class="spj26adm-metric-label">Akun Aktif</div>
+                                <div class="spj26adm-metric-number" id="spj26adm-residen-count-active">0</div>
+                                <div class="spj26adm-metric-note">Dapat mengakses SIPATUJU</div>
+                            </div>
+
+                            <div class="spj26adm-metric-icon active">
+                                <span class="material-symbols-outlined">verified_user</span>
+                            </div>
+
+                        </div>
+
+
+                        <div class="spj26adm-metric">
+
+                            <div>
+                                <div class="spj26adm-metric-label">Belum Pernah Login</div>
+                                <div class="spj26adm-metric-number" id="spj26adm-residen-count-never">0</div>
+                                <div class="spj26adm-metric-note">Akun aktif tanpa riwayat login</div>
+                            </div>
+
+                            <div class="spj26adm-metric-icon never">
+                                <span class="material-symbols-outlined">login</span>
+                            </div>
+
+                        </div>
+
+
+                        <div class="spj26adm-metric">
+
+                            <div>
+                                <div class="spj26adm-metric-label">Akun Nonaktif</div>
+                                <div class="spj26adm-metric-number" id="spj26adm-residen-count-inactive">0</div>
+                                <div class="spj26adm-metric-note">Tidak dapat login</div>
+                            </div>
+
+                            <div class="spj26adm-metric-icon inactive">
+                                <span class="material-symbols-outlined">person_off</span>
+                            </div>
+
+                        </div>
+
+                    </section>
+
+
+                    <!-- MAIN CARD -->
+                    <section class="spj26adm-card">
+
+                        <div class="spj26adm-card-head">
+
+                            <div>
+                                <div class="spj26adm-card-title">
+                                    Manajemen Mahasiswa
+                                </div>
+                                <div class="spj26adm-card-subtitle">
+                                    Kelola akun mahasiswa, status akses, aktivitas login, dan riwayat pengajuan.
+                                </div>
+                            </div>
+
+                            <button
+                                class="spj26adm-add-btn"
+                                id="spj26adm-residen-add-button"
+                                type="button"
+                            >
+                                <span class="material-symbols-outlined">person_add</span>
+                                <span>Tambah Mahasiswa</span>
+                            </button>
+
+                        </div>
+
+
+                        <div class="spj26adm-toolbar">
+
+                            <div class="spj26adm-search">
+
+                                <span class="material-symbols-outlined">search</span>
+
+                                <input
+                                    class="spj26adm-search-input"
+                                    id="spj26adm-residen-search"
+                                    type="text"
+                                    placeholder="Cari NIM atau nama mahasiswa..."
+                                >
+
+                            </div>
+
+
+                            <select
+                                class="spj26adm-filter"
+                                id="spj26adm-residen-program-filter"
+                            >
+                                
+                                
+                                <option value="all">Semua Program PPDS</option>
+                                <option value="Anestesiologi dan Terapi Intensif">Anestesiologi dan Terapi Intensif</option>
+                                <option value="Bedah Anak">Bedah Anak</option>
+                                <option value="Bedah Saraf">Bedah Saraf</option>
+                                <option value="Bedah Toraks Kardiak dan Vaskular">Bedah Toraks Kardiak dan Vaskular</option>
+                                <option value="Dermatologi dan Venereologi">Dermatologi dan Venereologi</option>
+                                <option value="Forensik dan Medikolegal">Forensik dan Medikolegal</option>
+                                <option value="Gizi Klinik">Gizi Klinik</option>
+                                <option value="Ilmu Bedah">Ilmu Bedah</option>
+                                <option value="Ilmu Kedokteran Fisik dan Rehabilitasi">Ilmu Kedokteran Fisik dan Rehabilitasi</option>
+                                <option value="Ilmu Kedokteran Jiwa">Ilmu Kedokteran Jiwa</option>
+                                <option value="Ilmu Kesehatan Anak">Ilmu Kesehatan Anak</option>
+                                <option value="Ilmu Kesehatan Mata">Ilmu Kesehatan Mata</option>
+                                <option value="Ilmu Kesehatan THT-BKL">Ilmu Kesehatan THT-BKL</option>
+                                <option value="Ilmu Patologi Klinik">Ilmu Patologi Klinik</option>
+                                <option value="Ilmu Penyakit Dalam">Ilmu Penyakit Dalam</option>
+                                <option value="Ilmu Penyakit Jantung dan Pembuluh Darah">Ilmu Penyakit Jantung dan Pembuluh Darah</option>
+                                <option value="Mikrobiologi Klinik">Mikrobiologi Klinik</option>
+                                <option value="Neurologi">Neurologi</option>
+                                <option value="Obstetri dan Ginekologi">Obstetri dan Ginekologi</option>
+                                <option value="Orthopaedi dan Traumatologi">Orthopaedi dan Traumatologi</option>
+                                <option value="Patologi Anatomi">Patologi Anatomi</option>
+                                <option value="Pulmonologi dan Kedokteran Respirasi">Pulmonologi dan Kedokteran Respirasi</option>
+                                <option value="Radiologi">Radiologi</option>
+                                <option value="Urologi">Urologi</option>
+                                <option value="SP2 - Anestesiologi dan Terapi Intensif">SP2 - Anestesiologi dan Terapi Intensif</option>
+                                <option value="SP2 - Bedah">SP2 - Bedah</option>
+                                <option value="SP2 - Dermatologi, Venerologi, dan Estetika">SP2 - Dermatologi, Venerologi, dan Estetika</option>
+                                <option value="SP2 - Ilmu Penyakit Dalam">SP2 - Ilmu Penyakit Dalam</option>
+                                <option value="SP2 - Obstetri dan Ginekologi">SP2 - Obstetri dan Ginekologi</option>
+                                <option value="SP2 - Orthopaedi dan Traumatologi">SP2 - Orthopaedi dan Traumatologi</option>
+                            </select>
+
+
+                            <select
+                                class="spj26adm-filter"
+                                id="spj26adm-residen-status-filter"
+                            >
+                                <option value="all">Semua Status</option>
+                                <option value="active">Aktif</option>
+                                <option value="never">Belum Pernah Login</option>
+                                <option value="inactive">Nonaktif</option>
+                            </select>
+
+                        </div>
+
+
+                        <div class="spj26adm-table-wrap">
+
+                            <table class="spj26adm-table">
+
+                                <thead>
+                                    <tr>
+                                        <th>NIM</th>
+                                        <th>Nama</th>
+                                        <th>Program PPDS</th>
+                                        <th>Status Akun</th>
+                                        <th>Aktivitas Login</th>
+                                        <th>Pengajuan</th>
+                                        <th>Aksi</th>
+                                    </tr>
+                                </thead>
+
+                                <tbody id="spj26adm-residen-table-body">
+                                    <tr>
+                                        <td colspan="7">
+                                            <div class="spj26adm-empty-state">
+                                                <span class="material-symbols-outlined">person_search</span>
+                                                <strong>Belum ada akun Mahasiswa</strong>
+                                                <span>Akun Mahasiswa yang dibuat oleh Admin akan muncul di sini.</span>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+
+                            </table>
+
+                        </div>
+
+                            <div class="spj26adm-table-footer" aria-label="Navigasi data">
+                                <label class="spj26adm-page-size">
+                                    <span>Tampilkan</span>
+                                    <select id="spj26adm-residen-page-size" aria-label="Jumlah data per halaman">
+                                        <option value="10" selected>10</option>
+                                        <option value="20">20</option>
+                                        <option value="30">30</option>
+                                        <option value="all">Semua</option>
+                                    </select>
+                                    <span>data</span>
+                                </label>
+
+                                <div class="spj26adm-page-info" id="spj26adm-residen-page-info">0 data</div>
+
+                                <div class="spj26adm-page-nav">
+                                    <button class="spj26adm-page-btn" id="spj26adm-residen-page-prev" type="button">Sebelumnya</button>
+                                    <button class="spj26adm-page-btn" id="spj26adm-residen-page-next" type="button">Berikutnya</button>
+                                </div>
+                            </div>
+
+                    </section>
+
+                </div>
+
+            </main>
+
+
+            <footer class="spj26adm-footer">
+
+                <div class="spj26adm-footer-left">
+                    <span class="spj26adm-footer-brand">SIPATUJU PPDS</span>
+                    <span>•</span>
+                    <span>Fakultas Kedokteran Universitas Hasanuddin</span>
+                </div>
+
+                <div class="spj26adm-footer-right">
+                    PPDS FK UNHAS - Versi Sistem 2026.1
+                </div>
+
+            </footer>
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         ADD MAHASISWA MODAL
+         - Satu Akun
+         - Import Massal Excel
+    ====================================================== -->
+
+    <div
+        class="spj26adm-modal-backdrop"
+        id="spj26adm-residen-add-modal"
+        hidden
+    >
+
+        <div
+            class="spj26adm-modal spj26adm-account-modal"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="spj26adm-residen-add-title"
+        >
+
+            <div class="spj26adm-modal-head">
+
+                <div>
+                    <div
+                        class="spj26adm-modal-title"
+                        id="spj26adm-residen-add-title"
+                    >
+                        Tambah Mahasiswa
+                    </div>
+
+                    <div class="spj26adm-modal-subtitle">
+                        Buat satu akun mahasiswa atau import beberapa akun sekaligus melalui file Excel.
+                    </div>
+                </div>
+
+                <button
+                    class="spj26adm-modal-close"
+                    id="spj26adm-residen-add-close"
+                    type="button"
+                    aria-label="Tutup"
+                >
+                    <span class="material-symbols-outlined">close</span>
+                </button>
+
+            </div>
+
+
+            <div class="spj26adm-modal-body">
+
+                <div class="spj26adm-account-tabs">
+
+                    <button
+                        class="spj26adm-account-tab active"
+                        id="spj26adm-account-tab-single"
+                        type="button"
+                        data-account-mode="single"
+                    >
+                        Satu Akun
+                    </button>
+
+                    <button
+                        class="spj26adm-account-tab"
+                        id="spj26adm-account-tab-bulk"
+                        type="button"
+                        data-account-mode="bulk"
+                    >
+                        Import Massal
+                    </button>
+
+                </div>
+
+
+                <!-- SINGLE ACCOUNT PANEL -->
+                <div
+                    class="spj26adm-account-panel"
+                    id="spj26adm-account-panel-single"
+                >
+
+                    <div
+                        class="spj26adm-error"
+                        id="spj26adm-residen-form-error"
+                    >
+                    </div>
+
+                    <div class="spj26adm-form-grid">
+
+
+                        <div class="spj26adm-field">
+
+                            <label
+                                class="spj26adm-label"
+                                for="spj26adm-residen-nim"
+                            >
+                                NIM
+                                <span class="spj26adm-required">*</span>
+                            </label>
+
+                            <input
+                                class="spj26adm-input"
+                                id="spj26adm-residen-nim"
+                                type="text"
+                                placeholder="Masukkan NIM"
+                            >
+
+                        </div>
+
+
+                        <div class="spj26adm-field">
+
+                            <label
+                                class="spj26adm-label"
+                                for="spj26adm-residen-name"
+                            >
+                                Nama Lengkap
+                                <span class="spj26adm-required">*</span>
+                            </label>
+
+                            <input
+                                class="spj26adm-input"
+                                id="spj26adm-residen-name"
+                                type="text"
+                                placeholder="Contoh: dr. Jijah"
+                            >
+
+                        </div>
+
+
+                        <div class="spj26adm-field full">
+
+                            <label
+                                class="spj26adm-label"
+                                for="spj26adm-residen-program"
+                            >
+                                Program PPDS
+                                <span class="spj26adm-required">*</span>
+                            </label>
+
+                            <select
+                                class="spj26adm-select"
+                                id="spj26adm-residen-program"
+                            >
+                                
+                                
+                                <option value="">Pilih program PPDS</option>
+                                <option value="Anestesiologi dan Terapi Intensif">Anestesiologi dan Terapi Intensif</option>
+                                <option value="Bedah Anak">Bedah Anak</option>
+                                <option value="Bedah Saraf">Bedah Saraf</option>
+                                <option value="Bedah Toraks Kardiak dan Vaskular">Bedah Toraks Kardiak dan Vaskular</option>
+                                <option value="Dermatologi dan Venereologi">Dermatologi dan Venereologi</option>
+                                <option value="Forensik dan Medikolegal">Forensik dan Medikolegal</option>
+                                <option value="Gizi Klinik">Gizi Klinik</option>
+                                <option value="Ilmu Bedah">Ilmu Bedah</option>
+                                <option value="Ilmu Kedokteran Fisik dan Rehabilitasi">Ilmu Kedokteran Fisik dan Rehabilitasi</option>
+                                <option value="Ilmu Kedokteran Jiwa">Ilmu Kedokteran Jiwa</option>
+                                <option value="Ilmu Kesehatan Anak">Ilmu Kesehatan Anak</option>
+                                <option value="Ilmu Kesehatan Mata">Ilmu Kesehatan Mata</option>
+                                <option value="Ilmu Kesehatan THT-BKL">Ilmu Kesehatan THT-BKL</option>
+                                <option value="Ilmu Patologi Klinik">Ilmu Patologi Klinik</option>
+                                <option value="Ilmu Penyakit Dalam">Ilmu Penyakit Dalam</option>
+                                <option value="Ilmu Penyakit Jantung dan Pembuluh Darah">Ilmu Penyakit Jantung dan Pembuluh Darah</option>
+                                <option value="Mikrobiologi Klinik">Mikrobiologi Klinik</option>
+                                <option value="Neurologi">Neurologi</option>
+                                <option value="Obstetri dan Ginekologi">Obstetri dan Ginekologi</option>
+                                <option value="Orthopaedi dan Traumatologi">Orthopaedi dan Traumatologi</option>
+                                <option value="Patologi Anatomi">Patologi Anatomi</option>
+                                <option value="Pulmonologi dan Kedokteran Respirasi">Pulmonologi dan Kedokteran Respirasi</option>
+                                <option value="Radiologi">Radiologi</option>
+                                <option value="Urologi">Urologi</option>
+                                <option value="SP2 - Anestesiologi dan Terapi Intensif">SP2 - Anestesiologi dan Terapi Intensif</option>
+                                <option value="SP2 - Bedah">SP2 - Bedah</option>
+                                <option value="SP2 - Dermatologi, Venerologi, dan Estetika">SP2 - Dermatologi, Venerologi, dan Estetika</option>
+                                <option value="SP2 - Ilmu Penyakit Dalam">SP2 - Ilmu Penyakit Dalam</option>
+                                <option value="SP2 - Obstetri dan Ginekologi">SP2 - Obstetri dan Ginekologi</option>
+                                <option value="SP2 - Orthopaedi dan Traumatologi">SP2 - Orthopaedi dan Traumatologi</option>
+                            </select>
+
+                        </div>
+
+
+                        <div class="spj26adm-field">
+
+                            <label
+                                class="spj26adm-label"
+                                for="spj26adm-residen-password"
+                            >
+                                Password Awal
+                                <span class="spj26adm-required">*</span>
+                            </label>
+
+                            <div class="spj26adm-password-wrap">
+
+                                <input
+                                    class="spj26adm-input"
+                                    id="spj26adm-residen-password"
+                                    type="password"
+                                    placeholder="Masukkan password awal"
+                                    autocomplete="new-password"
+                                    minlength="8"
+                                >
+
+                                <button
+                                    class="spj26adm-password-toggle"
+                                    type="button"
+                                    data-password-toggle="spj26adm-residen-password"
+                                    aria-label="Lihat password awal"
+                                    aria-pressed="false"
+                                >
+                                    <span class="material-symbols-outlined">visibility</span>
+                                </button>
+
+                            </div>
+
+                            <div class="spj26adm-password-hint">
+                                Minimal 8 karakter.
+                            </div>
+
+                        </div>
+
+
+                        <div class="spj26adm-field">
+
+                            <label
+                                class="spj26adm-label"
+                                for="spj26adm-residen-password-confirm"
+                            >
+                                Konfirmasi Password
+                                <span class="spj26adm-required">*</span>
+                            </label>
+
+                            <div class="spj26adm-password-wrap">
+
+                                <input
+                                    class="spj26adm-input"
+                                    id="spj26adm-residen-password-confirm"
+                                    type="password"
+                                    placeholder="Ulangi password"
+                                    autocomplete="new-password"
+                                    minlength="8"
+                                >
+
+                                <button
+                                    class="spj26adm-password-toggle"
+                                    type="button"
+                                    data-password-toggle="spj26adm-residen-password-confirm"
+                                    aria-label="Lihat konfirmasi password"
+                                    aria-pressed="false"
+                                >
+                                    <span class="material-symbols-outlined">visibility</span>
+                                </button>
+
+                            </div>
+
+                            <div class="spj26adm-password-hint">
+                                Masukkan kembali password yang sama.
+                            </div>
+
+                        </div>
+
+
+                        <div class="spj26adm-field full">
+                            <div class="spj26adm-help">
+                                Mahasiswa akan login menggunakan NIM dan password awal yang ditentukan oleh Admin. Password dapat diubah oleh mahasiswa dari dashboard mahasiswa.
+                            </div>
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- BULK IMPORT PANEL -->
+                <div
+                    class="spj26adm-account-panel"
+                    id="spj26adm-account-panel-bulk"
+                    hidden
+                >
+
+                    <div class="spj26adm-bulk-intro">
+                        <strong>Import Massal:</strong>
+                        download template Excel, isi kolom
+                        <strong>NIM, Nama Lengkap, Program PPDS, dan Password Awal</strong>,
+                        kemudian upload kembali file tersebut. Password tidak ditampilkan utuh pada preview dan dikirim ke backend hanya saat akun dibuat.
+                    </div>
+
+
+                    <div class="spj26adm-bulk-tools">
+
+                        <button
+                            class="spj26adm-template-btn"
+                            id="spj26adm-download-import-template"
+                            type="button"
+                        >
+                            <span class="material-symbols-outlined">download</span>
+                            <span>Download Template Excel</span>
+                        </button>
+
+                        <div class="spj26adm-template-note">
+                            Format file: .xlsx atau .xls • Maksimal 500 baris • Password minimal 8 karakter
+                        </div>
+
+                    </div>
+
+
+                    <div
+                        class="spj26adm-upload-box"
+                        id="spj26adm-import-dropzone"
+                        role="button"
+                        tabindex="0"
+                        aria-label="Upload file Excel mahasiswa"
+                    >
+
+                        <input
+                            id="spj26adm-import-file"
+                            type="file"
+                            accept=".xlsx,.xls"
+                            hidden
+                        >
+
+                        <div class="spj26adm-upload-content">
+
+                            <span class="material-symbols-outlined">upload_file</span>
+
+                            <div class="spj26adm-upload-title">
+                                Klik atau tarik file Excel ke sini
+                            </div>
+
+                            <div class="spj26adm-upload-subtitle">
+                                Sistem akan memvalidasi data terlebih dahulu sebelum akun dibuat.
+                            </div>
+
+                            <div
+                                class="spj26adm-upload-file"
+                                id="spj26adm-import-file-name"
+                            >
+                                Belum ada file dipilih
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <div
+                        class="spj26adm-import-error"
+                        id="spj26adm-import-error"
+                    ></div>
+
+
+                    <div
+                        class="spj26adm-import-summary"
+                        id="spj26adm-import-summary"
+                        hidden
+                    >
+
+                        <div class="spj26adm-import-stat">
+                            <div class="spj26adm-import-stat-label">Total Baris</div>
+                            <div class="spj26adm-import-stat-value" id="spj26adm-import-total">0</div>
+                        </div>
+
+                        <div class="spj26adm-import-stat">
+                            <div class="spj26adm-import-stat-label">Siap Dibuat</div>
+                            <div class="spj26adm-import-stat-value" id="spj26adm-import-ready">0</div>
+                        </div>
+
+                        <div class="spj26adm-import-stat">
+                            <div class="spj26adm-import-stat-label">Bermasalah</div>
+                            <div class="spj26adm-import-stat-value" id="spj26adm-import-invalid">0</div>
+                        </div>
+
+                        <div class="spj26adm-import-stat">
+                            <div class="spj26adm-import-stat-label">Berhasil</div>
+                            <div class="spj26adm-import-stat-value" id="spj26adm-import-success">0</div>
+                        </div>
+
+                    </div>
+
+
+                    <div
+                        class="spj26adm-import-preview"
+                        id="spj26adm-import-preview"
+                        hidden
+                    >
+
+                        <table class="spj26adm-import-table">
+
+                            <thead>
+                                <tr>
+                                    <th>No.</th>
+                                    <th>NIM</th>
+                                    <th>Nama Lengkap</th>
+                                    <th>Program PPDS</th>
+                                    <th>Password</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+
+                            <tbody id="spj26adm-import-table-body"></tbody>
+
+                        </table>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="spj26adm-modal-actions">
+
+                <div
+                    class="spj26adm-import-progress"
+                    id="spj26adm-import-progress"
+                    hidden
+                ></div>
+
+                <button
+                    class="spj26adm-modal-btn"
+                    id="spj26adm-residen-add-cancel"
+                    type="button"
+                >
+                    Batal
+                </button>
+
+                <button
+                    class="spj26adm-modal-btn primary"
+                    id="spj26adm-residen-save"
+                    type="button"
+                >
+                    Buat Akun
+                </button>
+
+                <button
+                    class="spj26adm-modal-btn primary"
+                    id="spj26adm-import-submit"
+                    type="button"
+                    hidden
+                    disabled
+                >
+                    Buat Akun Valid
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         EDIT MAHASISWA MODAL
+         Changes are persisted to WordPress database via AJAX.
+    ====================================================== -->
+
+    <div
+        class="spj26adm-modal-backdrop"
+        id="spj26adm-residen-edit-modal"
+        hidden
+    >
+
+        <div
+            class="spj26adm-modal"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="spj26adm-residen-edit-title"
+        >
+
+            <div class="spj26adm-modal-head">
+
+                <div>
+                    <div
+                        class="spj26adm-modal-title"
+                        id="spj26adm-residen-edit-title"
+                    >
+                        Edit Mahasiswa
+                    </div>
+
+                    <div
+                        class="spj26adm-modal-subtitle"
+                        id="spj26adm-residen-edit-subtitle"
+                    >
+                        Perbarui data akun mahasiswa.
+                    </div>
+                </div>
+
+                <button
+                    class="spj26adm-modal-close"
+                    id="spj26adm-residen-edit-close"
+                    type="button"
+                    aria-label="Tutup"
+                >
+                    <span class="material-symbols-outlined">close</span>
+                </button>
+
+            </div>
+
+
+            <div class="spj26adm-modal-body">
+
+                <div
+                    class="spj26adm-error"
+                    id="spj26adm-residen-edit-error"
+                ></div>
+
+                <input
+                    id="spj26adm-residen-edit-user-id"
+                    type="hidden"
+                >
+
+                <div class="spj26adm-form-grid">
+
+                    <div class="spj26adm-field">
+
+                        <label
+                            class="spj26adm-label"
+                            for="spj26adm-residen-edit-nim"
+                        >
+                            NIM
+                            <span class="spj26adm-required">*</span>
+                        </label>
+
+                        <input
+                            class="spj26adm-input"
+                            id="spj26adm-residen-edit-nim"
+                            type="text"
+                            autocomplete="off"
+                            placeholder="Masukkan NIM"
+                        >
+
+                        <div class="spj26adm-edit-note">
+                            <strong>Perhatian:</strong> mengubah NIM juga mengubah username login mahasiswa.
+                        </div>
+
+                    </div>
+
+
+                    <div class="spj26adm-field">
+
+                        <label
+                            class="spj26adm-label"
+                            for="spj26adm-residen-edit-name"
+                        >
+                            Nama Lengkap
+                            <span class="spj26adm-required">*</span>
+                        </label>
+
+                        <input
+                            class="spj26adm-input"
+                            id="spj26adm-residen-edit-name"
+                            type="text"
+                            autocomplete="off"
+                            placeholder="Masukkan nama lengkap"
+                        >
+
+                    </div>
+
+
+                    <div class="spj26adm-field full">
+
+                        <label
+                            class="spj26adm-label"
+                            for="spj26adm-residen-edit-program"
+                        >
+                            Program PPDS
+                            <span class="spj26adm-required">*</span>
+                        </label>
+
+                        <select
+                            class="spj26adm-select"
+                            id="spj26adm-residen-edit-program"
+                        >
+                            <option value="">Pilih program PPDS</option>
+                                <option value="Anestesiologi dan Terapi Intensif">Anestesiologi dan Terapi Intensif</option>
+                                <option value="Bedah Anak">Bedah Anak</option>
+                                <option value="Bedah Saraf">Bedah Saraf</option>
+                                <option value="Bedah Toraks Kardiak dan Vaskular">Bedah Toraks Kardiak dan Vaskular</option>
+                                <option value="Dermatologi dan Venereologi">Dermatologi dan Venereologi</option>
+                                <option value="Forensik dan Medikolegal">Forensik dan Medikolegal</option>
+                                <option value="Gizi Klinik">Gizi Klinik</option>
+                                <option value="Ilmu Bedah">Ilmu Bedah</option>
+                                <option value="Ilmu Kedokteran Fisik dan Rehabilitasi">Ilmu Kedokteran Fisik dan Rehabilitasi</option>
+                                <option value="Ilmu Kedokteran Jiwa">Ilmu Kedokteran Jiwa</option>
+                                <option value="Ilmu Kesehatan Anak">Ilmu Kesehatan Anak</option>
+                                <option value="Ilmu Kesehatan Mata">Ilmu Kesehatan Mata</option>
+                                <option value="Ilmu Kesehatan THT-BKL">Ilmu Kesehatan THT-BKL</option>
+                                <option value="Ilmu Patologi Klinik">Ilmu Patologi Klinik</option>
+                                <option value="Ilmu Penyakit Dalam">Ilmu Penyakit Dalam</option>
+                                <option value="Ilmu Penyakit Jantung dan Pembuluh Darah">Ilmu Penyakit Jantung dan Pembuluh Darah</option>
+                                <option value="Mikrobiologi Klinik">Mikrobiologi Klinik</option>
+                                <option value="Neurologi">Neurologi</option>
+                                <option value="Obstetri dan Ginekologi">Obstetri dan Ginekologi</option>
+                                <option value="Orthopaedi dan Traumatologi">Orthopaedi dan Traumatologi</option>
+                                <option value="Patologi Anatomi">Patologi Anatomi</option>
+                                <option value="Pulmonologi dan Kedokteran Respirasi">Pulmonologi dan Kedokteran Respirasi</option>
+                                <option value="Radiologi">Radiologi</option>
+                                <option value="Urologi">Urologi</option>
+                                <option value="SP2 - Anestesiologi dan Terapi Intensif">SP2 - Anestesiologi dan Terapi Intensif</option>
+                                <option value="SP2 - Bedah">SP2 - Bedah</option>
+                                <option value="SP2 - Dermatologi, Venerologi, dan Estetika">SP2 - Dermatologi, Venerologi, dan Estetika</option>
+                                <option value="SP2 - Ilmu Penyakit Dalam">SP2 - Ilmu Penyakit Dalam</option>
+                                <option value="SP2 - Obstetri dan Ginekologi">SP2 - Obstetri dan Ginekologi</option>
+                                <option value="SP2 - Orthopaedi dan Traumatologi">SP2 - Orthopaedi dan Traumatologi</option>
+                        </select>
+
+                    </div>
+
+
+                    <div class="spj26adm-field">
+
+                        <label
+                            class="spj26adm-label"
+                            for="spj26adm-residen-edit-password"
+                        >
+                            Password Baru
+                        </label>
+
+                        <div class="spj26adm-password-wrap">
+
+                            <input
+                                class="spj26adm-input"
+                                id="spj26adm-residen-edit-password"
+                                type="password"
+                                autocomplete="new-password"
+                                minlength="8"
+                                placeholder="Kosongkan jika tidak diubah"
+                            >
+
+                            <button
+                                class="spj26adm-password-toggle"
+                                type="button"
+                                data-password-toggle="spj26adm-residen-edit-password"
+                                aria-label="Lihat password baru"
+                                aria-pressed="false"
+                            >
+                                <span class="material-symbols-outlined">visibility</span>
+                            </button>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="spj26adm-field">
+
+                        <label
+                            class="spj26adm-label"
+                            for="spj26adm-residen-edit-password-confirm"
+                        >
+                            Konfirmasi Password Baru
+                        </label>
+
+                        <div class="spj26adm-password-wrap">
+
+                            <input
+                                class="spj26adm-input"
+                                id="spj26adm-residen-edit-password-confirm"
+                                type="password"
+                                autocomplete="new-password"
+                                minlength="8"
+                                placeholder="Ulangi password baru"
+                            >
+
+                            <button
+                                class="spj26adm-password-toggle"
+                                type="button"
+                                data-password-toggle="spj26adm-residen-edit-password-confirm"
+                                aria-label="Lihat konfirmasi password baru"
+                                aria-pressed="false"
+                            >
+                                <span class="material-symbols-outlined">visibility</span>
+                            </button>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="spj26adm-field full">
+
+                        <div class="spj26adm-edit-password-note">
+                            Password tidak pernah ditampilkan kembali. Kosongkan kedua field password
+                            jika password mahasiswa tidak ingin diubah.
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="spj26adm-modal-actions">
+
+                <button
+                    class="spj26adm-modal-btn"
+                    id="spj26adm-residen-edit-cancel"
+                    type="button"
+                >
+                    Batal
+                </button>
+
+                <button
+                    class="spj26adm-modal-btn primary"
+                    id="spj26adm-residen-edit-save"
+                    type="button"
+                >
+                    Simpan Perubahan
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         DETAIL MODAL
+    ====================================================== -->
+
+    <div
+        class="spj26adm-modal-backdrop"
+        id="spj26adm-residen-detail-modal"
+        hidden
+    >
+
+        <div
+            class="spj26adm-modal"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="spj26adm-residen-detail-title"
+        >
+
+            <div class="spj26adm-modal-head">
+
+                <div>
+                    <div
+                        class="spj26adm-modal-title"
+                        id="spj26adm-residen-detail-title"
+                    >
+                        Detail Mahasiswa
+                    </div>
+
+                    <div
+                        class="spj26adm-modal-subtitle"
+                        id="spj26adm-residen-detail-subtitle"
+                    >
+                    </div>
+                </div>
+
+                <button
+                    class="spj26adm-modal-close"
+                    id="spj26adm-residen-detail-close"
+                    type="button"
+                    aria-label="Tutup"
+                >
+                    <span class="material-symbols-outlined">close</span>
+                </button>
+
+            </div>
+
+
+            <div class="spj26adm-modal-body">
+
+                <div class="spj26adm-detail-grid">
+
+                    <div class="spj26adm-detail-item">
+                        <div class="spj26adm-detail-label">NIM</div>
+                        <div class="spj26adm-detail-value" id="spj26adm-detail-nim">-</div>
+                    </div>
+
+                    <div class="spj26adm-detail-item">
+                        <div class="spj26adm-detail-label">Program PPDS</div>
+                        <div class="spj26adm-detail-value" id="spj26adm-detail-program">-</div>
+                    </div>
+
+                    <div class="spj26adm-detail-item">
+                        <div class="spj26adm-detail-label">Status Akun</div>
+                        <div class="spj26adm-detail-value" id="spj26adm-detail-status">-</div>
+                    </div>
+
+                    <div class="spj26adm-detail-item">
+                        <div class="spj26adm-detail-label">Login Terakhir</div>
+                        <div class="spj26adm-detail-value" id="spj26adm-detail-login">-</div>
+                    </div>
+
+                    <div class="spj26adm-detail-item">
+                        <div class="spj26adm-detail-label">Jumlah Pengajuan</div>
+                        <div class="spj26adm-detail-value" id="spj26adm-detail-submissions">-</div>
+                    </div>
+
+                    <div class="spj26adm-detail-item">
+                        <div class="spj26adm-detail-label">Aktivitas Login</div>
+                        <div class="spj26adm-detail-value" id="spj26adm-detail-login-state">-</div>
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="spj26adm-modal-actions">
+
+                <button
+                    class="spj26adm-modal-btn"
+                    id="spj26adm-residen-detail-close-bottom"
+                    type="button"
+                >
+                    Tutup
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <div
+        class="spj26adm-toast"
+        id="spj26adm-residen-toast"
+        hidden
+    >
+    </div>
+
+</div>
+
+
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+
+<script>
+(function(){
+
+    /*
+     * Desktop layout lock:
+     * browser/page utama tidak scroll.
+     * Scroll hanya terjadi pada area konten kanan.
+     */
+    document.documentElement.classList.add(
+        'spj26adm-page-lock'
+    );
+
+    document.body.classList.add(
+        'spj26adm-page-lock'
+    );
+
+
+    const root =
+        document.getElementById(
+            'spj26adm-residen-root'
+        );
+
+    if(!root) return;
+
+
+    /* =====================================================
+       MOBILE SIDEBAR
+    ===================================================== */
+
+    const menuButton =
+        root.querySelector(
+            '#spj26adm-residen-menu-button'
+        );
+
+    const sidebar =
+        root.querySelector(
+            '#spj26adm-residen-sidebar'
+        );
+
+    const overlay =
+        root.querySelector(
+            '#spj26adm-residen-overlay'
+        );
+
+
+    function openSidebar(){
+
+        if(sidebar){
+            sidebar.classList.add('open');
+        }
+
+        if(overlay){
+            overlay.classList.add('open');
+        }
+
+    }
+
+
+    function closeSidebar(){
+
+        if(sidebar){
+            sidebar.classList.remove('open');
+        }
+
+        if(overlay){
+            overlay.classList.remove('open');
+        }
+
+    }
+
+
+    if(menuButton){
+        menuButton.addEventListener(
+            'click',
+            openSidebar
+        );
+    }
+
+    if(overlay){
+        overlay.addEventListener(
+            'click',
+            closeSidebar
+        );
+    }
+
+
+    /* =====================================================
+       PASSWORD VISIBILITY
+    ===================================================== */
+
+    root
+        .querySelectorAll(
+            '[data-password-toggle]'
+        )
+        .forEach(function(button){
+
+            button.addEventListener(
+                'click',
+                function(){
+
+                    const targetId =
+                        button.getAttribute(
+                            'data-password-toggle'
+                        );
+
+                    const input =
+                        root.querySelector(
+                            '#' + targetId
+                        );
+
+                    if(!input) return;
+
+
+                    const showing =
+                        input.type === 'text';
+
+
+                    input.type =
+                        showing
+                        ? 'password'
+                        : 'text';
+
+
+                    const icon =
+                        button.querySelector(
+                            '.material-symbols-outlined'
+                        );
+
+
+                    if(icon){
+
+                        icon.textContent =
+                            showing
+                            ? 'visibility'
+                            : 'visibility_off';
+
+                    }
+
+
+                    button.setAttribute(
+                        'aria-pressed',
+                        showing
+                        ? 'false'
+                        : 'true'
+                    );
+
+
+                    button.setAttribute(
+                        'aria-label',
+                        showing
+                        ? 'Lihat password'
+                        : 'Sembunyikan password'
+                    );
+
+                }
+            );
+
+        });
+
+
+    /* =====================================================
+       STATE
+    ===================================================== */
+
+    let residents = [];
+
+
+    const tableBody =
+        root.querySelector(
+            '#spj26adm-residen-table-body'
+        );
+
+    const searchInput =
+        root.querySelector(
+            '#spj26adm-residen-search'
+        );
+
+    const programFilter =
+        root.querySelector(
+            '#spj26adm-residen-program-filter'
+        );
+
+    const statusFilter =
+        root.querySelector(
+            '#spj26adm-residen-status-filter'
+        );
+
+    const toast =
+        root.querySelector(
+            '#spj26adm-residen-toast'
+        );
+
+
+    function setText(id,value){
+
+        const el =
+            root.querySelector(
+                '#' + id
+            );
+
+        if(el){
+            el.textContent =
+                String(value ?? '');
+        }
+
+    }
+
+
+    function showToast(message){
+
+        if(!toast) return;
+
+        toast.textContent = message;
+        toast.hidden = false;
+
+        window.setTimeout(
+            function(){
+                toast.hidden = true;
+            },
+            2800
+        );
+
+    }
+
+
+    function createEl(
+        tag,
+        className,
+        text
+    ){
+
+        const el =
+            document.createElement(tag);
+
+        if(className){
+            el.className = className;
+        }
+
+        if(
+            text !== undefined &&
+            text !== null
+        ){
+            el.textContent = text;
+        }
+
+        return el;
+    }
+
+
+    /* =====================================================
+       BACKEND REQUEST
+    ===================================================== */
+
+    async function backendRequest(
+        action,
+        payload
+    ){
+
+        if(
+            !window.spj26ResidentAdminConfig ||
+            !window.spj26ResidentAdminConfig.ajaxUrl ||
+            !window.spj26ResidentAdminConfig.nonce
+        ){
+
+            throw new Error(
+                'Konfigurasi backend Manajemen Mahasiswa belum tersedia.'
+            );
+
+        }
+
+
+        const body =
+            new URLSearchParams();
+
+        body.append(
+            'action',
+            action
+        );
+
+        body.append(
+            'nonce',
+            window.spj26ResidentAdminConfig.nonce
+        );
+
+
+        Object.keys(
+            payload || {}
+        ).forEach(function(key){
+
+            body.append(
+                key,
+                payload[key]
+            );
+
+        });
+
+
+        const response =
+            await fetch(
+                window.spj26ResidentAdminConfig.ajaxUrl,
+                {
+                    method:'POST',
+                    credentials:'same-origin',
+                    headers:{
+                        'Content-Type':
+                            'application/x-www-form-urlencoded; charset=UTF-8'
+                    },
+                    body:
+                        body.toString()
+                }
+            );
+
+
+        const result =
+            await response.json();
+
+
+        if(
+            !result ||
+            result.success !== true
+        ){
+
+            const message =
+                result &&
+                result.data &&
+                result.data.message
+                ? result.data.message
+                : 'Permintaan ke server gagal.';
+
+            throw new Error(message);
+
+        }
+
+
+        return result.data;
+
+    }
+
+
+    /* =====================================================
+       METRICS
+    ===================================================== */
+
+    function renderMetrics(){
+
+        const total =
+            residents.length;
+
+        const active =
+            residents.filter(
+                item => item.active === true
+            ).length;
+
+        const never =
+            residents.filter(
+                item =>
+                item.active === true &&
+                !item.last_login
+            ).length;
+
+        const inactive =
+            residents.filter(
+                item => item.active === false
+            ).length;
+
+
+        setText(
+            'spj26adm-residen-count-total',
+            total
+        );
+
+        setText(
+            'spj26adm-residen-count-active',
+            active
+        );
+
+        setText(
+            'spj26adm-residen-count-never',
+            never
+        );
+
+        setText(
+            'spj26adm-residen-count-inactive',
+            inactive
+        );
+
+    }
+
+
+    /* =====================================================
+       FILTER
+    ===================================================== */
+
+    function canonicalResidentProgram(value){
+
+        const program =
+            String(
+                value || ''
+            ).trim();
+
+        /*
+         * Backward compatibility:
+         * akun lama dapat masih menyimpan ejaan "Orthopedi".
+         * Di UI dan filter dinormalisasi menjadi nomenklatur baru.
+         */
+        if(
+            program.toLowerCase() ===
+            'orthopedi dan traumatologi'
+        ){
+            return 'Orthopaedi dan Traumatologi';
+        }
+
+        return program;
+    }
+
+
+    function getFilteredResidents(){
+
+        const query =
+            searchInput
+            ? searchInput.value.trim().toLowerCase()
+            : '';
+
+        const program =
+            programFilter
+            ? programFilter.value
+            : 'all';
+
+        const status =
+            statusFilter
+            ? statusFilter.value
+            : 'all';
+
+
+        return residents.filter(function(item){
+
+            const text =
+                [
+                    item.nim,
+                    item.name,
+                    item.program
+                ]
+                .filter(Boolean)
+                .join(' ')
+                .toLowerCase();
+
+
+            const queryMatch =
+                !query ||
+                text.includes(query);
+
+
+            const programMatch =
+                program === 'all' ||
+                item.program === program;
+
+
+            let statusMatch = true;
+
+
+            if(status === 'active'){
+
+                statusMatch =
+                    item.active === true;
+
+            }else if(status === 'inactive'){
+
+                statusMatch =
+                    item.active === false;
+
+            }else if(status === 'never'){
+
+                statusMatch =
+                    item.active === true &&
+                    !item.last_login;
+
+            }
+
+
+            return (
+                queryMatch &&
+                programMatch &&
+                statusMatch
+            );
+
+        });
+
+    }
+
+
+    /* =====================================================
+       TABLE
+    ===================================================== */
+
+    function renderTable(){
+
+        if(!tableBody) return;
+
+        tableBody.innerHTML = '';
+
+
+        const rows =
+            getFilteredResidents();
+
+
+        if(rows.length === 0){
+
+            const tr =
+                document.createElement('tr');
+
+            const td =
+                document.createElement('td');
+
+            td.colSpan = 7;
+
+
+            const empty =
+                createEl(
+                    'div',
+                    'spj26adm-empty-state'
+                );
+
+            empty.appendChild(
+                createEl(
+                    'span',
+                    'material-symbols-outlined',
+                    'person_search'
+                )
+            );
+
+            empty.appendChild(
+                createEl(
+                    'strong',
+                    '',
+                    residents.length === 0
+                    ? 'Belum ada akun Mahasiswa'
+                    : 'Tidak ada data yang sesuai'
+                )
+            );
+
+            empty.appendChild(
+                createEl(
+                    'span',
+                    '',
+                    residents.length === 0
+                    ? 'Akun Mahasiswa yang dibuat oleh Admin akan muncul di sini.'
+                    : 'Ubah kata pencarian atau filter yang digunakan.'
+                )
+            );
+
+
+            td.appendChild(empty);
+            tr.appendChild(td);
+            tableBody.appendChild(tr);
+
+            return;
+
+        }
+
+
+        rows.forEach(function(resident){
+
+            const tr =
+                document.createElement('tr');
+
+
+            const tdNim =
+                document.createElement('td');
+
+            tdNim.appendChild(
+                createEl(
+                    'div',
+                    'spj26adm-nim',
+                    resident.nim || '-'
+                )
+            );
+
+
+            const tdName =
+                document.createElement('td');
+
+            tdName.appendChild(
+                createEl(
+                    'div',
+                    'spj26adm-name',
+                    resident.name || '-'
+                )
+            );
+
+
+            const tdProgram =
+                document.createElement('td');
+
+            tdProgram.textContent =
+                resident.program || '-';
+
+
+            const tdStatus =
+                document.createElement('td');
+
+            tdStatus.appendChild(
+                createEl(
+                    'span',
+                    'spj26adm-status ' +
+                    (
+                        resident.active
+                        ? 'active'
+                        : 'inactive'
+                    ),
+                    resident.active
+                    ? 'Aktif'
+                    : 'Nonaktif'
+                )
+            );
+
+
+            const tdLogin =
+                document.createElement('td');
+
+            tdLogin.appendChild(
+                createEl(
+                    'div',
+                    'spj26adm-login-state' +
+                    (
+                        !resident.last_login
+                        ? ' never'
+                        : ''
+                    ),
+                    resident.last_login
+                    ? 'Pernah Login'
+                    : 'Belum Pernah Login'
+                )
+            );
+
+            tdLogin.appendChild(
+                createEl(
+                    'div',
+                    'spj26adm-subtext',
+                    resident.last_login ||
+                    'Belum ada aktivitas'
+                )
+            );
+
+
+            const tdSubmissions =
+                document.createElement('td');
+
+            tdSubmissions.textContent =
+                String(
+                    resident.submissions || 0
+                );
+
+
+            const tdActions =
+                document.createElement('td');
+
+            const group =
+                createEl(
+                    'div',
+                    'spj26adm-action-group'
+                );
+
+
+            const editButton =
+                createEl(
+                    'button',
+                    'spj26adm-action edit'
+                );
+
+            editButton.type = 'button';
+            editButton.title = 'Edit data mahasiswa';
+            editButton.setAttribute(
+                'aria-label',
+                'Edit data ' + (resident.name || resident.nim || 'mahasiswa')
+            );
+
+            editButton.appendChild(
+                createEl(
+                    'span',
+                    'material-symbols-outlined',
+                    'edit'
+                )
+            );
+
+            editButton.appendChild(
+                createEl(
+                    'span',
+                    '',
+                    'Edit'
+                )
+            );
+
+            editButton.addEventListener(
+                'click',
+                function(){
+                    openEditResident(
+                        resident
+                    );
+                }
+            );
+
+
+            const toggle =
+                createEl(
+                    'button',
+                    'spj26adm-action ' +
+                    (
+                        resident.active
+                        ? 'danger'
+                        : 'activate'
+                    ),
+                    resident.active
+                    ? 'Nonaktifkan'
+                    : 'Aktifkan'
+                );
+
+            toggle.type = 'button';
+
+            toggle.addEventListener(
+                'click',
+                function(){
+                    toggleResident(
+                        resident
+                    );
+                }
+            );
+
+
+            group.appendChild(editButton);
+            group.appendChild(toggle);
+
+            tdActions.appendChild(group);
+
+
+            tr.appendChild(tdNim);
+            tr.appendChild(tdName);
+            tr.appendChild(tdProgram);
+            tr.appendChild(tdStatus);
+            tr.appendChild(tdLogin);
+            tr.appendChild(tdSubmissions);
+            tr.appendChild(tdActions);
+
+            tableBody.appendChild(tr);
+
+        });
+
+    }
+
+
+    if(searchInput){
+        searchInput.addEventListener(
+            'input',
+            renderTable
+        );
+    }
+
+    if(programFilter){
+        programFilter.addEventListener(
+            'change',
+            renderTable
+        );
+    }
+
+    if(statusFilter){
+        statusFilter.addEventListener(
+            'change',
+            renderTable
+        );
+    }
+
+
+
+
+    /* =====================================================
+       CLIENT-SIDE PAGINATION
+       10 / 20 / 30 / Semua
+    ===================================================== */
+    (function setupPagination(){
+
+        const body = root.querySelector('#spj26adm-residen-table-body');
+        const sizeSelect = root.querySelector('#spj26adm-residen-page-size');
+        const info = root.querySelector('#spj26adm-residen-page-info');
+        const prev = root.querySelector('#spj26adm-residen-page-prev');
+        const next = root.querySelector('#spj26adm-residen-page-next');
+
+        if(!body || !sizeSelect || !info || !prev || !next){
+            return;
+        }
+
+        let page = 1;
+
+        function getDataRows(){
+            return Array.from(body.children).filter(function(row){
+                return !row.querySelector('.spj26adm-empty-state');
+            });
+        }
+
+        function applyPagination(){
+
+            const rows = getDataRows();
+            const total = rows.length;
+            const all = sizeSelect.value === 'all';
+            const requested = Number(sizeSelect.value) || 10;
+            const pageSize = all ? Math.max(total,1) : requested;
+            const totalPages = total === 0 ? 1 : Math.max(1, Math.ceil(total / pageSize));
+
+            page = Math.min(Math.max(page,1), totalPages);
+
+            const startIndex = all ? 0 : (page - 1) * pageSize;
+            const endIndex = all ? total : Math.min(startIndex + pageSize,total);
+
+            rows.forEach(function(row,index){
+                row.hidden = !(index >= startIndex && index < endIndex);
+            });
+
+            if(total === 0){
+                info.textContent = '0 data';
+            }else if(all){
+                info.textContent = total + ' data';
+            }else{
+                info.textContent = (startIndex + 1) + '–' + endIndex + ' dari ' + total + ' data';
+            }
+
+            prev.disabled = all || total === 0 || page <= 1;
+            next.disabled = all || total === 0 || page >= totalPages;
+        }
+
+        sizeSelect.addEventListener('change',function(){
+            page = 1;
+            applyPagination();
+        });
+
+        prev.addEventListener('click',function(){
+            if(page > 1){
+                page -= 1;
+                applyPagination();
+            }
+        });
+
+        next.addEventListener('click',function(){
+            page += 1;
+            applyPagination();
+        });
+
+        [
+            root.querySelector('#spj26adm-residen-search'),
+            root.querySelector('#spj26adm-residen-program-filter'),
+            root.querySelector('#spj26adm-residen-status-filter')
+        ].filter(Boolean).forEach(function(el){
+            el.addEventListener(
+                el.tagName === 'INPUT' ? 'input' : 'change',
+                function(){ page = 1; },
+                { capture:true }
+            );
+        });
+
+        if(window.MutationObserver){
+            new MutationObserver(function(){
+                applyPagination();
+            }).observe(body,{ childList:true });
+        }
+
+        applyPagination();
+
+    })();
+
+
+    function residentBoolean(value){
+        if(value === undefined || value === null || value === ''){
+            return true;
+        }
+        return value === true || value === 1 || value === '1' || value === 'true' || value === 'active' || value === 'yes';
+    }
+
+    function normalizeResident(item){
+        item = item || {};
+        return {
+            ...item,
+            id: item.id ?? item.user_id ?? item.ID ?? '',
+            nim: item.nim ?? item.username ?? item.user_login ?? '',
+            name: item.name ?? item.display_name ?? item.full_name ?? '',
+            program: canonicalResidentProgram(
+                item.program ?? item.study_program ?? item.prodi ?? ''
+            ),
+            active: residentBoolean(item.active ?? item.is_active ?? item.status),
+            last_login: item.last_login ?? item.lastLogin ?? item.last_login_at ?? '',
+            submissions: Number(item.submissions ?? item.submission_count ?? item.total_submissions ?? 0) || 0
+        };
+    }
+
+    function extractResidents(data){
+        const candidates = [
+            data,
+            data && data.residents,
+            data && data.items,
+            data && data.users,
+            data && data.data,
+            data && data.data && data.data.residents
+        ];
+        for(const candidate of candidates){
+            if(Array.isArray(candidate)){
+                return candidate.map(normalizeResident);
+            }
+        }
+        return [];
+    }
+
+
+    /* =====================================================
+       LOAD RESIDENTS
+    ===================================================== */
+
+    async function loadResidents(){
+
+        residents = [];
+
+        renderMetrics();
+        renderTable();
+
+
+        try{
+
+            const data =
+                await backendRequest(
+                    'spj26_admin_residents_data',
+                    {}
+                );
+
+
+            residents = extractResidents(data);
+
+
+            renderMetrics();
+            renderTable();
+
+
+        }catch(error){
+
+            console.error(
+                'SIPATUJU Mahasiswa:',
+                error
+            );
+
+            showToast(
+                error.message ||
+                'Data Mahasiswa gagal dimuat.'
+            );
+
+        }
+
+    }
+
+
+    /* =====================================================
+       ADD MAHASISWA
+       - Satu akun
+       - Import massal Excel
+    ===================================================== */
+
+    const addButton =
+        root.querySelector(
+            '#spj26adm-residen-add-button'
+        );
+
+    const addModal =
+        root.querySelector(
+            '#spj26adm-residen-add-modal'
+        );
+
+    const addClose =
+        root.querySelector(
+            '#spj26adm-residen-add-close'
+        );
+
+    const addCancel =
+        root.querySelector(
+            '#spj26adm-residen-add-cancel'
+        );
+
+    const saveButton =
+        root.querySelector(
+            '#spj26adm-residen-save'
+        );
+
+    const formError =
+        root.querySelector(
+            '#spj26adm-residen-form-error'
+        );
+
+
+    const accountTabs =
+        root.querySelectorAll(
+            '[data-account-mode]'
+        );
+
+    const singlePanel =
+        root.querySelector(
+            '#spj26adm-account-panel-single'
+        );
+
+    const bulkPanel =
+        root.querySelector(
+            '#spj26adm-account-panel-bulk'
+        );
+
+    const downloadTemplateButton =
+        root.querySelector(
+            '#spj26adm-download-import-template'
+        );
+
+    const importDropzone =
+        root.querySelector(
+            '#spj26adm-import-dropzone'
+        );
+
+    const importFileInput =
+        root.querySelector(
+            '#spj26adm-import-file'
+        );
+
+    const importFileName =
+        root.querySelector(
+            '#spj26adm-import-file-name'
+        );
+
+    const importError =
+        root.querySelector(
+            '#spj26adm-import-error'
+        );
+
+    const importSummary =
+        root.querySelector(
+            '#spj26adm-import-summary'
+        );
+
+    const importPreview =
+        root.querySelector(
+            '#spj26adm-import-preview'
+        );
+
+    const importTableBody =
+        root.querySelector(
+            '#spj26adm-import-table-body'
+        );
+
+    const importSubmit =
+        root.querySelector(
+            '#spj26adm-import-submit'
+        );
+
+    const importProgress =
+        root.querySelector(
+            '#spj26adm-import-progress'
+        );
+
+
+    let accountMode = 'single';
+    let importRows = [];
+    let importBusy = false;
+
+
+    function getInput(id){
+
+        const el =
+            root.querySelector(
+                '#' + id
+            );
+
+        return el
+            ? el.value.trim()
+            : '';
+
+    }
+
+
+    function setImportCount(
+        id,
+        value
+    ){
+
+        const el =
+            root.querySelector(
+                '#' + id
+            );
+
+        if(el){
+            el.textContent =
+                String(value);
+        }
+
+    }
+
+
+    function clearFormError(){
+
+        if(!formError) return;
+
+        formError.classList.remove(
+            'show'
+        );
+
+        formError.textContent = '';
+
+    }
+
+
+    function showFormError(message){
+
+        if(!formError) return;
+
+        formError.textContent = message;
+
+        formError.classList.add(
+            'show'
+        );
+
+    }
+
+
+    function clearImportError(){
+
+        if(!importError) return;
+
+        importError.classList.remove(
+            'show'
+        );
+
+        importError.textContent = '';
+
+    }
+
+
+    function showImportError(message){
+
+        if(!importError) return;
+
+        importError.textContent = message;
+
+        importError.classList.add(
+            'show'
+        );
+
+    }
+
+
+    function resetPasswordToggles(){
+
+        root
+            .querySelectorAll(
+                '[data-password-toggle]'
+            )
+            .forEach(function(button){
+
+                const targetId =
+                    button.getAttribute(
+                        'data-password-toggle'
+                    );
+
+                const input =
+                    root.querySelector(
+                        '#' + targetId
+                    );
+
+                if(input){
+                    input.type = 'password';
+                }
+
+                const icon =
+                    button.querySelector(
+                        '.material-symbols-outlined'
+                    );
+
+                if(icon){
+                    icon.textContent =
+                        'visibility';
+                }
+
+                button.setAttribute(
+                    'aria-pressed',
+                    'false'
+                );
+
+            });
+
+    }
+
+
+    function clearSingleForm(){
+
+        [
+            'spj26adm-residen-nim',
+            'spj26adm-residen-name',
+            'spj26adm-residen-password',
+            'spj26adm-residen-password-confirm'
+        ].forEach(function(id){
+
+            const el =
+                root.querySelector(
+                    '#' + id
+                );
+
+            if(el){
+                el.value = '';
+            }
+
+        });
+
+
+        const program =
+            root.querySelector(
+                '#spj26adm-residen-program'
+            );
+
+        if(program){
+            program.value = '';
+        }
+
+
+        resetPasswordToggles();
+        clearFormError();
+
+    }
+
+
+    function resetBulkImport(){
+
+        importRows = [];
+        importBusy = false;
+
+        if(importFileInput){
+            importFileInput.value = '';
+        }
+
+        if(importFileName){
+            importFileName.textContent =
+                'Belum ada file dipilih';
+        }
+
+        if(importSummary){
+            importSummary.hidden = true;
+        }
+
+        if(importPreview){
+            importPreview.hidden = true;
+        }
+
+        if(importTableBody){
+            importTableBody.innerHTML = '';
+        }
+
+        if(importProgress){
+            importProgress.hidden = true;
+            importProgress.textContent = '';
+        }
+
+        clearImportError();
+        renderImportState();
+
+    }
+
+
+    function clearForm(){
+
+        clearSingleForm();
+        resetBulkImport();
+        switchAccountMode('single');
+
+    }
+
+
+    function switchAccountMode(mode){
+
+        accountMode =
+            mode === 'bulk'
+            ? 'bulk'
+            : 'single';
+
+
+        accountTabs.forEach(
+            function(button){
+
+                const active =
+                    button.getAttribute(
+                        'data-account-mode'
+                    ) === accountMode;
+
+                button.classList.toggle(
+                    'active',
+                    active
+                );
+
+            }
+        );
+
+
+        if(singlePanel){
+            singlePanel.hidden =
+                accountMode !== 'single';
+        }
+
+        if(bulkPanel){
+            bulkPanel.hidden =
+                accountMode !== 'bulk';
+        }
+
+        if(saveButton){
+            saveButton.hidden =
+                accountMode !== 'single';
+        }
+
+        if(importSubmit){
+            importSubmit.hidden =
+                accountMode !== 'bulk';
+        }
+
+
+        clearFormError();
+        clearImportError();
+
+    }
+
+
+    function openAddModal(){
+
+        clearForm();
+
+        if(addModal){
+            addModal.hidden = false;
+        }
+
+    }
+
+
+    function closeAddModal(){
+
+        if(importBusy){
+            return;
+        }
+
+        if(addModal){
+            addModal.hidden = true;
+        }
+
+        /*
+         * Password hasil upload hanya disimpan di memori browser
+         * selama modal aktif. Bersihkan state saat modal ditutup.
+         */
+        importRows = [];
+
+    }
+
+
+    accountTabs.forEach(
+        function(button){
+
+            button.addEventListener(
+                'click',
+                function(){
+
+                    if(importBusy){
+                        return;
+                    }
+
+                    switchAccountMode(
+                        button.getAttribute(
+                            'data-account-mode'
+                        )
+                    );
+
+                }
+            );
+
+        }
+    );
+
+
+    if(addButton){
+        addButton.addEventListener(
+            'click',
+            openAddModal
+        );
+    }
+
+    if(addClose){
+        addClose.addEventListener(
+            'click',
+            closeAddModal
+        );
+    }
+
+    if(addCancel){
+        addCancel.addEventListener(
+            'click',
+            closeAddModal
+        );
+    }
+
+    if(addModal){
+        addModal.addEventListener(
+            'click',
+            function(event){
+
+                if(
+                    event.target === addModal &&
+                    !importBusy
+                ){
+                    closeAddModal();
+                }
+
+            }
+        );
+    }
+
+
+    /* =====================================================
+       SINGLE ACCOUNT CREATE
+    ===================================================== */
+
+    if(saveButton){
+
+        saveButton.addEventListener(
+            'click',
+            async function(){
+
+                const nim =
+                    getInput(
+                        'spj26adm-residen-nim'
+                    );
+
+                const name =
+                    getInput(
+                        'spj26adm-residen-name'
+                    );
+
+                const program =
+                    getInput(
+                        'spj26adm-residen-program'
+                    );
+
+                const password =
+                    getInput(
+                        'spj26adm-residen-password'
+                    );
+
+                const confirmPassword =
+                    getInput(
+                        'spj26adm-residen-password-confirm'
+                    );
+
+
+                if(
+                    !nim ||
+                    !name ||
+                    !program ||
+                    !password ||
+                    !confirmPassword
+                ){
+
+                    showFormError(
+                        'Semua field wajib diisi.'
+                    );
+
+                    return;
+
+                }
+
+
+                if(
+                    password.length < 8
+                ){
+
+                    showFormError(
+                        'Password minimal 8 karakter.'
+                    );
+
+                    return;
+
+                }
+
+
+                if(
+                    password !==
+                    confirmPassword
+                ){
+
+                    showFormError(
+                        'Konfirmasi password tidak sama.'
+                    );
+
+                    return;
+
+                }
+
+
+                clearFormError();
+                saveButton.disabled = true;
+
+
+                try{
+
+                    await backendRequest(
+                        'spj26_admin_create_resident',
+                        {
+                            nim:nim,
+                            name:name,
+                            program:program,
+                            password:password
+                        }
+                    );
+
+
+                    closeAddModal();
+
+                    showToast(
+                        'Akun Mahasiswa berhasil dibuat.'
+                    );
+
+
+                    await loadResidents();
+
+
+                }catch(error){
+
+                    showFormError(
+                        error.message ||
+                        'Gagal membuat akun Mahasiswa.'
+                    );
+
+                }finally{
+
+                    saveButton.disabled = false;
+
+                }
+
+            }
+        );
+
+    }
+
+
+    /* =====================================================
+       BULK IMPORT HELPERS
+    ===================================================== */
+
+    function getAllowedPrograms(){
+
+        const select =
+            root.querySelector(
+                '#spj26adm-residen-program'
+            );
+
+        if(!select){
+            return [];
+        }
+
+        return Array.from(
+            select.options
+        )
+        .map(
+            option =>
+                String(
+                    option.value || ''
+                ).trim()
+        )
+        .filter(Boolean);
+
+    }
+
+
+    function normalizeHeader(value){
+
+        return String(
+            value || ''
+        )
+        .trim()
+        .toLowerCase()
+        .replace(/[^a-z0-9]/g,'');
+
+    }
+
+
+    function findColumnIndex(
+        headers,
+        aliases
+    ){
+
+        const normalized =
+            headers.map(
+                normalizeHeader
+            );
+
+        for(
+            let index = 0;
+            index < normalized.length;
+            index++
+        ){
+
+            if(
+                aliases.includes(
+                    normalized[index]
+                )
+            ){
+                return index;
+            }
+
+        }
+
+        return -1;
+
+    }
+
+
+    function maskPassword(password){
+
+        const length =
+            Math.max(
+                8,
+                Math.min(
+                    String(
+                        password || ''
+                    ).length,
+                    12
+                )
+            );
+
+        return '•'.repeat(length);
+
+    }
+
+
+    function canonicalProgram(
+        program,
+        allowedPrograms
+    ){
+
+        const input =
+            canonicalResidentProgram(
+                program
+            );
+
+        const match =
+            allowedPrograms.find(
+                item =>
+                    item.toLowerCase() ===
+                    input.toLowerCase()
+            );
+
+        return match || input;
+
+    }
+
+
+    function validateImportedRows(rawRows){
+
+        const allowedPrograms =
+            getAllowedPrograms();
+
+        const nimCounts = {};
+
+
+        rawRows.forEach(
+            function(row){
+
+                const key =
+                    row.nim.toLowerCase();
+
+                if(key){
+
+                    nimCounts[key] =
+                        (nimCounts[key] || 0) + 1;
+
+                }
+
+            }
+        );
+
+
+        return rawRows.map(
+            function(row){
+
+                const errors = [];
+
+                row.program =
+                    canonicalProgram(
+                        row.program,
+                        allowedPrograms
+                    );
+
+
+                if(!row.nim){
+                    errors.push(
+                        'NIM wajib diisi'
+                    );
+                }
+
+                if(!row.name){
+                    errors.push(
+                        'Nama Lengkap wajib diisi'
+                    );
+                }
+
+                if(!row.program){
+                    errors.push(
+                        'Program PPDS wajib diisi'
+                    );
+                }else if(
+                    allowedPrograms.length > 0 &&
+                    !allowedPrograms.includes(
+                        row.program
+                    )
+                ){
+                    errors.push(
+                        'Program PPDS tidak dikenali'
+                    );
+                }
+
+                if(!row.password){
+                    errors.push(
+                        'Password Awal wajib diisi'
+                    );
+                }else if(
+                    row.password.length < 8
+                ){
+                    errors.push(
+                        'Password minimal 8 karakter'
+                    );
+                }
+
+                if(
+                    row.nim &&
+                    nimCounts[
+                        row.nim.toLowerCase()
+                    ] > 1
+                ){
+                    errors.push(
+                        'NIM duplikat di dalam file'
+                    );
+                }
+
+
+                return {
+                    rowNumber:
+                        row.rowNumber,
+                    nim:
+                        row.nim,
+                    name:
+                        row.name,
+                    program:
+                        row.program,
+                    password:
+                        row.password,
+                    validationErrors:
+                        errors,
+                    state:
+                        errors.length
+                        ? 'invalid'
+                        : 'ready',
+                    backendMessage:''
+                };
+
+            }
+        );
+
+    }
+
+
+    function getImportCounts(){
+
+        const counts = {
+            total:importRows.length,
+            ready:0,
+            invalid:0,
+            success:0,
+            failed:0,
+            processing:0
+        };
+
+
+        importRows.forEach(
+            function(row){
+
+                if(
+                    Object.prototype.hasOwnProperty.call(
+                        counts,
+                        row.state
+                    )
+                ){
+                    counts[row.state]++;
+                }
+
+            }
+        );
+
+
+        return counts;
+
+    }
+
+
+    function renderImportState(){
+
+        const counts =
+            getImportCounts();
+
+
+        setImportCount(
+            'spj26adm-import-total',
+            counts.total
+        );
+
+        setImportCount(
+            'spj26adm-import-ready',
+            counts.ready
+        );
+
+        setImportCount(
+            'spj26adm-import-invalid',
+            counts.invalid + counts.failed
+        );
+
+        setImportCount(
+            'spj26adm-import-success',
+            counts.success
+        );
+
+
+        if(importSummary){
+            importSummary.hidden =
+                counts.total === 0;
+        }
+
+        if(importPreview){
+            importPreview.hidden =
+                counts.total === 0;
+        }
+
+
+        if(importSubmit){
+
+            importSubmit.disabled =
+                importBusy ||
+                counts.ready === 0;
+
+            importSubmit.textContent =
+                counts.ready > 0
+                ? 'Buat ' +
+                  counts.ready +
+                  ' Akun Valid'
+                : 'Tidak Ada Akun Valid';
+
+        }
+
+
+        renderImportTable();
+
+    }
+
+
+    function renderImportTable(){
+
+        if(!importTableBody){
+            return;
+        }
+
+        importTableBody.innerHTML = '';
+
+
+        importRows.forEach(
+            function(row,index){
+
+                const tr =
+                    document.createElement('tr');
+
+
+                const tdNo =
+                    document.createElement('td');
+
+                tdNo.textContent =
+                    String(index + 1);
+
+
+                const tdNim =
+                    document.createElement('td');
+
+                tdNim.textContent =
+                    row.nim || '-';
+
+
+                const tdName =
+                    document.createElement('td');
+
+                tdName.textContent =
+                    row.name || '-';
+
+
+                const tdProgram =
+                    document.createElement('td');
+
+                tdProgram.textContent =
+                    row.program || '-';
+
+
+                const tdPassword =
+                    document.createElement('td');
+
+                tdPassword.appendChild(
+                    createEl(
+                        'span',
+                        'spj26adm-import-password',
+                        row.password
+                        ? maskPassword(
+                            row.password
+                          )
+                        : '-'
+                    )
+                );
+
+
+                const tdStatus =
+                    document.createElement('td');
+
+
+                let label =
+                    'Siap dibuat';
+
+                let statusClass =
+                    'ready';
+
+                let message = '';
+
+
+                if(
+                    row.state === 'invalid'
+                ){
+
+                    label =
+                        'Bermasalah';
+
+                    statusClass =
+                        'invalid';
+
+                    message =
+                        row.validationErrors.join(
+                            ' • '
+                        );
+
+                }else if(
+                    row.state === 'processing'
+                ){
+
+                    label =
+                        'Diproses';
+
+                    statusClass =
+                        'processing';
+
+                    message =
+                        'Sedang membuat akun...';
+
+                }else if(
+                    row.state === 'success'
+                ){
+
+                    label =
+                        'Berhasil';
+
+                    statusClass =
+                        'success';
+
+                    message =
+                        'Akun berhasil dibuat.';
+
+                }else if(
+                    row.state === 'failed'
+                ){
+
+                    label =
+                        'Gagal';
+
+                    statusClass =
+                        'failed';
+
+                    message =
+                        row.backendMessage ||
+                        'Akun gagal dibuat.';
+
+                }
+
+
+                tdStatus.appendChild(
+                    createEl(
+                        'span',
+                        'spj26adm-import-status ' +
+                        statusClass,
+                        label
+                    )
+                );
+
+
+                if(message){
+
+                    tdStatus.appendChild(
+                        createEl(
+                            'div',
+                            'spj26adm-import-message',
+                            message
+                        )
+                    );
+
+                }
+
+
+                tr.appendChild(tdNo);
+                tr.appendChild(tdNim);
+                tr.appendChild(tdName);
+                tr.appendChild(tdProgram);
+                tr.appendChild(tdPassword);
+                tr.appendChild(tdStatus);
+
+                importTableBody.appendChild(tr);
+
+            }
+        );
+
+    }
+
+
+    /* =====================================================
+       DOWNLOAD EXCEL TEMPLATE
+    ===================================================== */
+
+    function downloadImportTemplate(){
+
+        clearImportError();
+
+
+        if(
+            typeof window.XLSX === 'undefined'
+        ){
+
+            showImportError(
+                'Library Excel belum berhasil dimuat. Muat ulang halaman lalu coba kembali.'
+            );
+
+            return;
+
+        }
+
+
+        const allowedPrograms =
+            getAllowedPrograms();
+
+
+        const workbook =
+            XLSX.utils.book_new();
+
+
+        const templateRows = [
+            [
+                'NIM',
+                'Nama Lengkap',
+                'Program PPDS',
+                'Password Awal'
+            ]
+        ];
+
+
+        const templateSheet =
+            XLSX.utils.aoa_to_sheet(
+                templateRows
+            );
+
+
+        templateSheet['!cols'] = [
+            {wch:18},
+            {wch:32},
+            {wch:34},
+            {wch:22}
+        ];
+
+
+        XLSX.utils.book_append_sheet(
+            workbook,
+            templateSheet,
+            'IMPORT MAHASISWA'
+        );
+
+
+        const instructionRows = [
+            [
+                'PETUNJUK IMPORT AKUN MAHASISWA SIPATUJU'
+            ],
+            [
+                '1',
+                'Jangan mengubah nama kolom pada sheet IMPORT MAHASISWA.'
+            ],
+            [
+                '2',
+                'NIM wajib diisi dan tidak boleh duplikat.'
+            ],
+            [
+                '3',
+                'Nama Lengkap wajib diisi.'
+            ],
+            [
+                '4',
+                'Program PPDS harus sama dengan salah satu nama program pada daftar referensi.'
+            ],
+            [
+                '5',
+                'Password Awal wajib diisi dan minimal 8 karakter.'
+            ],
+            [
+                '6',
+                'Password dapat diubah oleh mahasiswa dari dashboard mahasiswa setelah login.'
+            ],
+            [
+                '7',
+                'Maksimal 500 baris mahasiswa per file.'
+            ],
+            [],
+            [
+                'REFERENSI PROGRAM PPDS'
+            ],
+            ...allowedPrograms.map(
+                function(program,index){
+                    return [
+                        String(index + 1),
+                        program
+                    ];
+                }
+            )
+        ];
+
+
+        const instructionSheet =
+            XLSX.utils.aoa_to_sheet(
+                instructionRows
+            );
+
+
+        instructionSheet['!cols'] = [
+            {wch:8},
+            {wch:70}
+        ];
+
+
+        XLSX.utils.book_append_sheet(
+            workbook,
+            instructionSheet,
+            'PETUNJUK'
+        );
+
+
+        XLSX.writeFile(
+            workbook,
+            'template-import-mahasiswa-sipatuju.xlsx'
+        );
+
+    }
+
+
+    if(downloadTemplateButton){
+
+        downloadTemplateButton.addEventListener(
+            'click',
+            downloadImportTemplate
+        );
+
+    }
+
+
+    /* =====================================================
+       READ / VALIDATE EXCEL
+    ===================================================== */
+
+    async function processImportFile(file){
+
+        resetBulkImport();
+
+
+        if(!file){
+            return;
+        }
+
+
+        if(
+            !/\.(xlsx|xls)$/i.test(
+                file.name || ''
+            )
+        ){
+
+            showImportError(
+                'File harus berformat .xlsx atau .xls.'
+            );
+
+            return;
+
+        }
+
+
+        if(
+            file.size >
+            5 * 1024 * 1024
+        ){
+
+            showImportError(
+                'Ukuran file terlalu besar. Maksimal 5 MB.'
+            );
+
+            return;
+
+        }
+
+
+        if(
+            typeof window.XLSX === 'undefined'
+        ){
+
+            showImportError(
+                'Library Excel belum berhasil dimuat. Muat ulang halaman lalu coba kembali.'
+            );
+
+            return;
+
+        }
+
+
+        if(importFileName){
+            importFileName.textContent =
+                file.name;
+        }
+
+
+        try{
+
+            const buffer =
+                await file.arrayBuffer();
+
+
+            const workbook =
+                XLSX.read(
+                    buffer,
+                    {
+                        type:'array'
+                    }
+                );
+
+
+            if(
+                !workbook.SheetNames ||
+                workbook.SheetNames.length === 0
+            ){
+
+                throw new Error(
+                    'Workbook tidak memiliki sheet.'
+                );
+
+            }
+
+
+            const sheet =
+                workbook.Sheets[
+                    workbook.SheetNames[0]
+                ];
+
+
+            const rows =
+                XLSX.utils.sheet_to_json(
+                    sheet,
+                    {
+                        header:1,
+                        defval:'',
+                        raw:false
+                    }
+                );
+
+
+            if(
+                !Array.isArray(rows) ||
+                rows.length < 2
+            ){
+
+                throw new Error(
+                    'File belum berisi data mahasiswa.'
+                );
+
+            }
+
+
+            const headers =
+                rows[0].map(
+                    value =>
+                        String(
+                            value || ''
+                        ).trim()
+                );
+
+
+            const nimIndex =
+                findColumnIndex(
+                    headers,
+                    [
+                        'nim'
+                    ]
+                );
+
+            const nameIndex =
+                findColumnIndex(
+                    headers,
+                    [
+                        'namalengkap',
+                        'nama'
+                    ]
+                );
+
+            const programIndex =
+                findColumnIndex(
+                    headers,
+                    [
+                        'programppds',
+                        'program'
+                    ]
+                );
+
+            const passwordIndex =
+                findColumnIndex(
+                    headers,
+                    [
+                        'passwordawal',
+                        'password'
+                    ]
+                );
+
+
+            const missingColumns = [];
+
+
+            if(nimIndex < 0){
+                missingColumns.push('NIM');
+            }
+
+            if(nameIndex < 0){
+                missingColumns.push(
+                    'Nama Lengkap'
+                );
+            }
+
+            if(programIndex < 0){
+                missingColumns.push(
+                    'Program PPDS'
+                );
+            }
+
+            if(passwordIndex < 0){
+                missingColumns.push(
+                    'Password Awal'
+                );
+            }
+
+
+            if(missingColumns.length){
+
+                throw new Error(
+                    'Kolom wajib tidak ditemukan: ' +
+                    missingColumns.join(', ') +
+                    '. Gunakan template Excel SIPATUJU.'
+                );
+
+            }
+
+
+            const rawRows = [];
+
+
+            for(
+                let i = 1;
+                i < rows.length;
+                i++
+            ){
+
+                const row =
+                    rows[i] || [];
+
+
+                const nim =
+                    String(
+                        row[nimIndex] || ''
+                    ).trim();
+
+                const name =
+                    String(
+                        row[nameIndex] || ''
+                    ).trim();
+
+                const program =
+                    String(
+                        row[programIndex] || ''
+                    ).trim();
+
+                const password =
+                    String(
+                        row[passwordIndex] || ''
+                    ).trim();
+
+
+                if(
+                    !nim &&
+                    !name &&
+                    !program &&
+                    !password
+                ){
+                    continue;
+                }
+
+
+                rawRows.push({
+                    rowNumber:i + 1,
+                    nim:nim,
+                    name:name,
+                    program:program,
+                    password:password
+                });
+
+            }
+
+
+            if(
+                rawRows.length === 0
+            ){
+
+                throw new Error(
+                    'Tidak ada data mahasiswa yang dapat diproses.'
+                );
+
+            }
+
+
+            if(
+                rawRows.length > 500
+            ){
+
+                throw new Error(
+                    'Maksimal 500 baris mahasiswa per file.'
+                );
+
+            }
+
+
+            importRows =
+                validateImportedRows(
+                    rawRows
+                );
+
+
+            clearImportError();
+            renderImportState();
+
+
+        }catch(error){
+
+            importRows = [];
+
+            showImportError(
+                error.message ||
+                'File Excel gagal dibaca.'
+            );
+
+            renderImportState();
+
+        }
+
+    }
+
+
+    if(importDropzone){
+
+        importDropzone.addEventListener(
+            'click',
+            function(){
+
+                if(
+                    !importBusy &&
+                    importFileInput
+                ){
+                    importFileInput.click();
+                }
+
+            }
+        );
+
+
+        importDropzone.addEventListener(
+            'keydown',
+            function(event){
+
+                if(
+                    (
+                        event.key === 'Enter' ||
+                        event.key === ' '
+                    ) &&
+                    !importBusy &&
+                    importFileInput
+                ){
+
+                    event.preventDefault();
+                    importFileInput.click();
+
+                }
+
+            }
+        );
+
+
+        [
+            'dragenter',
+            'dragover'
+        ].forEach(
+            function(eventName){
+
+                importDropzone.addEventListener(
+                    eventName,
+                    function(event){
+
+                        event.preventDefault();
+
+                        if(!importBusy){
+                            importDropzone.classList.add(
+                                'dragover'
+                            );
+                        }
+
+                    }
+                );
+
+            }
+        );
+
+
+        [
+            'dragleave',
+            'drop'
+        ].forEach(
+            function(eventName){
+
+                importDropzone.addEventListener(
+                    eventName,
+                    function(event){
+
+                        event.preventDefault();
+
+                        importDropzone.classList.remove(
+                            'dragover'
+                        );
+
+                    }
+                );
+
+            }
+        );
+
+
+        importDropzone.addEventListener(
+            'drop',
+            function(event){
+
+                if(importBusy){
+                    return;
+                }
+
+                const file =
+                    event.dataTransfer &&
+                    event.dataTransfer.files
+                    ? event.dataTransfer.files[0]
+                    : null;
+
+                processImportFile(file);
+
+            }
+        );
+
+    }
+
+
+    if(importFileInput){
+
+        importFileInput.addEventListener(
+            'change',
+            function(){
+
+                const file =
+                    importFileInput.files &&
+                    importFileInput.files[0]
+                    ? importFileInput.files[0]
+                    : null;
+
+                processImportFile(file);
+
+            }
+        );
+
+    }
+
+
+    /* =====================================================
+       EXECUTE BULK CREATE
+       Reuse endpoint single account untuk menjaga kompatibilitas
+       dengan backend yang sudah ada.
+    ===================================================== */
+
+    if(importSubmit){
+
+        importSubmit.addEventListener(
+            'click',
+            async function(){
+
+                const pendingRows =
+                    importRows.filter(
+                        row =>
+                            row.state === 'ready'
+                    );
+
+
+                if(
+                    pendingRows.length === 0 ||
+                    importBusy
+                ){
+                    return;
+                }
+
+
+                importBusy = true;
+                clearImportError();
+
+                importSubmit.disabled = true;
+
+                if(downloadTemplateButton){
+                    downloadTemplateButton.disabled = true;
+                }
+
+                if(importFileInput){
+                    importFileInput.disabled = true;
+                }
+
+                accountTabs.forEach(
+                    button =>
+                        button.disabled = true
+                );
+
+
+                let successCount = 0;
+                let failedCount = 0;
+
+
+                for(
+                    let index = 0;
+                    index < pendingRows.length;
+                    index++
+                ){
+
+                    const row =
+                        pendingRows[index];
+
+
+                    row.state =
+                        'processing';
+
+                    row.backendMessage = '';
+
+                    if(importProgress){
+
+                        importProgress.hidden = false;
+
+                        importProgress.textContent =
+                            'Memproses ' +
+                            (index + 1) +
+                            ' dari ' +
+                            pendingRows.length +
+                            ' akun...';
+
+                    }
+
+                    renderImportState();
+
+
+                    try{
+
+                        await backendRequest(
+                            'spj26_admin_create_resident',
+                            {
+                                nim:row.nim,
+                                name:row.name,
+                                program:row.program,
+                                password:row.password
+                            }
+                        );
+
+
+                        row.state =
+                            'success';
+
+                        /*
+                         * Hapus password dari memori setelah akun
+                         * berhasil dibuat.
+                         */
+                        row.password = '';
+
+                        successCount++;
+
+
+                    }catch(error){
+
+                        row.state =
+                            'failed';
+
+                        row.backendMessage =
+                            error.message ||
+                            'Akun gagal dibuat.';
+
+                        failedCount++;
+
+                    }
+
+
+                    renderImportState();
+
+                }
+
+
+                importBusy = false;
+
+
+                if(downloadTemplateButton){
+                    downloadTemplateButton.disabled = false;
+                }
+
+                if(importFileInput){
+                    importFileInput.disabled = false;
+                }
+
+                accountTabs.forEach(
+                    button =>
+                        button.disabled = false
+                );
+
+
+                if(importProgress){
+
+                    importProgress.hidden = false;
+
+                    importProgress.textContent =
+                        'Selesai: ' +
+                        successCount +
+                        ' berhasil' +
+                        (
+                            failedCount > 0
+                            ? ', ' +
+                              failedCount +
+                              ' gagal'
+                            : ''
+                        ) +
+                        '.';
+
+                }
+
+
+                renderImportState();
+
+
+                if(successCount > 0){
+
+                    showToast(
+                        successCount +
+                        ' akun Mahasiswa berhasil dibuat' +
+                        (
+                            failedCount > 0
+                            ? ', ' +
+                              failedCount +
+                              ' gagal.'
+                            : '.'
+                        )
+                    );
+
+
+                    await loadResidents();
+
+                }else{
+
+                    showImportError(
+                        'Tidak ada akun yang berhasil dibuat. Periksa status setiap baris pada tabel preview.'
+                    );
+
+                }
+
+            }
+        );
+
+    }
+
+
+
+    /* =====================================================
+       EDIT MAHASISWA
+       Persisted through spj26_admin_update_resident.
+    ===================================================== */
+
+    const editModal =
+        root.querySelector(
+            '#spj26adm-residen-edit-modal'
+        );
+
+    const editClose =
+        root.querySelector(
+            '#spj26adm-residen-edit-close'
+        );
+
+    const editCancel =
+        root.querySelector(
+            '#spj26adm-residen-edit-cancel'
+        );
+
+    const editSave =
+        root.querySelector(
+            '#spj26adm-residen-edit-save'
+        );
+
+    const editError =
+        root.querySelector(
+            '#spj26adm-residen-edit-error'
+        );
+
+    let editResidentTarget = null;
+
+
+    function clearEditError(){
+
+        if(!editError){
+            return;
+        }
+
+        editError.textContent = '';
+        editError.classList.remove('show');
+    }
+
+
+    function showEditError(message){
+
+        if(!editError){
+            return;
+        }
+
+        editError.textContent =
+            message || 'Data gagal diperbarui.';
+
+        editError.classList.add('show');
+    }
+
+
+    function resetEditPasswords(){
+
+        [
+            'spj26adm-residen-edit-password',
+            'spj26adm-residen-edit-password-confirm'
+        ].forEach(function(id){
+
+            const input =
+                root.querySelector(
+                    '#' + id
+                );
+
+            if(input){
+                input.value = '';
+                input.type = 'password';
+            }
+
+        });
+
+
+        root
+            .querySelectorAll(
+                '#spj26adm-residen-edit-modal [data-password-toggle]'
+            )
+            .forEach(function(button){
+
+                const icon =
+                    button.querySelector(
+                        '.material-symbols-outlined'
+                    );
+
+                if(icon){
+                    icon.textContent = 'visibility';
+                }
+
+                button.setAttribute(
+                    'aria-pressed',
+                    'false'
+                );
+            });
+    }
+
+
+    function openEditResident(resident){
+
+        if(
+            !resident ||
+            !resident.id
+        ){
+            showToast(
+                'Data mahasiswa tidak valid.'
+            );
+            return;
+        }
+
+        editResidentTarget =
+            resident;
+
+        clearEditError();
+        resetEditPasswords();
+
+        const userId =
+            root.querySelector(
+                '#spj26adm-residen-edit-user-id'
+            );
+
+        const nim =
+            root.querySelector(
+                '#spj26adm-residen-edit-nim'
+            );
+
+        const name =
+            root.querySelector(
+                '#spj26adm-residen-edit-name'
+            );
+
+        const program =
+            root.querySelector(
+                '#spj26adm-residen-edit-program'
+            );
+
+        const subtitle =
+            root.querySelector(
+                '#spj26adm-residen-edit-subtitle'
+            );
+
+
+        if(userId){
+            userId.value =
+                String(resident.id);
+        }
+
+        if(nim){
+            nim.value =
+                resident.nim || '';
+        }
+
+        if(name){
+            name.value =
+                resident.name || '';
+        }
+
+        if(program){
+            program.value =
+                canonicalResidentProgram(
+                    resident.program || ''
+                );
+        }
+
+        if(subtitle){
+            subtitle.textContent =
+                (resident.name || 'Mahasiswa') +
+                ' • ' +
+                (resident.nim || '-');
+        }
+
+        if(editModal){
+            editModal.hidden = false;
+        }
+
+        if(name){
+            window.setTimeout(
+                function(){
+                    name.focus();
+                    name.select();
+                },
+                0
+            );
+        }
+    }
+
+
+    function closeEditResident(){
+
+        if(editModal){
+            editModal.hidden = true;
+        }
+
+        clearEditError();
+        resetEditPasswords();
+        editResidentTarget = null;
+    }
+
+
+    [editClose,editCancel]
+        .filter(Boolean)
+        .forEach(function(button){
+
+            button.addEventListener(
+                'click',
+                closeEditResident
+            );
+        });
+
+
+    if(editModal){
+
+        editModal.addEventListener(
+            'click',
+            function(event){
+
+                if(event.target === editModal){
+                    closeEditResident();
+                }
+            }
+        );
+    }
+
+
+    if(editSave){
+
+        editSave.addEventListener(
+            'click',
+            async function(){
+
+                if(
+                    !editResidentTarget ||
+                    !editResidentTarget.id
+                ){
+                    showEditError(
+                        'Data mahasiswa tidak valid.'
+                    );
+                    return;
+                }
+
+
+                const nim =
+                    getInput(
+                        'spj26adm-residen-edit-nim'
+                    );
+
+                const name =
+                    getInput(
+                        'spj26adm-residen-edit-name'
+                    );
+
+                const program =
+                    getInput(
+                        'spj26adm-residen-edit-program'
+                    );
+
+                const password =
+                    getInput(
+                        'spj26adm-residen-edit-password'
+                    );
+
+                const confirmPassword =
+                    getInput(
+                        'spj26adm-residen-edit-password-confirm'
+                    );
+
+
+                if(
+                    !nim ||
+                    !name ||
+                    !program
+                ){
+                    showEditError(
+                        'NIM, nama lengkap, dan Program PPDS wajib diisi.'
+                    );
+                    return;
+                }
+
+
+                if(
+                    password &&
+                    password.length < 8
+                ){
+                    showEditError(
+                        'Password baru minimal 8 karakter.'
+                    );
+                    return;
+                }
+
+
+                if(
+                    password !==
+                    confirmPassword
+                ){
+                    showEditError(
+                        'Konfirmasi password baru tidak sama.'
+                    );
+                    return;
+                }
+
+
+                clearEditError();
+                editSave.disabled = true;
+                editSave.textContent =
+                    'Menyimpan...';
+
+
+                try{
+
+                    await backendRequest(
+                        'spj26_admin_update_resident',
+                        {
+                            user_id:
+                                editResidentTarget.id,
+                            nim:nim,
+                            name:name,
+                            program:program,
+                            password:password
+                        }
+                    );
+
+
+                    closeEditResident();
+
+                    showToast(
+                        'Data mahasiswa berhasil diperbarui.'
+                    );
+
+                    await loadResidents();
+
+
+                }catch(error){
+
+                    showEditError(
+                        error.message ||
+                        'Data mahasiswa gagal diperbarui.'
+                    );
+
+
+                }finally{
+
+                    editSave.disabled = false;
+                    editSave.textContent =
+                        'Simpan Perubahan';
+                }
+            }
+        );
+    }
+
+
+    /* =====================================================
+       DETAIL MODAL
+    ===================================================== */
+
+    const detailModal =
+        root.querySelector(
+            '#spj26adm-residen-detail-modal'
+        );
+
+    const detailClose =
+        root.querySelector(
+            '#spj26adm-residen-detail-close'
+        );
+
+    const detailCloseBottom =
+        root.querySelector(
+            '#spj26adm-residen-detail-close-bottom'
+        );
+
+
+    function openDetail(resident){
+
+        const subtitle =
+            root.querySelector(
+                '#spj26adm-residen-detail-subtitle'
+            );
+
+        if(subtitle){
+            subtitle.textContent =
+                resident.name || '';
+        }
+
+
+        setText(
+            'spj26adm-detail-nim',
+            resident.nim || '-'
+        );
+
+        setText(
+            'spj26adm-detail-program',
+            resident.program || '-'
+        );
+
+        setText(
+            'spj26adm-detail-status',
+            resident.active
+            ? 'Aktif'
+            : 'Nonaktif'
+        );
+
+        setText(
+            'spj26adm-detail-login',
+            resident.last_login ||
+            'Belum pernah login'
+        );
+
+        setText(
+            'spj26adm-detail-submissions',
+            resident.submissions || 0
+        );
+
+        setText(
+            'spj26adm-detail-login-state',
+            resident.last_login
+            ? 'Pernah login'
+            : 'Belum pernah login'
+        );
+
+
+        if(detailModal){
+            detailModal.hidden = false;
+        }
+
+    }
+
+
+    function closeDetail(){
+
+        if(detailModal){
+            detailModal.hidden = true;
+        }
+
+    }
+
+
+    if(detailClose){
+        detailClose.addEventListener(
+            'click',
+            closeDetail
+        );
+    }
+
+    if(detailCloseBottom){
+        detailCloseBottom.addEventListener(
+            'click',
+            closeDetail
+        );
+    }
+
+    if(detailModal){
+        detailModal.addEventListener(
+            'click',
+            function(event){
+
+                if(event.target === detailModal){
+                    closeDetail();
+                }
+
+            }
+        );
+    }
+
+
+    /* =====================================================
+       ACTIVATE / DEACTIVATE
+    ===================================================== */
+
+    async function toggleResident(
+        resident
+    ){
+
+        try{
+
+            await backendRequest(
+                'spj26_admin_toggle_resident',
+                {
+                    user_id:
+                        resident.id,
+                    active:
+                        resident.active
+                        ? '0'
+                        : '1'
+                }
+            );
+
+
+            showToast(
+                resident.active
+                ? 'Akun Mahasiswa berhasil dinonaktifkan.'
+                : 'Akun Mahasiswa berhasil diaktifkan.'
+            );
+
+
+            await loadResidents();
+
+
+        }catch(error){
+
+            showToast(
+                error.message ||
+                'Perubahan status akun gagal.'
+            );
+
+        }
+
+    }
+
+
+    /* =====================================================
+       LOGOUT
+    ===================================================== */
+
+    const logoutLink =
+        root.querySelector(
+            '#spj26adm-residen-logout'
+        );
+
+
+    function applyResidentConfig(){
+
+        if(
+            logoutLink &&
+            window.spj26ResidentAdminConfig &&
+            window.spj26ResidentAdminConfig.logoutUrl
+        ){
+
+            logoutLink.href =
+                window.spj26ResidentAdminConfig.logoutUrl;
+
+        }
+
+    }
+
+
+    document.addEventListener(
+        'keydown',
+        function(event){
+
+            if(
+                event.key === 'Escape' &&
+                editModal &&
+                !editModal.hidden
+            ){
+                closeEditResident();
+            }
+        }
+    );
+
+
+    /* =====================================================
+       INITIAL
+       Elementor HTML Widget dapat dieksekusi sebelum wp_footer
+       mencetak window.spj26ResidentAdminConfig. Karena itu,
+       tunggu sampai seluruh page selesai dimuat terlebih dahulu.
+    ===================================================== */
+
+    function initializeResidentPage(){
+
+        applyResidentConfig();
+
+        if(
+            !window.spj26ResidentAdminConfig ||
+            !window.spj26ResidentAdminConfig.ajaxUrl ||
+            !window.spj26ResidentAdminConfig.nonce
+        ){
+
+            showToast(
+                'Konfigurasi backend Manajemen Mahasiswa belum tersedia.'
+            );
+
+            console.error(
+                'SIPATUJU Mahasiswa: spj26ResidentAdminConfig tidak ditemukan.'
+            );
+
+            return;
+
+        }
+
+        loadResidents();
+
+    }
+
+
+    if(
+        document.readyState === 'complete'
+    ){
+
+        initializeResidentPage();
+
+    }else{
+
+        window.addEventListener(
+            'load',
+            initializeResidentPage,
+            { once:true }
+        );
+
+    }
+
+})();
+</script>

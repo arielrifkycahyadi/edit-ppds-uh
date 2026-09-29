@@ -1,0 +1,1114 @@
+/**
+ * SIPATUJU PPDS FK UNHAS
+ * 000 — 02 - SIPATUJU User Management — CANONICAL 2026.4
+ *
+ * Fungsi:
+ * - Manajemen akun Residen
+ * - Manajemen akun Reviewer
+ * - Membuat akun WordPress nyata untuk Residen/Reviewer
+ * - Membaca daftar akun dari wp_users / wp_usermeta
+ * - Mengaktifkan / menonaktifkan akun SIPATUJU
+ * - Menyediakan AJAX API untuk page Admin Residen/Reviewer
+ * - Mengirim konfigurasi backend ke frontend Elementor
+ * - Memastikan role akun Residen/Reviewer tersimpan secara eksplisit
+ * - Menandai tipe akun dengan meta spj26_account_type
+ * - Mengirim identitas akun nyata ke Dashboard Residen
+ *
+ * Dependency:
+ * - 000 — 01 - SIPATUJU Core & Authentication
+ *
+ * Namespace PHP: spj26_um_
+ *
+ * PENTING:
+ * - Paste ke Code Snippets TANPA tag <?php
+ * - Location: Run everywhere
+ * - Priority: 10
+ */
+
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
+
+/* =========================================================
+ * 1. SECURITY / ADMIN ACCESS
+ * ========================================================= */
+
+function spj26_um_current_admin_can_manage_users() {
+
+	if ( ! is_user_logged_in() ) {
+		return false;
+	}
+
+	$user = wp_get_current_user();
+
+	if ( function_exists( 'spj26_is_system_admin' ) ) {
+		return spj26_is_system_admin( $user );
+	}
+
+	return user_can(
+		$user,
+		'manage_options'
+	);
+}
+
+
+function spj26_um_require_admin() {
+
+	if ( ! spj26_um_current_admin_can_manage_users() ) {
+
+		wp_send_json_error(
+			array(
+				'message' => 'Anda tidak memiliki izin untuk mengelola pengguna SIPATUJU.',
+			),
+			403
+		);
+	}
+}
+
+
+function spj26_um_verify_request() {
+
+	check_ajax_referer(
+		'spj26_user_management_action',
+		'nonce'
+	);
+
+	spj26_um_require_admin();
+}
+
+
+/* =========================================================
+ * 2. USER META HELPERS
+ * ========================================================= */
+
+function spj26_um_is_active( $user_id ) {
+
+	$value = get_user_meta(
+		$user_id,
+		'spj26_account_active',
+		true
+	);
+
+	/*
+	 * Akun lama tanpa meta dianggap aktif.
+	 */
+	if ( $value === '' ) {
+		return true;
+	}
+
+	return (string) $value === '1';
+}
+
+
+function spj26_um_format_last_login( $user_id ) {
+
+	$value = get_user_meta(
+		$user_id,
+		'spj26_last_login',
+		true
+	);
+
+	if ( ! $value ) {
+		return null;
+	}
+
+	$timestamp = strtotime( $value );
+
+	if ( ! $timestamp ) {
+		return $value;
+	}
+
+	return wp_date(
+		'd M Y, H:i',
+		$timestamp
+	);
+}
+
+
+function spj26_um_submission_count(
+	$user_id,
+	$user_type
+) {
+
+	/*
+	 * Snippet Submission System nantinya dapat mengisi angka nyata
+	 * melalui filter ini tanpa perlu mengubah snippet User Management.
+	 */
+	return (int) apply_filters(
+		'spj26_user_submission_count',
+		0,
+		$user_id,
+		$user_type
+	);
+}
+
+
+/* =========================================================
+ * 3. SERIALIZE RESIDEN
+ * ========================================================= */
+
+function spj26_um_serialize_resident( $user ) {
+
+	return array(
+		'id'          => (int) $user->ID,
+		'nim'         => (string) $user->user_login,
+		'name'        => (string) $user->display_name,
+		'program'     => (string) get_user_meta(
+			$user->ID,
+			'spj26_program_ppds',
+			true
+		),
+		'active'      => spj26_um_is_active(
+			$user->ID
+		),
+		'last_login'  => spj26_um_format_last_login(
+			$user->ID
+		),
+		'submissions' => spj26_um_submission_count(
+			$user->ID,
+			'residen'
+		),
+	);
+}
+
+
+/* =========================================================
+ * 4. SERIALIZE REVIEWER
+ * ========================================================= */
+
+function spj26_um_serialize_reviewer( $user ) {
+
+	return array(
+		'id'                 => (int) $user->ID,
+		'username'           => (string) $user->user_login,
+		'name'               => (string) $user->display_name,
+		'unit'               => (string) get_user_meta(
+			$user->ID,
+			'spj26_reviewer_unit',
+			true
+		),
+		'active'             => spj26_um_is_active(
+			$user->ID
+		),
+		'last_login'         => spj26_um_format_last_login(
+			$user->ID
+		),
+		'active_submissions' => (int) apply_filters(
+			'spj26_reviewer_active_submission_count',
+			0,
+			$user->ID
+		),
+		'completed_reviews'  => (int) apply_filters(
+			'spj26_reviewer_completed_review_count',
+			0,
+			$user->ID
+		),
+	);
+}
+
+
+/* =========================================================
+ * 5. USER COLLECTION HELPERS
+ * ========================================================= */
+
+/**
+ * Ambil seluruh akun Residen SIPATUJU.
+ *
+ * Sumber utama adalah role WordPress `sipatuju_residen`.
+ * Meta `spj26_account_type` dipakai sebagai marker tambahan agar
+ * akun yang dibuat SIPATUJU tetap mudah dikenali dan diaudit.
+ */
+function spj26_um_get_resident_users() {
+
+	$users = get_users(
+		array(
+			'role__in' => array(
+				'sipatuju_residen',
+			),
+			'orderby'  => 'display_name',
+			'order'    => 'ASC',
+		)
+	);
+
+	/*
+	 * Pastikan akun lama yang sudah memiliki role SIPATUJU
+	 * ikut memperoleh marker tipe akun.
+	 */
+	foreach ( $users as $user ) {
+
+		if (
+			get_user_meta(
+				$user->ID,
+				'spj26_account_type',
+				true
+			) !== 'residen'
+		) {
+
+			update_user_meta(
+				$user->ID,
+				'spj26_account_type',
+				'residen'
+			);
+		}
+	}
+
+	return $users;
+}
+
+
+/**
+ * Ambil seluruh akun Reviewer SIPATUJU.
+ */
+function spj26_um_get_reviewer_users() {
+
+	$users = get_users(
+		array(
+			'role__in' => array(
+				'sipatuju_reviewer',
+			),
+			'orderby'  => 'display_name',
+			'order'    => 'ASC',
+		)
+	);
+
+	foreach ( $users as $user ) {
+
+		if (
+			get_user_meta(
+				$user->ID,
+				'spj26_account_type',
+				true
+			) !== 'reviewer'
+		) {
+
+			update_user_meta(
+				$user->ID,
+				'spj26_account_type',
+				'reviewer'
+			);
+		}
+	}
+
+	return $users;
+}
+
+
+/* =========================================================
+ * 6. GET RESIDENTS
+ * AJAX: spj26_admin_residents_data
+ * ========================================================= */
+
+add_action(
+	'wp_ajax_spj26_admin_residents_data',
+	'spj26_um_ajax_residents_data'
+);
+
+
+function spj26_um_ajax_residents_data() {
+
+	spj26_um_verify_request();
+
+	$users =
+		spj26_um_get_resident_users();
+
+	$residents = array();
+
+	foreach ( $users as $user ) {
+		$residents[] =
+			spj26_um_serialize_resident(
+				$user
+			);
+	}
+
+	wp_send_json_success(
+		array(
+			'residents' => $residents,
+		)
+	);
+}
+
+
+/* =========================================================
+ * 7. CREATE RESIDENT
+ * AJAX: spj26_admin_create_resident
+ * ========================================================= */
+
+add_action(
+	'wp_ajax_spj26_admin_create_resident',
+	'spj26_um_ajax_create_resident'
+);
+
+
+function spj26_um_ajax_create_resident() {
+
+	spj26_um_verify_request();
+
+	$nim = isset( $_POST['nim'] )
+		? sanitize_user(
+			wp_unslash(
+				$_POST['nim']
+			),
+			true
+		)
+		: '';
+
+	$name = isset( $_POST['name'] )
+		? sanitize_text_field(
+			wp_unslash(
+				$_POST['name']
+			)
+		)
+		: '';
+
+	$program = isset( $_POST['program'] )
+		? sanitize_text_field(
+			wp_unslash(
+				$_POST['program']
+			)
+		)
+		: '';
+
+	$password = isset( $_POST['password'] )
+		? (string) wp_unslash(
+			$_POST['password']
+		)
+		: '';
+
+	if (
+		$nim === ''
+		||
+		$name === ''
+		||
+		$program === ''
+		||
+		$password === ''
+	) {
+
+		wp_send_json_error(
+			array(
+				'message' => 'NIM, nama, program PPDS, dan password wajib diisi.',
+			),
+			400
+		);
+	}
+
+	if ( username_exists( $nim ) ) {
+
+		wp_send_json_error(
+			array(
+				'message' => 'NIM tersebut sudah digunakan oleh akun lain.',
+			),
+			409
+		);
+	}
+
+	if ( ! get_role( 'sipatuju_residen' ) ) {
+
+		wp_send_json_error(
+			array(
+				'message' => 'Role SIPATUJU Residen belum tersedia. Pastikan snippet 000 — 01 aktif.',
+			),
+			500
+		);
+	}
+
+	if ( strlen( $password ) < 8 ) {
+
+		wp_send_json_error(
+			array(
+				'message' => 'Password minimal 8 karakter.',
+			),
+			400
+		);
+	}
+
+	$user_id = wp_insert_user(
+		array(
+			'user_login'   => $nim,
+			'user_pass'    => $password,
+			'display_name' => $name,
+			'nickname'     => $name,
+			'role'         => 'sipatuju_residen',
+		)
+	);
+
+	if ( is_wp_error( $user_id ) ) {
+
+		wp_send_json_error(
+			array(
+				'message' => $user_id->get_error_message(),
+			),
+			400
+		);
+	}
+
+	/*
+	 * Pastikan role benar-benar tersimpan pada akun baru.
+	 */
+	$new_user =
+		new WP_User(
+			$user_id
+		);
+
+	$new_user->set_role(
+		'sipatuju_residen'
+	);
+
+	update_user_meta(
+		$user_id,
+		'spj26_account_type',
+		'residen'
+	);
+
+	update_user_meta(
+		$user_id,
+		'spj26_program_ppds',
+		$program
+	);
+
+	update_user_meta(
+		$user_id,
+		'spj26_account_active',
+		'1'
+	);
+
+	update_user_meta(
+		$user_id,
+		'spj26_created_by',
+		get_current_user_id()
+	);
+
+	update_user_meta(
+		$user_id,
+		'spj26_created_at',
+		current_time( 'mysql' )
+	);
+
+	$user = get_userdata(
+		$user_id
+	);
+
+	wp_send_json_success(
+		array(
+			'message'  => 'Akun Residen berhasil dibuat.',
+			'resident' => spj26_um_serialize_resident(
+				$user
+			),
+		)
+	);
+}
+
+
+/* =========================================================
+ * 8. TOGGLE RESIDENT
+ * AJAX: spj26_admin_toggle_resident
+ * ========================================================= */
+
+add_action(
+	'wp_ajax_spj26_admin_toggle_resident',
+	'spj26_um_ajax_toggle_resident'
+);
+
+
+function spj26_um_ajax_toggle_resident() {
+
+	spj26_um_verify_request();
+
+	$user_id = isset( $_POST['user_id'] )
+		? absint(
+			$_POST['user_id']
+		)
+		: 0;
+
+	$active = isset( $_POST['active'] )
+		? sanitize_text_field(
+			wp_unslash(
+				$_POST['active']
+			)
+		)
+		: '0';
+
+	$user = get_userdata(
+		$user_id
+	);
+
+	if (
+		! $user
+		||
+		! in_array(
+			'sipatuju_residen',
+			(array) $user->roles,
+			true
+		)
+	) {
+
+		wp_send_json_error(
+			array(
+				'message' => 'Akun Residen tidak ditemukan.',
+			),
+			404
+		);
+	}
+
+	$new_value =
+		$active === '1'
+		? '1'
+		: '0';
+
+	update_user_meta(
+		$user_id,
+		'spj26_account_active',
+		$new_value
+	);
+
+	/*
+	 * Jika dinonaktifkan, seluruh sesi WordPress akun tersebut
+	 * langsung diputus.
+	 */
+	if ( $new_value === '0' ) {
+
+		$sessions =
+			WP_Session_Tokens::get_instance(
+				$user_id
+			);
+
+		$sessions->destroy_all();
+	}
+
+	wp_send_json_success(
+		array(
+			'message' => $new_value === '1'
+				? 'Akun Residen berhasil diaktifkan.'
+				: 'Akun Residen berhasil dinonaktifkan.',
+		)
+	);
+}
+
+
+/* =========================================================
+ * 9. GET REVIEWERS
+ * AJAX: spj26_admin_reviewers_data
+ * ========================================================= */
+
+add_action(
+	'wp_ajax_spj26_admin_reviewers_data',
+	'spj26_um_ajax_reviewers_data'
+);
+
+
+function spj26_um_ajax_reviewers_data() {
+
+	spj26_um_verify_request();
+
+	$users =
+		spj26_um_get_reviewer_users();
+
+	$reviewers = array();
+
+	foreach ( $users as $user ) {
+		$reviewers[] =
+			spj26_um_serialize_reviewer(
+				$user
+			);
+	}
+
+	wp_send_json_success(
+		array(
+			'reviewers' => $reviewers,
+		)
+	);
+}
+
+
+/* =========================================================
+ * 10. CREATE REVIEWER
+ * AJAX: spj26_admin_create_reviewer
+ * ========================================================= */
+
+add_action(
+	'wp_ajax_spj26_admin_create_reviewer',
+	'spj26_um_ajax_create_reviewer'
+);
+
+
+function spj26_um_ajax_create_reviewer() {
+
+	spj26_um_verify_request();
+
+	$username = isset( $_POST['username'] )
+		? sanitize_user(
+			wp_unslash(
+				$_POST['username']
+			),
+			true
+		)
+		: '';
+
+	$name = isset( $_POST['name'] )
+		? sanitize_text_field(
+			wp_unslash(
+				$_POST['name']
+			)
+		)
+		: '';
+
+	$unit = isset( $_POST['unit'] )
+		? sanitize_text_field(
+			wp_unslash(
+				$_POST['unit']
+			)
+		)
+		: '';
+
+	$password = isset( $_POST['password'] )
+		? (string) wp_unslash(
+			$_POST['password']
+		)
+		: '';
+
+	if (
+		$username === ''
+		||
+		$name === ''
+		||
+		$password === ''
+	) {
+
+		wp_send_json_error(
+			array(
+				'message' => 'Username, nama reviewer, dan password wajib diisi.',
+			),
+			400
+		);
+	}
+
+	if ( username_exists( $username ) ) {
+
+		wp_send_json_error(
+			array(
+				'message' => 'Username reviewer tersebut sudah digunakan.',
+			),
+			409
+		);
+	}
+
+	if ( ! get_role( 'sipatuju_reviewer' ) ) {
+
+		wp_send_json_error(
+			array(
+				'message' => 'Role SIPATUJU Reviewer belum tersedia. Pastikan snippet 000 — 01 aktif.',
+			),
+			500
+		);
+	}
+
+	if ( strlen( $password ) < 8 ) {
+
+		wp_send_json_error(
+			array(
+				'message' => 'Password minimal 8 karakter.',
+			),
+			400
+		);
+	}
+
+	$user_id = wp_insert_user(
+		array(
+			'user_login'   => $username,
+			'user_pass'    => $password,
+			'display_name' => $name,
+			'nickname'     => $name,
+			'role'         => 'sipatuju_reviewer',
+		)
+	);
+
+	if ( is_wp_error( $user_id ) ) {
+
+		wp_send_json_error(
+			array(
+				'message' => $user_id->get_error_message(),
+			),
+			400
+		);
+	}
+
+	/*
+	 * Pastikan role benar-benar tersimpan pada akun baru.
+	 */
+	$new_user =
+		new WP_User(
+			$user_id
+		);
+
+	$new_user->set_role(
+		'sipatuju_reviewer'
+	);
+
+	update_user_meta(
+		$user_id,
+		'spj26_account_type',
+		'reviewer'
+	);
+
+	if ( $unit !== '' ) {
+
+		update_user_meta(
+			$user_id,
+			'spj26_reviewer_unit',
+			$unit
+		);
+	}
+
+	update_user_meta(
+		$user_id,
+		'spj26_account_active',
+		'1'
+	);
+
+	update_user_meta(
+		$user_id,
+		'spj26_created_by',
+		get_current_user_id()
+	);
+
+	update_user_meta(
+		$user_id,
+		'spj26_created_at',
+		current_time( 'mysql' )
+	);
+
+	$user = get_userdata(
+		$user_id
+	);
+
+	wp_send_json_success(
+		array(
+			'message'  => 'Akun Reviewer berhasil dibuat.',
+			'reviewer' => spj26_um_serialize_reviewer(
+				$user
+			),
+		)
+	);
+}
+
+
+/* =========================================================
+ * 11. TOGGLE REVIEWER
+ * AJAX: spj26_admin_toggle_reviewer
+ * ========================================================= */
+
+add_action(
+	'wp_ajax_spj26_admin_toggle_reviewer',
+	'spj26_um_ajax_toggle_reviewer'
+);
+
+
+function spj26_um_ajax_toggle_reviewer() {
+
+	spj26_um_verify_request();
+
+	$user_id = isset( $_POST['user_id'] )
+		? absint(
+			$_POST['user_id']
+		)
+		: 0;
+
+	$active = isset( $_POST['active'] )
+		? sanitize_text_field(
+			wp_unslash(
+				$_POST['active']
+			)
+		)
+		: '0';
+
+	$user = get_userdata(
+		$user_id
+	);
+
+	if (
+		! $user
+		||
+		! in_array(
+			'sipatuju_reviewer',
+			(array) $user->roles,
+			true
+		)
+	) {
+
+		wp_send_json_error(
+			array(
+				'message' => 'Akun Reviewer tidak ditemukan.',
+			),
+			404
+		);
+	}
+
+	$new_value =
+		$active === '1'
+		? '1'
+		: '0';
+
+	update_user_meta(
+		$user_id,
+		'spj26_account_active',
+		$new_value
+	);
+
+	if ( $new_value === '0' ) {
+
+		$sessions =
+			WP_Session_Tokens::get_instance(
+				$user_id
+			);
+
+		$sessions->destroy_all();
+	}
+
+	wp_send_json_success(
+		array(
+			'message' => $new_value === '1'
+				? 'Akun Reviewer berhasil diaktifkan.'
+				: 'Akun Reviewer berhasil dinonaktifkan.',
+		)
+	);
+}
+
+
+/* =========================================================
+ * 12. FRONTEND CONFIG
+ * ========================================================= */
+
+function spj26_um_request_path() {
+
+	if (
+		function_exists(
+			'spj26_get_request_path'
+		)
+	) {
+		return spj26_get_request_path();
+	}
+
+	$request_uri = isset( $_SERVER['REQUEST_URI'] )
+		? wp_unslash(
+			$_SERVER['REQUEST_URI']
+		)
+		: '/';
+
+	$path = wp_parse_url(
+		$request_uri,
+		PHP_URL_PATH
+	);
+
+	return '/' .
+		trim(
+			(string) $path,
+			'/'
+		) .
+		'/';
+}
+
+
+function spj26_um_print_frontend_config() {
+
+	if ( ! spj26_um_current_admin_can_manage_users() ) {
+		return;
+	}
+
+	$path =
+		spj26_um_request_path();
+
+	$ajax_url =
+		admin_url(
+			'admin-ajax.php'
+		);
+
+	$nonce =
+		wp_create_nonce(
+			'spj26_user_management_action'
+		);
+
+	$login_url =
+		function_exists(
+			'spj26_login_url'
+		)
+		? spj26_login_url()
+		: home_url(
+			'/sipatuju-login/'
+		);
+
+	/*
+	 * URL logout dikirim ke JavaScript, sehingga HTML entity
+	 * dari wp_logout_url() perlu di-decode terlebih dahulu.
+	 */
+	$logout_url =
+		html_entity_decode(
+			wp_logout_url(
+				$login_url
+			),
+			ENT_QUOTES,
+			'UTF-8'
+		);
+
+
+	/*
+	 * Page:
+	 * /admin-sipatuju/residen/
+	 */
+	if (
+		$path ===
+		'/admin-sipatuju/residen/'
+	) {
+
+		$config = array(
+			'ajaxUrl'    => $ajax_url,
+			'nonce'      => $nonce,
+			'logoutUrl'  => $logout_url,
+			'portalPath' => $path,
+		);
+
+		echo '<script>';
+		echo 'window.spj26ResidentAdminConfig = ';
+		echo wp_json_encode( $config );
+		echo ';</script>';
+	}
+
+
+	/*
+	 * Page:
+	 * /admin-sipatuju/reviewer/
+	 */
+	if (
+		$path ===
+		'/admin-sipatuju/reviewer/'
+	) {
+
+		$config = array(
+			'ajaxUrl'    => $ajax_url,
+			'nonce'      => $nonce,
+			'logoutUrl'  => $logout_url,
+			'portalPath' => $path,
+		);
+
+		echo '<script>';
+		echo 'window.spj26ReviewerAdminConfig = ';
+		echo wp_json_encode( $config );
+		echo ';</script>';
+	}
+
+}
+
+add_action(
+	'wp_footer',
+	'spj26_um_print_frontend_config',
+	99
+);
+
+/* =========================================================
+ * 13. RESIDEN PORTAL CONFIG
+ *
+ * Page:
+ * /residen-sipatuju/
+ *
+ * Menyediakan identitas akun Residen yang sedang login
+ * untuk Dashboard Residen. Data berasal dari WordPress.
+ * ========================================================= */
+
+function spj26_um_print_resident_portal_config() {
+
+	if ( ! is_user_logged_in() ) {
+		return;
+	}
+
+	$user =
+		wp_get_current_user();
+
+	if (
+		! in_array(
+			'sipatuju_residen',
+			(array) $user->roles,
+			true
+		)
+	) {
+		return;
+	}
+
+	if (
+		function_exists(
+			'spj26_is_account_active'
+		)
+		&&
+		! spj26_is_account_active(
+			$user
+		)
+	) {
+		return;
+	}
+
+	$path =
+		spj26_um_request_path();
+
+	if (
+		$path !==
+		'/residen-sipatuju/'
+	) {
+		return;
+	}
+
+	$login_url =
+		function_exists(
+			'spj26_login_url'
+		)
+		? spj26_login_url()
+		: home_url(
+			'/sipatuju-login/'
+		);
+
+	$logout_url =
+		html_entity_decode(
+			wp_logout_url(
+				$login_url
+			),
+			ENT_QUOTES,
+			'UTF-8'
+		);
+
+	/*
+	 * Default false.
+	 * Submission System nanti dapat mengubah nilai ini
+	 * melalui filter spj26_resident_can_resubmit.
+	 */
+	$can_resubmit =
+		(bool) apply_filters(
+			'spj26_resident_can_resubmit',
+			false,
+			$user->ID
+		);
+
+	$config = array(
+		'name' => (string) $user->display_name,
+		'nim'  => (string) $user->user_login,
+		'program' => (string) get_user_meta(
+			$user->ID,
+			'spj26_program_ppds',
+			true
+		),
+		'canResubmit' => $can_resubmit,
+		'logoutUrl'   => $logout_url,
+		'portalPath'  => $path,
+	);
+
+	echo '<script>';
+	echo 'window.spj26ResidentPortalConfig = ';
+	echo wp_json_encode(
+		$config
+	);
+	echo ';</script>';
+}
+
+add_action(
+	'wp_footer',
+	'spj26_um_print_resident_portal_config',
+	98
+);
+
