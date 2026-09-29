@@ -1,3 +1,13 @@
 {
-  "/login/page": "app/login/page.js"
+  "/login/page": "app/login/page.js",
+  "/residen/pengajuan-baru/page": "app/residen/pengajuan-baru/page.js",
+  "/reviewer/page": "app/reviewer/page.js",
+  "/residen/hasil/page": "app/residen/hasil/page.js",
+  "/admin/page": "app/admin/page.js",
+  "/reviewer/pemeriksaan-jurnal/[id]/page": "app/reviewer/pemeriksaan-jurnal/[id]/page.js",
+  "/reviewer/riwayat-pemeriksaan/page": "app/reviewer/riwayat-pemeriksaan/page.js",
+  "/admin/residen/page": "app/admin/residen/page.js",
+  "/admin/reviewer/page": "app/admin/reviewer/page.js",
+  "/reviewer/pengajuan-tersedia/page": "app/reviewer/pengajuan-tersedia/page.js",
+  "/admin/jurnal-predator/page": "app/admin/jurnal-predator/page.js"
 }
