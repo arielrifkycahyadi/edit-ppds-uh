@@ -1,20 +1,3 @@
 {
-  "/_not-found/page": "app/_not-found/page.js",
-  "/api/guard/pre-check/route": "app/api/guard/pre-check/route.js",
-  "/api/submissions/[id]/route": "app/api/submissions/[id]/route.js",
-  "/login/page": "app/login/page.js",
-  "/api/submissions/route": "app/api/submissions/route.js",
-  "/page": "app/page.js",
-  "/admin/jurnal-predator/page": "app/admin/jurnal-predator/page.js",
-  "/residen/hasil/page": "app/residen/hasil/page.js",
-  "/residen/page": "app/residen/page.js",
-  "/admin/page": "app/admin/page.js",
-  "/reviewer/page": "app/reviewer/page.js",
-  "/admin/reviewer/page": "app/admin/reviewer/page.js",
-  "/admin/residen/page": "app/admin/residen/page.js",
-  "/reviewer/pemeriksaan-jurnal/[id]/page": "app/reviewer/pemeriksaan-jurnal/[id]/page.js",
-  "/residen/pengajuan-baru/page": "app/residen/pengajuan-baru/page.js",
-  "/reviewer/pemeriksaan-saya/page": "app/reviewer/pemeriksaan-saya/page.js",
-  "/reviewer/riwayat-pemeriksaan/page": "app/reviewer/riwayat-pemeriksaan/page.js",
-  "/reviewer/pengajuan-tersedia/page": "app/reviewer/pengajuan-tersedia/page.js"
+  "/login/page": "app/login/page.js"
 }
