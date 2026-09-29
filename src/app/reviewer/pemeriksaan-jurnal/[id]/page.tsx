@@ -108,12 +108,13 @@ export default function PemeriksaanJurnalDetailPage() {
     );
   };
 
-  const handleSubmitReview = (e: React.FormEvent) => {
+  const handleSubmitReview = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!currentUser) return;
     setSubmitting(true);
 
-    setTimeout(() => {
-      DataService.submitReview(submission.id, currentUser.id, decisions);
+    try {
+      await DataService.submitReview(submission.id, currentUser.id, decisions);
 
       confetti({
         particleCount: 100,
@@ -123,7 +124,10 @@ export default function PemeriksaanJurnalDetailPage() {
 
       setSubmitting(false);
       router.push('/reviewer/riwayat-pemeriksaan');
-    }, 600);
+    } catch (err) {
+      console.error(err);
+      setSubmitting(false);
+    }
   };
 
   return (

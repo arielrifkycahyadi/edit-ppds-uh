@@ -1,4 +1,4 @@
-// File: D:\0. SECOND BRAIN - PARA Ariel\PROJECT - Para (Upaya Jangka Pendek)\Codingan\PPDS UNHAS NEW VER TEAM\Edit PPDS\src\app\reviewer\layout.tsx
+// File: D:\0. SECOND BRAIN - PARA Ariel\PROJECT - Para (Upaya Jangka Pendek)\Codingan\PPDS UNHAS NEW VER TEAM\Edit PPDS\edit-ppds-uh\src\app\reviewer\layout.tsx
 import * as entry from '../../../../src/app/reviewer/layout.js'
 import type { ResolvingMetadata, ResolvingViewport } from 'next/dist/lib/metadata/types/metadata-interface.js'
 

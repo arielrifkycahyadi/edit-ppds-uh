@@ -75,12 +75,13 @@ export default function BuatPengajuanResidenPage() {
     setCurrentStep(4);
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!currentUser) return;
     setSubmitting(true);
 
-    setTimeout(() => {
-      const newSub = DataService.createSubmission({
+    try {
+      await DataService.createSubmission({
         resident_id: currentUser.id,
         resident_name: currentUser.full_name,
         resident_nim: currentUser.nim_nip,
@@ -101,7 +102,10 @@ export default function BuatPengajuanResidenPage() {
 
       setSubmitting(false);
       router.push('/residen/hasil');
-    }, 600);
+    } catch (err) {
+      console.error(err);
+      setSubmitting(false);
+    }
   };
 
   const steps = [

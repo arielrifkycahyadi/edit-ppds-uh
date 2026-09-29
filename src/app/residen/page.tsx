@@ -22,16 +22,25 @@ import {
 } from 'lucide-react';
 
 export default function ResidenDashboardPage() {
-  const [currentUser, setCurrentUser] = useState(DataService.getCurrentUser());
+  const [currentUser, setCurrentUser] = useState<any>(null);
   const [submissions, setSubmissions] = useState<Submission[]>([]);
 
   useEffect(() => {
     const user = DataService.getCurrentUser();
     setCurrentUser(user);
-    const allSubs = DataService.getSubmissions();
-    const mySubs = allSubs.filter((s) => s.resident_id === user.id || s.resident_nim === user.nim_nip);
-    setSubmissions(mySubs);
+    if (user) {
+      const allSubs = DataService.getSubmissions();
+      const mySubs = allSubs.filter((s) => s.resident_id === user.id || s.resident_nim === user.nim_nip);
+      setSubmissions(mySubs);
+
+      DataService.syncSubmissionsFromSupabase().then((synced) => {
+        const updatedMySubs = synced.filter((s) => s.resident_id === user.id || s.resident_nim === user.nim_nip);
+        setSubmissions(updatedMySubs);
+      });
+    }
   }, []);
+
+  if (!currentUser) return null;
 
   const totalMySubs = submissions.length;
   const inReviewCount = submissions.filter((s) => s.status === 'in_review' || s.status === 'waiting').length;

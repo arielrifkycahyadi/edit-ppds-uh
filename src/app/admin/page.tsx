@@ -37,9 +37,20 @@ export default function AdminDashboardPage() {
   const [selectedReviewerId, setSelectedReviewerId] = useState('');
   const [deletingSubmission, setDeletingSubmission] = useState<Submission | null>(null);
 
-  const loadData = () => {
+  const loadData = async () => {
     setSubmissions(DataService.getSubmissions());
     setReviewers(DataService.getUsers('reviewer').filter(r => r.is_active));
+
+    try {
+      const [subs, users] = await Promise.all([
+        DataService.syncSubmissionsFromSupabase(),
+        DataService.syncUsersFromSupabase()
+      ]);
+      setSubmissions(subs);
+      setReviewers(users.filter(r => r.role === 'reviewer' && r.is_active));
+    } catch (e) {
+      console.warn('Sync data error:', e);
+    }
   };
 
   useEffect(() => {
@@ -65,19 +76,19 @@ export default function AdminDashboardPage() {
   const inReviewCount = submissions.filter((s) => s.status === 'in_review').length;
   const completedCount = submissions.filter((s) => s.status === 'completed').length;
 
-  const handleAssignReviewer = (e: React.FormEvent) => {
+  const handleAssignReviewer = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!assigningSubmission || !selectedReviewerId) return;
 
-    DataService.assignReviewer(assigningSubmission.id, selectedReviewerId, 'admin_assigned');
+    await DataService.assignReviewer(assigningSubmission.id, selectedReviewerId, 'admin_assigned');
     setAssigningSubmission(null);
     setSelectedReviewerId('');
     loadData();
   };
 
-  const handleDelete = () => {
+  const handleDelete = async () => {
     if (!deletingSubmission) return;
-    DataService.deleteSubmission(deletingSubmission.id);
+    await DataService.deleteSubmission(deletingSubmission.id);
     setDeletingSubmission(null);
     loadData();
   };

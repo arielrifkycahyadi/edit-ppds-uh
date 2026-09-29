@@ -1,4 +1,4 @@
-// File: D:\0. SECOND BRAIN - PARA Ariel\PROJECT - Para (Upaya Jangka Pendek)\Codingan\PPDS UNHAS NEW VER TEAM\Edit PPDS\src\app\api\submissions\[id]\route.ts
+// File: D:\0. SECOND BRAIN - PARA Ariel\PROJECT - Para (Upaya Jangka Pendek)\Codingan\PPDS UNHAS NEW VER TEAM\Edit PPDS\edit-ppds-uh\src\app\api\submissions\[id]\route.ts
 import * as entry from '../../../../../../src/app/api/submissions/[id]/route.js'
 import type { NextRequest } from 'next/server.js'
 

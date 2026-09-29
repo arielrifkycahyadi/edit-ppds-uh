@@ -39,8 +39,14 @@ export default function AdminResidenPage() {
     is_active: true,
   });
 
-  const loadResidents = () => {
+  const loadResidents = async () => {
     setResidents(DataService.getUsers('residen'));
+    try {
+      const users = await DataService.syncUsersFromSupabase();
+      setResidents(users.filter((u) => u.role === 'residen'));
+    } catch (e) {
+      console.warn('Sync residents error:', e);
+    }
   };
 
   useEffect(() => {
@@ -73,9 +79,9 @@ export default function AdminResidenPage() {
     setIsAddEditOpen(true);
   };
 
-  const handleSave = (e: React.FormEvent) => {
+  const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
-    DataService.saveUser({
+    await DataService.saveUser({
       id: editingUser ? editingUser.id : undefined,
       role: 'residen',
       nim_nip: formData.nim_nip,
@@ -89,14 +95,14 @@ export default function AdminResidenPage() {
     loadResidents();
   };
 
-  const handleToggleStatus = (id: string) => {
-    DataService.toggleUserActive(id);
+  const handleToggleStatus = async (id: string) => {
+    await DataService.toggleUserActive(id);
     loadResidents();
   };
 
-  const handleDelete = (id: string) => {
+  const handleDelete = async (id: string) => {
     if (confirm('Apakah Anda yakin ingin menghapus data akun Residen ini?')) {
-      DataService.deleteUser(id);
+      await DataService.deleteUser(id);
       loadResidents();
     }
   };

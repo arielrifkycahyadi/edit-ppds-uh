@@ -36,8 +36,14 @@ export default function AdminReviewerPage() {
     is_active: true,
   });
 
-  const loadReviewers = () => {
+  const loadReviewers = async () => {
     setReviewers(DataService.getUsers('reviewer'));
+    try {
+      const users = await DataService.syncUsersFromSupabase();
+      setReviewers(users.filter((u) => u.role === 'reviewer'));
+    } catch (e) {
+      console.warn('Sync reviewers error:', e);
+    }
   };
 
   useEffect(() => {
@@ -70,9 +76,9 @@ export default function AdminReviewerPage() {
     setIsAddEditOpen(true);
   };
 
-  const handleSave = (e: React.FormEvent) => {
+  const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
-    DataService.saveUser({
+    await DataService.saveUser({
       id: editingUser ? editingUser.id : undefined,
       role: 'reviewer',
       nim_nip: formData.nim_nip,
@@ -86,14 +92,14 @@ export default function AdminReviewerPage() {
     loadReviewers();
   };
 
-  const handleToggleStatus = (id: string) => {
-    DataService.toggleUserActive(id);
+  const handleToggleStatus = async (id: string) => {
+    await DataService.toggleUserActive(id);
     loadReviewers();
   };
 
-  const handleDelete = (id: string) => {
+  const handleDelete = async (id: string) => {
     if (confirm('Apakah Anda yakin ingin menghapus akun Reviewer ini?')) {
-      DataService.deleteUser(id);
+      await DataService.deleteUser(id);
       loadReviewers();
     }
   };

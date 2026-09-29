@@ -26,19 +26,27 @@ export default function ReviewerPengajuanTersediaPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedSub, setSelectedSub] = useState<Submission | null>(null);
 
-  const loadData = () => {
+  const loadData = async () => {
     const user = DataService.getCurrentUser();
     setCurrentUser(user);
     const all = DataService.getSubmissions();
     setSubmissions(all.filter((s) => s.status === 'waiting'));
+
+    try {
+      const synced = await DataService.syncSubmissionsFromSupabase();
+      setSubmissions(synced.filter((s) => s.status === 'waiting'));
+    } catch (e) {
+      console.warn('Sync submissions error:', e);
+    }
   };
 
   useEffect(() => {
     loadData();
   }, []);
 
-  const handleClaim = (subId: string) => {
-    const success = DataService.assignReviewer(subId, currentUser.id, 'self_claimed');
+  const handleClaim = async (subId: string) => {
+    if (!currentUser) return;
+    const success = await DataService.assignReviewer(subId, currentUser.id, 'self_claimed');
     if (success) {
       router.push(`/reviewer/pemeriksaan-jurnal/${subId}`);
     }

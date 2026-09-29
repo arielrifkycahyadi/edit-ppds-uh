@@ -24,7 +24,7 @@ import {
 } from 'lucide-react';
 
 export default function ResidenHasilPemeriksaanPage() {
-  const [currentUser, setCurrentUser] = useState(DataService.getCurrentUser());
+  const [currentUser, setCurrentUser] = useState<any>(null);
   const [submissions, setSubmissions] = useState<Submission[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
@@ -36,9 +36,16 @@ export default function ResidenHasilPemeriksaanPage() {
   useEffect(() => {
     const user = DataService.getCurrentUser();
     setCurrentUser(user);
-    const all = DataService.getSubmissions();
-    const my = all.filter((s) => s.resident_id === user.id || s.resident_nim === user.nim_nip);
-    setSubmissions(my);
+    if (user) {
+      const all = DataService.getSubmissions();
+      const my = all.filter((s) => s.resident_id === user.id || s.resident_nim === user.nim_nip);
+      setSubmissions(my);
+
+      DataService.syncSubmissionsFromSupabase().then((synced) => {
+        const updatedMy = synced.filter((s) => s.resident_id === user.id || s.resident_nim === user.nim_nip);
+        setSubmissions(updatedMy);
+      });
+    }
   }, []);
 
   const handleDownloadPDF = async (sub: Submission) => {

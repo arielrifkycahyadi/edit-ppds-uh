@@ -1,4 +1,4 @@
-// File: D:\0. SECOND BRAIN - PARA Ariel\PROJECT - Para (Upaya Jangka Pendek)\Codingan\PPDS UNHAS NEW VER TEAM\Edit PPDS\src\app\api\guard\pre-check\route.ts
+// File: D:\0. SECOND BRAIN - PARA Ariel\PROJECT - Para (Upaya Jangka Pendek)\Codingan\PPDS UNHAS NEW VER TEAM\Edit PPDS\edit-ppds-uh\src\app\api\guard\pre-check\route.ts
 import * as entry from '../../../../../../src/app/api/guard/pre-check/route.js'
 import type { NextRequest } from 'next/server.js'
 

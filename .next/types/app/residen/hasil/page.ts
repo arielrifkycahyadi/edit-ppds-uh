@@ -1,4 +1,4 @@
-// File: D:\0. SECOND BRAIN - PARA Ariel\PROJECT - Para (Upaya Jangka Pendek)\Codingan\PPDS UNHAS NEW VER TEAM\Edit PPDS\src\app\residen\hasil\page.tsx
+// File: D:\0. SECOND BRAIN - PARA Ariel\PROJECT - Para (Upaya Jangka Pendek)\Codingan\PPDS UNHAS NEW VER TEAM\Edit PPDS\edit-ppds-uh\src\app\residen\hasil\page.tsx
 import * as entry from '../../../../../src/app/residen/hasil/page.js'
 import type { ResolvingMetadata, ResolvingViewport } from 'next/dist/lib/metadata/types/metadata-interface.js'
 

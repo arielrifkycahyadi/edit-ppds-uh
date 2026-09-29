@@ -33,17 +33,23 @@ export default function AdminJurnalPredatorPage() {
     source_reference: '',
   });
 
-  const loadJournals = () => {
+  const loadJournals = async () => {
     setJournals(DataService.getRestrictedJournals());
+    try {
+      const list = await DataService.syncRestrictedJournalsFromSupabase();
+      setJournals(list);
+    } catch (e) {
+      console.warn('Sync restricted journals error:', e);
+    }
   };
 
   useEffect(() => {
     loadJournals();
   }, []);
 
-  const handleAddJournal = (e: React.FormEvent) => {
+  const handleAddJournal = async (e: React.FormEvent) => {
     e.preventDefault();
-    DataService.addRestrictedJournal(
+    await DataService.addRestrictedJournal(
       formData.journal_name,
       formData.issn,
       formData.source,
@@ -59,8 +65,8 @@ export default function AdminJurnalPredatorPage() {
     loadJournals();
   };
 
-  const handleToggleStatus = (id: string) => {
-    DataService.toggleRestrictedJournal(id);
+  const handleToggleStatus = async (id: string) => {
+    await DataService.toggleRestrictedJournal(id);
     loadJournals();
   };
 

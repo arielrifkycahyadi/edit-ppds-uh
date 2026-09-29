@@ -21,14 +21,20 @@ import {
 } from 'lucide-react';
 
 export default function ReviewerDashboardPage() {
-  const [currentUser, setCurrentUser] = useState(DataService.getCurrentUser());
+  const [currentUser, setCurrentUser] = useState<any>(null);
   const [submissions, setSubmissions] = useState<Submission[]>([]);
 
   useEffect(() => {
     const user = DataService.getCurrentUser();
     setCurrentUser(user);
     setSubmissions(DataService.getSubmissions());
+
+    DataService.syncSubmissionsFromSupabase().then((subs) => {
+      setSubmissions(subs);
+    });
   }, []);
+
+  if (!currentUser) return null;
 
   const availableCount = submissions.filter((s) => s.status === 'waiting').length;
   const myActiveReviews = submissions.filter(

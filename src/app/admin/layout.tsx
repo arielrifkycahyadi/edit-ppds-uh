@@ -1,13 +1,40 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { Sidebar } from '@/components/layout/Sidebar';
+import { DataService } from '@/lib/data-service';
 
 export default function AdminLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const router = useRouter();
+  const [authorized, setAuthorized] = useState(false);
+
+  useEffect(() => {
+    const user = DataService.getCurrentUser();
+    if (!user) {
+      router.replace('/login');
+      return;
+    }
+    if (user.role !== 'admin') {
+      if (user.role === 'reviewer') router.replace('/reviewer');
+      else router.replace('/residen');
+      return;
+    }
+    setAuthorized(true);
+  }, [router]);
+
+  if (!authorized) {
+    return (
+      <div className="flex h-screen w-screen items-center justify-center bg-[#5c0000] text-white">
+        <div className="w-8 h-8 border-3 border-amber-300 border-t-transparent rounded-full animate-spin" />
+      </div>
+    );
+  }
+
   return (
     <div className="flex h-screen w-screen overflow-hidden bg-[#f3f5f8]">
       <Sidebar role="admin" />

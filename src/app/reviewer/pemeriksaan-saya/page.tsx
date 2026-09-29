@@ -18,17 +18,25 @@ import {
 } from 'lucide-react';
 
 export default function ReviewerPemeriksaanSayaPage() {
-  const [currentUser, setCurrentUser] = useState(DataService.getCurrentUser());
+  const [currentUser, setCurrentUser] = useState<any>(null);
   const [submissions, setSubmissions] = useState<Submission[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
 
   useEffect(() => {
     const user = DataService.getCurrentUser();
     setCurrentUser(user);
-    const all = DataService.getSubmissions();
-    setSubmissions(
-      all.filter((s) => s.status === 'in_review' && s.assigned_reviewer_id === user.id)
-    );
+    if (user) {
+      const all = DataService.getSubmissions();
+      setSubmissions(
+        all.filter((s) => s.status === 'in_review' && s.assigned_reviewer_id === user.id)
+      );
+
+      DataService.syncSubmissionsFromSupabase().then((synced) => {
+        setSubmissions(
+          synced.filter((s) => s.status === 'in_review' && s.assigned_reviewer_id === user.id)
+        );
+      });
+    }
   }, []);
 
   const filtered = submissions.filter((s) => {
